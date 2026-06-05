@@ -7,6 +7,7 @@ import { signOut } from '@/lib/actions/auth'
 const links = [
   { href: '/admin/dashboard', label: 'Dashboard' },
   { href: '/admin/schedule', label: 'Schedule' },
+  { href: '/admin/templates', label: 'Templates' },
   { href: '/admin/employees', label: 'Employees' },
   { href: '/admin/time-entries', label: 'Time entries' },
 ]

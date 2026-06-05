@@ -42,7 +42,7 @@ export default function ClockInButton({ openEntry }: Props) {
       setElapsed(formatDuration(calcDurationMinutes(openEntry!.clock_in, null)))
     }
     tick()
-    const id = setInterval(tick, 30000)
+    const id = setInterval(tick, 60000)
     return () => clearInterval(id)
   }, [openEntry])
 

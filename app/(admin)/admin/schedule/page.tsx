@@ -1,13 +1,13 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { format, eachDayOfInterval, isSameDay } from 'date-fns'
-// format used for day headings (server-safe); shift times use ClientTime
 import { getWeekRange } from '@/lib/utils'
 import Card from '@/components/ui/Card'
 import Link from 'next/link'
 import AdminWeekNav from '@/components/admin/AdminWeekNav'
 import NewShiftButton from '@/components/admin/NewShiftButton'
 import ClientTime from '@/components/ui/ClientTime'
+import ApplyTemplateButton from '@/components/admin/ApplyTemplateButton'
 
 export default async function AdminSchedulePage({
   searchParams,
@@ -22,7 +22,7 @@ export default async function AdminSchedulePage({
   const weekOffset = parseInt(params.week ?? '0', 10)
   const { start, end } = getWeekRange(weekOffset)
 
-  const [{ data: shifts }, { data: employees }] = await Promise.all([
+  const [{ data: shifts }, { data: employees }, { data: templates }] = await Promise.all([
     supabase
       .from('shifts')
       .select('id, start_time, end_time, notes, employee_id, employees(name)')
@@ -34,6 +34,9 @@ export default async function AdminSchedulePage({
       .select('id, name')
       .eq('active', true)
       .order('name'),
+    supabase
+      .from('schedule_templates')
+      .select('employee_id, day_of_week, start_time, end_time, notes'),
   ])
 
   const weekDays = eachDayOfInterval({ start, end })
@@ -46,10 +49,21 @@ export default async function AdminSchedulePage({
           <NewShiftButton employees={employees ?? []} weekStart={start.toISOString()} />
         </div>
         <div className="flex items-center justify-between">
-          <p className="text-sm text-stone-400">
-            {format(start, 'MMM d')} – {format(end, 'MMM d')}
-          </p>
-          <AdminWeekNav weekOffset={weekOffset} />
+          <div className="flex items-center gap-3">
+            <p className="text-sm text-stone-400">
+              {format(start, 'MMM d')} – {format(end, 'MMM d')}
+            </p>
+            <Link href="/admin/templates" className="text-xs text-stone-400 hover:text-stone-600 transition-colors">
+              Templates →
+            </Link>
+          </div>
+          <div className="flex items-center gap-1">
+            <ApplyTemplateButton
+              templates={templates ?? []}
+              weekStart={start}
+            />
+            <AdminWeekNav weekOffset={weekOffset} />
+          </div>
         </div>
       </div>
 
