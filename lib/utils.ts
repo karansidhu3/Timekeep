@@ -1,0 +1,25 @@
+import { format, startOfWeek, endOfWeek, addWeeks, differenceInMinutes } from 'date-fns'
+
+export function formatShiftTime(start: string, end: string): string {
+  const s = new Date(start)
+  const e = new Date(end)
+  return `${format(s, 'EEE MMM d')} · ${format(s, 'h:mm a')} – ${format(e, 'h:mm a')}`
+}
+
+export function formatDuration(minutes: number): string {
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  return `${h}h ${m}m`
+}
+
+export function getWeekRange(weekOffset = 0): { start: Date; end: Date } {
+  const base = addWeeks(new Date(), weekOffset)
+  return {
+    start: startOfWeek(base, { weekStartsOn: 1 }),
+    end: endOfWeek(base, { weekStartsOn: 1 }),
+  }
+}
+
+export function calcDurationMinutes(clockIn: string, clockOut: string | null): number {
+  return differenceInMinutes(clockOut ? new Date(clockOut) : new Date(), new Date(clockIn))
+}
