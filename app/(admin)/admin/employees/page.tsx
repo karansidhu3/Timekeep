@@ -35,7 +35,7 @@ export default async function EmployeesPage() {
             </div>
             <Link
               href={`/admin/employees/${emp.id}`}
-              className="text-xs text-stone-400 hover:text-stone-600 px-2 py-1 rounded hover:bg-stone-100"
+              className="text-sm text-stone-400 hover:text-stone-700 px-3 py-3 rounded-xl hover:bg-stone-50 transition-colors min-h-[44px] flex items-center"
             >
               Edit
             </Link>

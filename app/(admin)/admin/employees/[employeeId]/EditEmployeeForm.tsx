@@ -62,14 +62,24 @@ export default function EditEmployeeForm({ employee }: { employee: Employee }) {
       </div>
       <Input label="New PIN (leave blank to keep current)" name="pin" type="text" inputMode="numeric" maxLength={4} placeholder="••••" />
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <div className="flex gap-2 pt-2">
-        <Button type="button" variant="ghost" onClick={() => router.back()}>Cancel</Button>
-        <Button type="submit" disabled={isPending} className="flex-1">
-          {isPending ? 'Saving…' : 'Save changes'}
-        </Button>
+      <div className="space-y-2 pt-2">
+        <div className="flex gap-2">
+          <Button type="button" variant="secondary" className="flex-1" onClick={() => router.back()}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isPending} className="flex-1">
+            {isPending ? 'Saving…' : 'Save changes'}
+          </Button>
+        </div>
         {employee.active && (
-          <Button type="button" variant="danger" onClick={handleDeactivate} disabled={isDeactivating}>
-            Deactivate
+          <Button
+            type="button"
+            variant="danger"
+            onClick={handleDeactivate}
+            disabled={isDeactivating}
+            className="w-full"
+          >
+            {isDeactivating ? 'Deactivating…' : 'Deactivate employee'}
           </Button>
         )}
       </div>

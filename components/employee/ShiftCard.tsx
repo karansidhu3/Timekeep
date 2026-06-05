@@ -1,7 +1,8 @@
 'use client'
 
+import { format } from 'date-fns'
 import Card from '@/components/ui/Card'
-import { formatShiftTime, formatDuration, calcDurationMinutes } from '@/lib/utils'
+import { formatDuration, calcDurationMinutes } from '@/lib/utils'
 
 interface Shift {
   id: string
@@ -14,20 +15,23 @@ export default function ShiftCard({ shift }: { shift: Shift | null }) {
   if (!shift) {
     return (
       <Card className="p-5">
-        <p className="text-stone-500 text-sm">No shift scheduled for today.</p>
+        <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-1">Today&apos;s shift</p>
+        <p className="text-stone-400 text-sm">No shift scheduled.</p>
       </Card>
     )
   }
 
+  const startTime = format(new Date(shift.start_time), 'h:mm a')
+  const endTime = format(new Date(shift.end_time), 'h:mm a')
   const duration = calcDurationMinutes(shift.start_time, shift.end_time)
 
   return (
     <Card className="p-5">
-      <p className="text-xs font-medium text-stone-400 uppercase tracking-wide mb-2">Today&apos;s shift</p>
-      <p className="text-stone-900 font-semibold text-lg leading-snug">
-        {formatShiftTime(shift.start_time, shift.end_time)}
+      <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-2">Today&apos;s shift</p>
+      <p className="text-stone-900 font-semibold text-2xl leading-none tracking-tight">
+        {startTime} – {endTime}
       </p>
-      <p className="text-sm text-stone-500 mt-1">{formatDuration(duration)}</p>
+      <p className="text-sm text-stone-400 mt-2">{formatDuration(duration)}</p>
       {shift.notes && (
         <p className="text-sm text-stone-500 mt-3 pt-3 border-t border-stone-100">{shift.notes}</p>
       )}

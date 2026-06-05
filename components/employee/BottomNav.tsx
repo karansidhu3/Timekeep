@@ -31,33 +31,36 @@ export default function BottomNav() {
   const [isPending, startTransition] = useTransition()
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 bg-white border-t border-stone-200 flex safe-area-inset-bottom">
-      {links.map(({ href, label, icon }) => {
-        const active = pathname === href
-        return (
-          <Link
-            key={href}
-            href={href}
-            className={`flex-1 flex flex-col items-center gap-1 py-3 transition-colors ${
-              active ? 'text-stone-900' : 'text-stone-400'
-            }`}
-          >
-            {icon(active)}
-            <span className="text-xs font-medium">{label}</span>
-          </Link>
-        )
-      })}
+    <nav className="fixed bottom-0 inset-x-0 bg-white border-t border-stone-100">
+      {/* items sit above the home indicator */}
+      <div className="flex" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+        {links.map(({ href, label, icon }) => {
+          const active = pathname === href
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={`flex-1 flex flex-col items-center gap-1 py-3 transition-colors ${
+                active ? 'text-stone-900' : 'text-stone-400'
+              }`}
+            >
+              {icon(active)}
+              <span className="text-xs font-medium">{label}</span>
+            </Link>
+          )
+        })}
 
-      <button
-        onClick={() => startTransition(() => signOut())}
-        disabled={isPending}
-        className="flex-1 flex flex-col items-center gap-1 py-3 text-stone-400 hover:text-stone-600 transition-colors disabled:opacity-50"
-      >
-        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
-        </svg>
-        <span className="text-xs font-medium">{isPending ? '…' : 'Sign out'}</span>
-      </button>
+        <button
+          onClick={() => startTransition(() => signOut())}
+          disabled={isPending}
+          className="flex-1 flex flex-col items-center gap-1 py-3 text-stone-400 transition-colors disabled:opacity-50"
+        >
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+          </svg>
+          <span className="text-xs font-medium">{isPending ? '…' : 'Sign out'}</span>
+        </button>
+      </div>
     </nav>
   )
 }

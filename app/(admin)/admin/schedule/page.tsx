@@ -40,16 +40,16 @@ export default async function AdminSchedulePage({
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-10">
-      <div className="flex flex-wrap items-start justify-between gap-3 mb-8">
-        <div>
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-1">
           <h1 className="text-2xl font-semibold text-stone-900">Schedule</h1>
-          <p className="text-sm text-stone-500 mt-1">
-            {format(start, 'MMM d')} – {format(end, 'MMM d, yyyy')}
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <AdminWeekNav weekOffset={weekOffset} />
           <NewShiftButton employees={employees ?? []} weekStart={start.toISOString()} />
+        </div>
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-stone-400">
+            {format(start, 'MMM d')} – {format(end, 'MMM d')}
+          </p>
+          <AdminWeekNav weekOffset={weekOffset} />
         </div>
       </div>
 
@@ -80,7 +80,7 @@ export default async function AdminSchedulePage({
                       </div>
                       <Link
                         href={`/admin/schedule/${shift.id}`}
-                        className="text-xs text-stone-400 hover:text-stone-600 px-2 py-1 rounded hover:bg-stone-100"
+                        className="text-sm text-stone-400 hover:text-stone-700 px-3 py-3 rounded-xl hover:bg-stone-50 transition-colors min-h-[44px] flex items-center"
                       >
                         Edit
                       </Link>

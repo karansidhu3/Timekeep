@@ -24,9 +24,16 @@ export default function EditShiftForm({ shift, employees }: { shift: Shift; empl
 
   const startDate = new Date(shift.start_time)
   const endDate = new Date(shift.end_time)
-  const defaultDate = startDate.toISOString().split('T')[0]
-  const defaultStart = startDate.toTimeString().slice(0, 5)
-  const defaultEnd = endDate.toTimeString().slice(0, 5)
+  // Use local date/time — toISOString() returns UTC which is wrong in non-UTC zones
+  function toLocalDate(d: Date) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  }
+  function toLocalTime(d: Date) {
+    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+  }
+  const defaultDate = toLocalDate(startDate)
+  const defaultStart = toLocalTime(startDate)
+  const defaultEnd = toLocalTime(endDate)
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -83,13 +90,17 @@ export default function EditShiftForm({ shift, employees }: { shift: Shift; empl
       </div>
       <Input label="Notes (optional)" name="notes" type="text" defaultValue={shift.notes ?? ''} />
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <div className="flex gap-2 pt-2">
-        <Button type="button" variant="ghost" onClick={() => router.back()}>Cancel</Button>
-        <Button type="submit" disabled={isPending} className="flex-1">
-          {isPending ? 'Saving…' : 'Save changes'}
-        </Button>
-        <Button type="button" variant="danger" onClick={handleDelete} disabled={isDeleting}>
-          {isDeleting ? '…' : 'Delete'}
+      <div className="space-y-2 pt-2">
+        <div className="flex gap-2">
+          <Button type="button" variant="secondary" className="flex-1" onClick={() => router.back()}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isPending} className="flex-1">
+            {isPending ? 'Saving…' : 'Save changes'}
+          </Button>
+        </div>
+        <Button type="button" variant="danger" onClick={handleDelete} disabled={isDeleting} className="w-full">
+          {isDeleting ? 'Deleting…' : 'Delete shift'}
         </Button>
       </div>
     </form>

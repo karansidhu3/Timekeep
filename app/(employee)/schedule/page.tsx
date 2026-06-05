@@ -29,13 +29,13 @@ export default async function SchedulePage({
   const weekDays = eachDayOfInterval({ start, end })
 
   return (
-    <div className="max-w-lg mx-auto px-4 pt-12 pb-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="max-w-lg mx-auto px-4 pt-10 pb-6">
+      <div className="flex items-center justify-between mb-1">
         <h1 className="text-xl font-semibold text-stone-900">Schedule</h1>
         <WeekNav weekOffset={weekOffset} />
       </div>
-      <p className="text-sm text-stone-500 mb-4">
-        {format(start, 'MMM d')} – {format(end, 'MMM d, yyyy')}
+      <p className="text-sm text-stone-400 mb-6">
+        {format(start, 'MMM d')} – {format(end, 'MMM d')}
       </p>
       <WeeklySchedule shifts={shifts ?? []} weekDays={weekDays} />
     </div>
