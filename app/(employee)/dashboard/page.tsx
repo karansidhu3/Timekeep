@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation'
 import { startOfDay, endOfDay } from 'date-fns'
 import ShiftCard from '@/components/employee/ShiftCard'
 import ClockInButton from '@/components/employee/ClockInButton'
-import { signOut } from '@/lib/actions/auth'
 
 export default async function DashboardPage() {
   const supabase = await createServerClient()
@@ -44,21 +43,14 @@ export default async function DashboardPage() {
             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          {employee?.role === 'admin' && (
-            <a
-              href="/admin/dashboard"
-              className="text-xs font-medium text-stone-500 hover:text-stone-700 px-3 py-1.5 rounded-lg hover:bg-stone-100"
-            >
-              Admin
-            </a>
-          )}
-          <form action={signOut}>
-            <button className="text-xs font-medium text-stone-400 hover:text-stone-600 px-3 py-1.5 rounded-lg hover:bg-stone-100">
-              Sign out
-            </button>
-          </form>
-        </div>
+        {employee?.role === 'admin' && (
+          <a
+            href="/admin/dashboard"
+            className="text-xs font-medium text-stone-500 hover:text-stone-700 px-3 py-1.5 rounded-lg hover:bg-stone-100"
+          >
+            Admin →
+          </a>
+        )}
       </div>
 
       <div className="space-y-4">
