@@ -1,6 +1,5 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { startOfDay, endOfDay } from 'date-fns'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Link from 'next/link'
@@ -13,13 +12,16 @@ export default async function AdminDashboardPage() {
   if (!user) redirect('/login')
 
   const now = new Date()
+  // ±14h UTC window — same reasoning as employee dashboard
+  const windowStart = new Date(now.getTime() - 14 * 60 * 60 * 1000)
+  const windowEnd   = new Date(now.getTime() + 14 * 60 * 60 * 1000)
 
   const [{ data: todayShifts }, { data: openEntries }, { data: employees }] = await Promise.all([
     supabase
       .from('shifts')
       .select('id, start_time, end_time, notes, employees(name)')
-      .gte('start_time', startOfDay(now).toISOString())
-      .lte('start_time', endOfDay(now).toISOString())
+      .gte('start_time', windowStart.toISOString())
+      .lte('start_time', windowEnd.toISOString())
       .order('start_time'),
     supabase
       .from('time_entries')

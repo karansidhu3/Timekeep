@@ -8,6 +8,15 @@ export async function clockIn() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Not authenticated' }
 
+  // Belt-and-suspenders: verify the employee is still active even if a stale
+  // session somehow bypassed the proxy check.
+  const { data: emp } = await supabase
+    .from('employees')
+    .select('active')
+    .eq('id', user.id)
+    .single()
+  if (!emp?.active) return { success: false, error: 'Your account has been deactivated.' }
+
   const { data: existing } = await supabase
     .from('time_entries')
     .select('id')
@@ -36,12 +45,19 @@ export async function clockOut(entryId: string, customClockOut?: string) {
 
   const clockOutTime = customClockOut ?? new Date().toISOString()
 
-  const { error } = await supabase
+  // .select() after .update() returns the modified rows — if empty, no row matched
+  // (entry already closed, deleted, or wrong id). Without this check the action
+  // would return success on a 0-row update, leaving the UI in a confused state.
+  const { data: updated, error } = await supabase
     .from('time_entries')
     .update({ clock_out: clockOutTime })
     .eq('id', entryId)
+    .select('id')
 
   if (error) return { success: false, error: error.message }
+  if (!updated || updated.length === 0) {
+    return { success: false, error: 'Could not clock out — entry not found or already closed.' }
+  }
 
   revalidatePath('/dashboard')
   return { success: true }

@@ -1,6 +1,5 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { startOfDay, endOfDay } from 'date-fns'
 import ShiftCard from '@/components/employee/ShiftCard'
 import ClockInButton from '@/components/employee/ClockInButton'
 import ClientDate from '@/components/ui/ClientDate'
@@ -11,15 +10,19 @@ export default async function DashboardPage() {
   if (!user) redirect('/login')
 
   const now = new Date()
+  // ±14h UTC window covers all timezones. ShiftCard (client component) filters
+  // down to the shift whose start_time falls on the browser's local today.
+  const windowStart = new Date(now.getTime() - 14 * 60 * 60 * 1000)
+  const windowEnd   = new Date(now.getTime() + 14 * 60 * 60 * 1000)
 
-  const [{ data: shift }, { data: openEntry }, { data: employee }] = await Promise.all([
+  const [{ data: shifts }, { data: openEntry }, { data: employee }] = await Promise.all([
     supabase
       .from('shifts')
-      .select('*')
+      .select('id, start_time, end_time, notes')
       .eq('employee_id', user.id)
-      .gte('start_time', startOfDay(now).toISOString())
-      .lte('start_time', endOfDay(now).toISOString())
-      .maybeSingle(),
+      .gte('start_time', windowStart.toISOString())
+      .lte('start_time', windowEnd.toISOString())
+      .order('start_time'),
     supabase
       .from('time_entries')
       .select('id, clock_in')
@@ -53,7 +56,7 @@ export default async function DashboardPage() {
       </div>
 
       <div className="space-y-3">
-        <ShiftCard shift={shift} />
+        <ShiftCard shifts={shifts ?? []} />
         <ClockInButton openEntry={openEntry} />
       </div>
     </div>

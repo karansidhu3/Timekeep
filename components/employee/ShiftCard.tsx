@@ -11,7 +11,14 @@ interface Shift {
   notes: string | null
 }
 
-export default function ShiftCard({ shift }: { shift: Shift | null }) {
+// Accepts a window of nearby shifts and picks the one that falls on local today.
+// The server query uses a ±14h UTC window to avoid timezone-boundary bugs where
+// startOfDay/endOfDay on the UTC server misses shifts during late-afternoon/evening
+// hours in negative-offset timezones (PST, EST, etc.).
+export default function ShiftCard({ shifts }: { shifts: Shift[] }) {
+  const todayStr = new Date().toDateString()
+  const shift = shifts.find(s => new Date(s.start_time).toDateString() === todayStr) ?? null
+
   if (!shift) {
     return (
       <Card className="p-5">

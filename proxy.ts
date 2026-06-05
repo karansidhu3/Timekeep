@@ -24,18 +24,26 @@ export async function proxy(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
+  // Unauthenticated — send to login (except when already there)
   if (!user && pathname !== '/login') {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  if (user && pathname.startsWith('/admin')) {
+  // Authenticated — check active status and role in a single query
+  if (user && pathname !== '/login') {
     const { data: employee } = await supabase
       .from('employees')
-      .select('role')
+      .select('role, active')
       .eq('id', user.id)
       .single()
 
-    if (employee?.role !== 'admin') {
+    // Deactivated account — redirect to login (session expires naturally)
+    if (!employee?.active) {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+
+    // Employee trying to reach admin routes
+    if (pathname.startsWith('/admin') && employee?.role !== 'admin') {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
   }
