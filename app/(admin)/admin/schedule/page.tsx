@@ -1,12 +1,13 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { format, eachDayOfInterval, isSameDay } from 'date-fns'
+// format used for day headings (server-safe); shift times use ClientTime
 import { getWeekRange } from '@/lib/utils'
 import Card from '@/components/ui/Card'
-import Badge from '@/components/ui/Badge'
 import Link from 'next/link'
 import AdminWeekNav from '@/components/admin/AdminWeekNav'
 import NewShiftButton from '@/components/admin/NewShiftButton'
+import ClientTime from '@/components/ui/ClientTime'
 
 export default async function AdminSchedulePage({
   searchParams,
@@ -73,7 +74,7 @@ export default async function AdminSchedulePage({
                           {(shift.employees as unknown as { name: string } | null)?.name}
                         </p>
                         <p className="text-xs text-stone-500 mt-0.5">
-                          {format(new Date(shift.start_time), 'h:mm a')} – {format(new Date(shift.end_time), 'h:mm a')}
+                          <ClientTime iso={shift.start_time} /> – <ClientTime iso={shift.end_time} />
                         </p>
                         {shift.notes && <p className="text-xs text-stone-400 mt-1">{shift.notes}</p>}
                       </div>

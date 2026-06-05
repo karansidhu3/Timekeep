@@ -1,6 +1,8 @@
+'use client'
+
 import { format, isSameDay } from 'date-fns'
 import Card from '@/components/ui/Card'
-import { formatShiftTime, formatDuration, calcDurationMinutes } from '@/lib/utils'
+import { formatDuration, calcDurationMinutes } from '@/lib/utils'
 
 interface Shift {
   id: string

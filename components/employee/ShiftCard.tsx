@@ -1,3 +1,5 @@
+'use client'
+
 import Card from '@/components/ui/Card'
 import { formatShiftTime, formatDuration, calcDurationMinutes } from '@/lib/utils'
 

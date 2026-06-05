@@ -3,8 +3,8 @@ import { redirect } from 'next/navigation'
 import { startOfDay, endOfDay } from 'date-fns'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
-import { formatShiftTime } from '@/lib/utils'
 import Link from 'next/link'
+import ClientTime from '@/components/ui/ClientTime'
 
 export default async function AdminDashboardPage() {
   const supabase = await createServerClient()
@@ -79,7 +79,7 @@ export default async function AdminDashboardPage() {
                     {(shift.employees as unknown as { name: string } | null)?.name}
                   </p>
                   <p className="text-xs text-stone-500 mt-0.5">
-                    {formatShiftTime(shift.start_time, shift.end_time)}
+                    <ClientTime iso={shift.start_time} fmt="EEE MMM d · h:mm a" /> – <ClientTime iso={shift.end_time} fmt="h:mm a" />
                   </p>
                 </div>
                 {isClockedIn && <Badge variant="success">Clocked in</Badge>}

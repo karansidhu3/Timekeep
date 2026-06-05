@@ -1,9 +1,10 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { format } from 'date-fns'
+
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import { formatDuration, calcDurationMinutes } from '@/lib/utils'
+import ClientTime from '@/components/ui/ClientTime'
 
 export default async function TimeEntriesPage() {
   const supabase = await createServerClient()
@@ -45,11 +46,11 @@ export default async function TimeEntriesPage() {
                       {(entry.employees as unknown as { name: string } | null)?.name}
                     </td>
                     <td className="px-4 py-3 text-stone-600">
-                      {format(new Date(entry.clock_in), 'MMM d, h:mm a')}
+                      <ClientTime iso={entry.clock_in} fmt="MMM d, h:mm a" />
                     </td>
                     <td className="px-4 py-3 text-stone-600">
                       {entry.clock_out
-                        ? format(new Date(entry.clock_out), 'MMM d, h:mm a')
+                        ? <ClientTime iso={entry.clock_out} fmt="MMM d, h:mm a" />
                         : <Badge variant="success">Active</Badge>}
                     </td>
                     <td className="px-4 py-3 text-stone-500">

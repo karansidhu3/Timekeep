@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { createShift } from '@/lib/actions/shifts'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export default function NewShiftButton({ employees, weekStart }: Props) {
+  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -50,6 +52,7 @@ export default function NewShiftButton({ employees, weekStart }: Props) {
       })
       if (result.success) {
         setOpen(false)
+        router.refresh()
       } else {
         setError(result.error ?? 'Failed to create shift')
       }

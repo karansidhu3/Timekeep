@@ -6,16 +6,16 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants = {
-  primary: 'bg-stone-900 text-white hover:bg-stone-800 active:bg-stone-950',
-  secondary: 'bg-stone-100 text-stone-800 hover:bg-stone-200 active:bg-stone-300',
-  danger: 'bg-red-600 text-white hover:bg-red-500 active:bg-red-700',
-  ghost: 'text-stone-600 hover:bg-stone-100 active:bg-stone-200',
+  primary: 'bg-stone-900 text-white active:bg-stone-950 hover:bg-stone-800',
+  secondary: 'bg-stone-100 text-stone-800 active:bg-stone-300 hover:bg-stone-200',
+  danger: 'bg-red-600 text-white active:bg-red-700 hover:bg-red-500',
+  ghost: 'text-stone-600 active:bg-stone-200 hover:bg-stone-100',
 }
 
 const sizes = {
-  sm: 'px-3 py-1.5 text-sm',
-  md: 'px-4 py-2.5 text-sm',
-  lg: 'px-5 py-3.5 text-base',
+  sm: 'px-3 py-2.5 text-sm min-h-[44px]',
+  md: 'px-4 py-2.5 text-sm min-h-[44px]',
+  lg: 'px-5 py-3.5 text-base min-h-[44px]',
 }
 
 export default function Button({
