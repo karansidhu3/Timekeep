@@ -95,8 +95,9 @@ function TimeEntryModal({ mode, employees, entry, onClose }: ModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-sm p-6 pb-8 sm:pb-6">
+    <div className="animate-fade-in fixed inset-0 bg-black/30 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+      <div className="animate-sheet-up sm:animate-float-in bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-sm p-6 pb-[max(2rem,env(safe-area-inset-bottom))] sm:pb-6">
+        <div className="w-10 h-1 bg-stone-200 rounded-full mx-auto mb-5 sm:hidden" />
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-base font-semibold text-stone-900">
             {mode === 'add' ? 'Add time entry' : 'Edit time entry'}
@@ -115,7 +116,7 @@ function TimeEntryModal({ mode, employees, entry, onClose }: ModalProps) {
               <select
                 name="employeeId"
                 required
-                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-stone-400"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-stone-400 min-h-[44px]"
               >
                 <option value="">Select employee…</option>
                 {employees.map(e => (

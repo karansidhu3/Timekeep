@@ -82,7 +82,7 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
     <Card className="p-6">
       <button
         onClick={() => { setSelectedId(null); setPin(''); setError(null) }}
-        className="text-sm text-stone-400 mb-6 flex items-center gap-1.5"
+        className="text-sm text-stone-400 mb-6 flex items-center gap-1.5 hover:text-stone-700 transition-colors duration-150"
       >
         <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -120,9 +120,10 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
             disabled={isPending}
             className={`
               py-5 rounded-xl text-xl font-medium text-stone-900 select-none
-              active:bg-stone-100 transition-colors
+              active:bg-stone-100 active:scale-[0.93]
+              transition-[colors,transform] duration-100
               ${d === '' ? 'pointer-events-none' : ''}
-              disabled:opacity-40
+              disabled:opacity-40 disabled:active:scale-100
             `}
           >
             {d === 'del' ? (

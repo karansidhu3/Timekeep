@@ -50,7 +50,7 @@ export default function WeeklySchedule({ shifts, weekDays }: Props) {
             {/* Shift content */}
             <div className="flex-1 min-w-0 pt-0.5">
               {!hasShifts ? (
-                <p className={`text-sm ${today ? 'text-stone-400' : 'text-stone-300'}`}>Off</p>
+                <p className="text-sm text-stone-400">Off</p>
               ) : (
                 dayShifts.map(shift => (
                   <div key={shift.id} className="mb-2 last:mb-0">

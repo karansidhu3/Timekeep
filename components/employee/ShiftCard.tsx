@@ -34,7 +34,7 @@ export default function ShiftCard({ shifts }: { shifts: Shift[] }) {
 
   return (
     <Card className="p-5">
-      <p className="text-[11px] font-semibold text-stone-400 uppercase tracking-widest mb-3">Today&apos;s shift</p>
+      <p className="text-xs font-semibold text-stone-400 uppercase tracking-widest mb-3">Today&apos;s shift</p>
       <p className="text-stone-900 font-semibold text-3xl leading-none tracking-tight">
         {startTime}
       </p>

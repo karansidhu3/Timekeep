@@ -78,7 +78,7 @@ export default function EditShiftForm({ shift, employees }: { shift: Shift; empl
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-medium text-stone-700">Employee</label>
-        <select name="employeeId" defaultValue={shift.employee_id} className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-stone-400" required>
+        <select name="employeeId" defaultValue={shift.employee_id} className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-stone-400 min-h-[44px]" required>
           {employees.map(e => (
             <option key={e.id} value={e.id}>{e.name}</option>
           ))}

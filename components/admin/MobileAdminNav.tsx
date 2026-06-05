@@ -57,7 +57,7 @@ export default function MobileAdminNav() {
             <Link
               key={href}
               href={href}
-              className={`flex-1 flex flex-col items-center gap-1 py-3 transition-colors ${
+              className={`flex-1 flex flex-col items-center gap-1 py-3 transition-colors duration-150 ${
                 active ? 'text-stone-900' : 'text-stone-400'
               }`}
             >

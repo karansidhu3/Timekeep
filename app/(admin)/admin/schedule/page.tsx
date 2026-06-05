@@ -78,7 +78,7 @@ export default async function AdminSchedulePage({
                 {format(day, 'EEEE, MMM d')}{isToday && ' · Today'}
               </p>
               {dayShifts.length === 0 ? (
-                <p className="text-sm text-stone-300 pl-1 mb-4">No shifts</p>
+                <p className="text-sm text-stone-400 pl-1 mb-4">No shifts</p>
               ) : (
                 <div className="space-y-2 mb-4">
                   {dayShifts.map(shift => (

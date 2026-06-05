@@ -37,14 +37,15 @@ export default function NewEmployeeButton() {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-sm p-6 pb-8 sm:pb-6">
+    <div className="animate-fade-in fixed inset-0 bg-black/30 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+      <div className="animate-sheet-up sm:animate-float-in bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-sm p-6 pb-[max(2rem,env(safe-area-inset-bottom))] sm:pb-6">
+        <div className="w-10 h-1 bg-stone-200 rounded-full mx-auto mb-5 sm:hidden" />
         <h2 className="text-base font-semibold text-stone-900 mb-5">New employee</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input label="Full name" name="name" type="text" placeholder="Jane Smith" required />
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-stone-700">Role</label>
-            <select name="role" className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-stone-400">
+            <select name="role" className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-stone-400 min-h-[44px]">
               <option value="employee">Employee</option>
               <option value="admin">Admin</option>
             </select>
