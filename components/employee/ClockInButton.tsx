@@ -4,6 +4,7 @@ import { useState, useTransition, useEffect } from 'react'
 import { format } from 'date-fns'
 import { clockIn, clockOut } from '@/lib/actions/time-entries'
 import Button from '@/components/ui/Button'
+import TimeSelect from '@/components/ui/TimeSelect'
 import { calcDurationMinutes, formatDuration } from '@/lib/utils'
 
 interface TimeEntry {
@@ -103,13 +104,22 @@ export default function ClockInButton({ openEntry }: Props) {
           <label className="text-sm font-medium text-stone-700">
             What time did you leave on {format(new Date(openEntry.clock_in), 'MMM d')}?
           </label>
-          <input
-            type="time"
+          <select
             value={fixTime}
             onChange={e => setFixTime(e.target.value)}
             className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-white
-              focus:outline-none focus:ring-2 focus:ring-stone-400 min-h-[44px]"
-          />
+              text-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-400 min-h-[44px]"
+          >
+            <option value="">Select time…</option>
+            {Array.from({ length: 96 }, (_, i) => {
+              const h = Math.floor(i / 4)
+              const m = (i % 4) * 15
+              const value = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`
+              const h12  = h % 12 || 12
+              const ampm = h >= 12 ? 'PM' : 'AM'
+              return <option key={value} value={value}>{h12}:{String(m).padStart(2,'0')} {ampm}</option>
+            })}
+          </select>
         </div>
 
         <Button

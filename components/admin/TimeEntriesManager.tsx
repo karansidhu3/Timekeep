@@ -7,6 +7,7 @@ import { adminCreateTimeEntry, adminUpdateTimeEntry } from '@/lib/actions/time-e
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Badge from '@/components/ui/Badge'
+import TimeSelect from '@/components/ui/TimeSelect'
 import Card from '@/components/ui/Card'
 import { formatDuration, calcDurationMinutes } from '@/lib/utils'
 
@@ -129,9 +130,10 @@ function TimeEntryModal({ mode, employees, entry, onClose }: ModalProps) {
           <Input label="Date" name="date" type="date" defaultValue={defaultDate} required />
 
           <div className="grid grid-cols-2 gap-3">
-            <Input label="Clock in" name="startTime" type="time" defaultValue={defaultStart} required />
-            <Input label="Clock out" name="endTime" type="time" defaultValue={defaultEnd} />
+            <TimeSelect label="Clock in"  name="startTime" defaultValue={defaultStart} required />
+            <TimeSelect label="Clock out" name="endTime"   defaultValue={defaultEnd} />
           </div>
+          <p className="text-xs text-stone-400 -mt-1">Leave clock-out blank if still active.</p>
 
           <Input
             label="Notes (optional)"

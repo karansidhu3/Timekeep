@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createShift } from '@/lib/actions/shifts'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import TimeSelect from '@/components/ui/TimeSelect'
 
 interface Employee { id: string; name: string }
 
@@ -87,8 +88,8 @@ export default function NewShiftButton({ employees, weekStart }: Props) {
           </div>
           <Input label="Date" name="date" type="date" defaultValue={defaultDate} required />
           <div className="grid grid-cols-2 gap-3">
-            <Input label="Start time" name="startTime" type="time" required />
-            <Input label="End time" name="endTime" type="time" required />
+            <TimeSelect label="Start time" name="startTime" required />
+            <TimeSelect label="End time"   name="endTime"   required />
           </div>
           <Input label="Notes (optional)" name="notes" type="text" placeholder="e.g. Opening shift" />
           {error && <p className="text-sm text-red-600">{error}</p>}

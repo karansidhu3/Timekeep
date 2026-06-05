@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { updateShift, deleteShift } from '@/lib/actions/shifts'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import TimeSelect from '@/components/ui/TimeSelect'
 
 interface Shift {
   id: string
@@ -85,8 +86,8 @@ export default function EditShiftForm({ shift, employees }: { shift: Shift; empl
       </div>
       <Input label="Date" name="date" type="date" defaultValue={defaultDate} required />
       <div className="grid grid-cols-2 gap-3">
-        <Input label="Start time" name="startTime" type="time" defaultValue={defaultStart} required />
-        <Input label="End time" name="endTime" type="time" defaultValue={defaultEnd} required />
+        <TimeSelect label="Start time" name="startTime" defaultValue={defaultStart} required />
+        <TimeSelect label="End time"   name="endTime"   defaultValue={defaultEnd}   required />
       </div>
       <Input label="Notes (optional)" name="notes" type="text" defaultValue={shift.notes ?? ''} />
       {error && <p className="text-sm text-red-600">{error}</p>}

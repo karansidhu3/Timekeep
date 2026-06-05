@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { upsertTemplate, deleteTemplate } from '@/lib/actions/templates'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
+import TimeSelect from '@/components/ui/TimeSelect'
 
 export interface TemplateRow {
   id: string
@@ -88,7 +89,10 @@ function DayModal({ state, onClose }: { state: EditState; onClose: () => void })
 
   return (
     <div className="fixed inset-0 bg-black/30 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-sm p-6 pb-8 sm:pb-6">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-sm p-6 pb-[max(2rem,env(safe-area-inset-bottom))] sm:pb-6">
+        {/* drag handle — mobile only */}
+        <div className="w-10 h-1 bg-stone-200 rounded-full mx-auto mb-5 sm:hidden" />
+
         <div className="flex items-center justify-between mb-5">
           <div>
             <p className="text-base font-semibold text-stone-900">
@@ -105,26 +109,8 @@ function DayModal({ state, onClose }: { state: EditState; onClose: () => void })
 
         <form onSubmit={handleSave} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-stone-700">Start</label>
-              <input
-                type="time"
-                name="startTime"
-                defaultValue={state.startTime}
-                required
-                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-stone-400 min-h-[44px]"
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-stone-700">End</label>
-              <input
-                type="time"
-                name="endTime"
-                defaultValue={state.endTime}
-                required
-                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-stone-400 min-h-[44px]"
-              />
-            </div>
+            <TimeSelect label="Start" name="startTime" defaultValue={state.startTime} required />
+            <TimeSelect label="End"   name="endTime"   defaultValue={state.endTime}   required />
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -134,7 +120,7 @@ function DayModal({ state, onClose }: { state: EditState; onClose: () => void })
               name="notes"
               defaultValue={state.notes}
               placeholder="e.g. Opening shift"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-stone-400"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-stone-400 min-h-[44px]"
             />
           </div>
 
