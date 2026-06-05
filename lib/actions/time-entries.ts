@@ -8,6 +8,15 @@ export async function clockIn() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Not authenticated' }
 
+  const { data: existing } = await supabase
+    .from('time_entries')
+    .select('id')
+    .eq('employee_id', user.id)
+    .is('clock_out', null)
+    .maybeSingle()
+
+  if (existing) return { success: false, error: 'You are already clocked in.' }
+
   const { error } = await supabase.from('time_entries').insert({
     employee_id: user.id,
     clock_in: new Date().toISOString(),

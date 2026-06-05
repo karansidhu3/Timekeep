@@ -21,7 +21,8 @@ export default async function TimeEntriesPage() {
       <h1 className="text-2xl font-semibold text-stone-900 mb-8">Time entries</h1>
 
       <Card className="overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full text-sm min-w-[480px]">
           <thead>
             <tr className="border-b border-stone-100">
               <th className="text-left text-xs font-medium text-stone-400 uppercase tracking-wide px-4 py-3">Employee</th>
@@ -60,6 +61,7 @@ export default async function TimeEntriesPage() {
             )}
           </tbody>
         </table>
+        </div>
       </Card>
     </div>
   )

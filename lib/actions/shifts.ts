@@ -8,18 +8,19 @@ interface ShiftInput {
   startTime: string
   endTime: string
   notes?: string
-  createdBy: string
 }
 
 export async function createShift(data: ShiftInput) {
   const supabase = await createServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Not authenticated' }
 
   const { error } = await supabase.from('shifts').insert({
     employee_id: data.employeeId,
     start_time: data.startTime,
     end_time: data.endTime,
     notes: data.notes ?? null,
-    created_by: data.createdBy,
+    created_by: user.id,
   })
 
   if (error) return { success: false, error: error.message }

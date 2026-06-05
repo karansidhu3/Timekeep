@@ -39,7 +39,7 @@ export default async function AdminSchedulePage({
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-10">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-8">
         <div>
           <h1 className="text-2xl font-semibold text-stone-900">Schedule</h1>
           <p className="text-sm text-stone-500 mt-1">

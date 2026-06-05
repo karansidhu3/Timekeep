@@ -39,17 +39,17 @@ export default async function AdminDashboardPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-8">
-        <Card className="p-5">
-          <p className="text-xs font-medium text-stone-400 uppercase tracking-wide">Active employees</p>
+      <div className="grid grid-cols-3 gap-3 mb-8">
+        <Card className="p-4">
+          <p className="text-xs font-medium text-stone-400 uppercase tracking-wide">Staff</p>
           <p className="text-3xl font-semibold text-stone-900 mt-1">{employees?.length ?? 0}</p>
         </Card>
-        <Card className="p-5">
-          <p className="text-xs font-medium text-stone-400 uppercase tracking-wide">Shifts today</p>
+        <Card className="p-4">
+          <p className="text-xs font-medium text-stone-400 uppercase tracking-wide">Shifts</p>
           <p className="text-3xl font-semibold text-stone-900 mt-1">{todayShifts?.length ?? 0}</p>
         </Card>
-        <Card className="p-5">
-          <p className="text-xs font-medium text-stone-400 uppercase tracking-wide">Clocked in</p>
+        <Card className="p-4">
+          <p className="text-xs font-medium text-stone-400 uppercase tracking-wide">Active</p>
           <p className="text-3xl font-semibold text-stone-900 mt-1">{openEntries?.length ?? 0}</p>
         </Card>
       </div>

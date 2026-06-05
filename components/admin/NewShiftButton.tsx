@@ -47,7 +47,6 @@ export default function NewShiftButton({ employees, weekStart }: Props) {
         startTime: startDateTime,
         endTime: endDateTime,
         notes: notes || undefined,
-        createdBy: employeeId,
       })
       if (result.success) {
         setOpen(false)
