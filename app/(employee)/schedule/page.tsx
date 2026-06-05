@@ -29,7 +29,7 @@ export default async function SchedulePage({
   const weekDays = eachDayOfInterval({ start, end })
 
   return (
-    <div className="max-w-lg mx-auto px-4 pt-10 pb-6">
+    <div className="max-w-lg mx-auto px-4 pt-page pb-6">
       <div className="flex items-center justify-between mb-1">
         <h1 className="text-xl font-semibold text-stone-900">Schedule</h1>
         <WeekNav weekOffset={weekOffset} />

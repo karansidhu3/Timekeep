@@ -61,18 +61,20 @@ export default function NewShiftButton({ employees, weekStart }: Props) {
 
   if (!open) {
     return (
-      <Button onClick={() => setOpen(true)} size="sm">
+      <Button onClick={() => setOpen(true)} size="sm" variant="secondary">
         + New shift
       </Button>
     )
   }
 
-  const defaultDate = new Date(weekStart).toISOString().split('T')[0]
+  // Use local date to avoid UTC-offset mismatch
+  const _d = new Date(weekStart)
+  const defaultDate = `${_d.getFullYear()}-${String(_d.getMonth() + 1).padStart(2, '0')}-${String(_d.getDate()).padStart(2, '0')}`
 
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
-        <h2 className="text-lg font-semibold text-stone-900 mb-4">New shift</h2>
+    <div className="fixed inset-0 bg-black/30 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-sm p-6 pb-8 sm:pb-6">
+        <h2 className="text-base font-semibold text-stone-900 mb-5">New shift</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-stone-700">Employee</label>

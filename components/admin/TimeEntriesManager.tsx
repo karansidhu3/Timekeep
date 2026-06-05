@@ -24,7 +24,7 @@ export interface EmployeeOption {
   name: string
 }
 
-// ── local helpers ─────────────────────────────────────────────────────────────
+// ── helpers ───────────────────────────────────────────────────────────────────
 
 function toLocalDate(iso: string) {
   const d = new Date(iso)
@@ -94,11 +94,18 @@ function TimeEntryModal({ mode, employees, entry, onClose }: ModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
-        <h2 className="text-lg font-semibold text-stone-900 mb-4">
-          {mode === 'add' ? 'Add time entry' : 'Edit time entry'}
-        </h2>
+    <div className="fixed inset-0 bg-black/30 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-sm p-6 pb-8 sm:pb-6">
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-base font-semibold text-stone-900">
+            {mode === 'add' ? 'Add time entry' : 'Edit time entry'}
+          </h2>
+          <button onClick={onClose} className="text-stone-400 hover:text-stone-600 p-1 rounded-lg hover:bg-stone-100">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === 'add' ? (
@@ -116,7 +123,7 @@ function TimeEntryModal({ mode, employees, entry, onClose }: ModalProps) {
               </select>
             </div>
           ) : (
-            <p className="text-sm font-medium text-stone-700">{entry!.employee_name}</p>
+            <p className="text-sm font-medium text-stone-700 -mb-1">{entry!.employee_name}</p>
           )}
 
           <Input label="Date" name="date" type="date" defaultValue={defaultDate} required />
@@ -125,8 +132,6 @@ function TimeEntryModal({ mode, employees, entry, onClose }: ModalProps) {
             <Input label="Clock in" name="startTime" type="time" defaultValue={defaultStart} required />
             <Input label="Clock out" name="endTime" type="time" defaultValue={defaultEnd} />
           </div>
-
-          <p className="text-xs text-stone-400 -mt-1">Leave clock-out blank if still active.</p>
 
           <Input
             label="Notes (optional)"
@@ -165,14 +170,52 @@ export default function TimeEntriesManager({ entries, employees }: Props) {
 
   return (
     <>
-      {/* Add entry button */}
+      {/* Header action */}
       <div className="flex justify-end mb-4">
-        <Button size="sm" onClick={() => setAddOpen(true)}>+ Add entry</Button>
+        <Button size="sm" variant="secondary" onClick={() => setAddOpen(true)}>+ Add entry</Button>
       </div>
 
-      <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm min-w-[520px]">
+      {/* ── Mobile: card list ─────────────────────────────────────── */}
+      <div className="md:hidden">
+        <Card className="overflow-hidden divide-y divide-stone-50">
+          {entries.length === 0 ? (
+            <p className="px-4 py-8 text-stone-400 text-sm text-center">No time entries yet.</p>
+          ) : (
+            entries.map(entry => {
+              const duration = calcDurationMinutes(entry.clock_in, entry.clock_out)
+              const isActive = !entry.clock_out
+              return (
+                <div key={entry.id} className={`px-4 py-3.5 ${isActive ? 'bg-green-50/60' : ''}`}>
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm font-medium text-stone-900">{entry.employee_name}</p>
+                    <button
+                      onClick={() => setEditEntry(entry)}
+                      className="text-xs text-stone-400 hover:text-stone-700 px-2.5 py-1.5 rounded-lg hover:bg-stone-100 transition-colors shrink-0 -mr-1"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                  <p className="text-xs text-stone-500 mt-1">
+                    {format(new Date(entry.clock_in), 'MMM d · h:mm a')}
+                    {' '}
+                    <span className="text-stone-300">→</span>
+                    {' '}
+                    {entry.clock_out
+                      ? format(new Date(entry.clock_out), 'h:mm a')
+                      : <Badge variant="success">Active</Badge>}
+                  </p>
+                  <p className="text-xs text-stone-400 mt-0.5">{formatDuration(duration)}</p>
+                </div>
+              )
+            })
+          )}
+        </Card>
+      </div>
+
+      {/* ── Desktop: table ────────────────────────────────────────── */}
+      <div className="hidden md:block">
+        <Card className="overflow-hidden">
+          <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-stone-100">
                 <th className="text-left text-xs font-medium text-stone-400 uppercase tracking-wide px-4 py-3">Employee</th>
@@ -217,8 +260,8 @@ export default function TimeEntriesManager({ entries, employees }: Props) {
               )}
             </tbody>
           </table>
-        </div>
-      </Card>
+        </Card>
+      </div>
 
       {/* Modals */}
       {addOpen && (

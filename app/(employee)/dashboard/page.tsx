@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { startOfDay, endOfDay } from 'date-fns'
 import ShiftCard from '@/components/employee/ShiftCard'
 import ClockInButton from '@/components/employee/ClockInButton'
+import ClientDate from '@/components/ui/ClientDate'
 
 export default async function DashboardPage() {
   const supabase = await createServerClient()
@@ -33,15 +34,13 @@ export default async function DashboardPage() {
   ])
 
   return (
-    <div className="max-w-lg mx-auto px-4 pt-12 pb-6">
-      <div className="flex items-center justify-between mb-8">
+    <div className="max-w-lg mx-auto px-4 pt-page pb-6">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-xl font-semibold text-stone-900">
             Hi, {employee?.name?.split(' ')[0]}
           </h1>
-          <p className="text-sm text-stone-500">
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-          </p>
+          <p className="text-sm text-stone-400"><ClientDate /></p>
         </div>
         {employee?.role === 'admin' && (
           <a
@@ -53,7 +52,7 @@ export default async function DashboardPage() {
         )}
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         <ShiftCard shift={shift} />
         <ClockInButton openEntry={openEntry} />
       </div>

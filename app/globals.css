@@ -31,3 +31,14 @@ textarea {
 @media (min-width: 768px) {
   .pb-nav { padding-bottom: 0; }
 }
+
+/* Safe-area-aware page top padding — use on every page container */
+.pt-page {
+  padding-top: max(2.5rem, calc(env(safe-area-inset-top, 0px) + 1.5rem));
+}
+
+/* Smooth momentum scroll on iOS */
+html {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}

@@ -27,11 +27,14 @@ export default function ShiftCard({ shift }: { shift: Shift | null }) {
 
   return (
     <Card className="p-5">
-      <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-2">Today&apos;s shift</p>
-      <p className="text-stone-900 font-semibold text-2xl leading-none tracking-tight">
-        {startTime} – {endTime}
+      <p className="text-[11px] font-semibold text-stone-400 uppercase tracking-widest mb-3">Today&apos;s shift</p>
+      <p className="text-stone-900 font-semibold text-3xl leading-none tracking-tight">
+        {startTime}
       </p>
-      <p className="text-sm text-stone-400 mt-2">{formatDuration(duration)}</p>
+      <p className="text-stone-400 font-medium text-xl leading-none tracking-tight mt-1.5">
+        until {endTime}
+      </p>
+      <p className="text-sm text-stone-400 mt-3">{formatDuration(duration)}</p>
       {shift.notes && (
         <p className="text-sm text-stone-500 mt-3 pt-3 border-t border-stone-100">{shift.notes}</p>
       )}

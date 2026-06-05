@@ -17,7 +17,7 @@ export default async function EditEmployeePage({ params }: { params: Promise<{ e
   if (!employee) notFound()
 
   return (
-    <div className="max-w-lg mx-auto px-6 py-10">
+    <div className="max-w-lg mx-auto px-6 pb-10 pt-page">
       <h1 className="text-2xl font-semibold text-stone-900 mb-8">Edit employee</h1>
       <EditEmployeeForm employee={employee} />
     </div>

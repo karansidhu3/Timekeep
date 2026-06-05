@@ -17,7 +17,7 @@ export default async function EmployeesPage() {
     .order('name')
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-10">
+    <div className="max-w-3xl mx-auto px-6 pb-10 pt-page">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-semibold text-stone-900">Employees</h1>
         <NewEmployeeButton />

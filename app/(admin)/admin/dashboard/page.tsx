@@ -5,6 +5,7 @@ import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Link from 'next/link'
 import ClientTime from '@/components/ui/ClientTime'
+import ClientDate from '@/components/ui/ClientDate'
 
 export default async function AdminDashboardPage() {
   const supabase = await createServerClient()
@@ -31,12 +32,10 @@ export default async function AdminDashboardPage() {
   ])
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-10">
+    <div className="max-w-3xl mx-auto px-6 pb-10 pt-page">
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-stone-900">Dashboard</h1>
-        <p className="text-stone-500 text-sm mt-1">
-          {now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-        </p>
+        <p className="text-stone-500 text-sm mt-1"><ClientDate /></p>
       </div>
 
       <div className="grid grid-cols-3 gap-3 mb-8">

@@ -56,13 +56,10 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
   if (!selectedId) {
     return (
       <Card className="overflow-hidden">
-        <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider px-4 pt-4 pb-2">
-          Who are you?
-        </p>
         {employees.length === 0 ? (
-          <p className="text-sm text-stone-500 px-4 pb-4">No employees found.</p>
+          <p className="text-sm text-stone-400 px-4 py-5">No employees found.</p>
         ) : (
-          <div className="pb-2">
+          <div className="divide-y divide-stone-100">
             {employees.map(emp => (
               <button
                 key={emp.id}
@@ -116,10 +113,10 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
 
       {/* Keypad */}
       <div className="grid grid-cols-3 gap-1">
-        {['1','2','3','4','5','6','7','8','9','','0','⌫'].map((d, i) => (
+        {['1','2','3','4','5','6','7','8','9','','0','del'].map((d, i) => (
           <button
             key={i}
-            onClick={() => d === '⌫' ? handlePinClear() : d !== '' ? handlePinPress(d) : undefined}
+            onClick={() => d === 'del' ? handlePinClear() : d !== '' ? handlePinPress(d) : undefined}
             disabled={isPending}
             className={`
               py-5 rounded-xl text-xl font-medium text-stone-900 select-none
@@ -128,7 +125,11 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
               disabled:opacity-40
             `}
           >
-            {d}
+            {d === 'del' ? (
+              <svg className="mx-auto" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9.75 14.25 12m0 0 2.25 2.25M14.25 12l2.25-2.25M14.25 12 12 14.25m-2.58 4.92-6.374-6.374a1.125 1.125 0 0 1 0-1.59L9.42 4.83c.21-.211.497-.33.795-.33H19.5a2.25 2.25 0 0 1 2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25h-9.284c-.298 0-.585-.12-.796-.33z" />
+              </svg>
+            ) : d}
           </button>
         ))}
       </div>

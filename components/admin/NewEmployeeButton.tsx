@@ -33,13 +33,13 @@ export default function NewEmployeeButton() {
   }
 
   if (!open) {
-    return <Button onClick={() => setOpen(true)} size="sm">+ New employee</Button>
+    return <Button onClick={() => setOpen(true)} size="sm" variant="secondary">+ New employee</Button>
   }
 
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
-        <h2 className="text-lg font-semibold text-stone-900 mb-4">New employee</h2>
+    <div className="fixed inset-0 bg-black/30 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-sm p-6 pb-8 sm:pb-6">
+        <h2 className="text-base font-semibold text-stone-900 mb-5">New employee</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input label="Full name" name="name" type="text" placeholder="Jane Smith" required />
           <div className="flex flex-col gap-1.5">
