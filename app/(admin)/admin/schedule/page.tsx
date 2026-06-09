@@ -98,108 +98,104 @@ export default async function AdminSchedulePage({
       {(employees ?? []).length === 0 ? (
         <p className="text-sm text-stone-400 py-4">No employees yet.</p>
       ) : (
-        /* Horizontally scrollable on mobile so columns never crush */
-        <div className="-mx-6 overflow-x-auto">
-          <div className="min-w-[520px] px-6">
+        <>
+          {/* ── Day header row ──────────────────────────────────── */}
+          <div
+            className="grid gap-1.5 mb-2"
+            style={{ gridTemplateColumns: '56px repeat(7, 1fr)' }}
+          >
+            <div /> {/* name column spacer */}
+            {weekDays.map(day => {
+              const isToday = isSameDay(day, today)
+              return (
+                <div key={day.toISOString()} className="text-center">
+                  <p className={`text-[9px] font-bold uppercase tracking-widest leading-none ${
+                    isToday ? 'text-stone-900' : 'text-stone-300'
+                  }`}>
+                    {format(day, 'EEE')[0]}
+                  </p>
+                  <p className={`text-xs mt-0.5 tabular-nums ${
+                    isToday ? 'text-stone-900 font-semibold' : 'text-stone-400'
+                  }`}>
+                    {format(day, 'd')}
+                  </p>
+                </div>
+              )
+            })}
+          </div>
 
-            {/* ── Day header row ──────────────────────────────────── */}
-            <div
-              className="grid gap-2 mb-2"
-              style={{ gridTemplateColumns: '96px repeat(7, 1fr)' }}
-            >
-              <div /> {/* name column spacer */}
-              {weekDays.map(day => {
-                const isToday = isSameDay(day, today)
-                return (
-                  <div key={day.toISOString()} className="text-center">
-                    <p className={`text-[9px] font-bold uppercase tracking-widest leading-none ${
-                      isToday ? 'text-stone-900' : 'text-stone-300'
-                    }`}>
-                      {format(day, 'EEE')[0]}
-                    </p>
-                    <p className={`text-xs mt-0.5 tabular-nums ${
-                      isToday ? 'text-stone-900 font-semibold' : 'text-stone-400'
-                    }`}>
-                      {format(day, 'd')}
+          {/* ── Employee rows ───────────────────────────────────── */}
+          <div className="space-y-1.5">
+            {(employees ?? []).map(emp => {
+              const empShifts = rotaMap.get(emp.id)
+              const totalMins = hoursMap.get(emp.id) ?? 0
+              const firstName = emp.name.trim().split(/\s+/)[0]
+
+              return (
+                <div
+                  key={emp.id}
+                  className="grid gap-1.5 items-center bg-[#fffefb] rounded-2xl border border-stone-200 [box-shadow:var(--shadow-sm)] px-2.5 py-2.5"
+                  style={{ gridTemplateColumns: '56px repeat(7, 1fr)' }}
+                >
+                  {/* Name + hours */}
+                  <div className="min-w-0">
+                    <p className="text-xs font-medium text-stone-900 truncate">{firstName}</p>
+                    <p className="text-[10px] text-stone-400 mt-0.5 tabular-nums">
+                      {totalMins > 0 ? fmtMinutes(totalMins) : (
+                        <span className="text-stone-300">—</span>
+                      )}
                     </p>
                   </div>
-                )
-              })}
-            </div>
 
-            {/* ── Employee rows ───────────────────────────────────── */}
-            <div className="space-y-1.5">
-              {(employees ?? []).map(emp => {
-                const empShifts = rotaMap.get(emp.id)
-                const totalMins = hoursMap.get(emp.id) ?? 0
-                const firstName = emp.name.trim().split(/\s+/)[0]
+                  {/* Day cells */}
+                  {[0, 1, 2, 3, 4, 5, 6].map(dayIdx => {
+                    const shift = empShifts?.get(dayIdx)
+                    const isToday = isSameDay(weekDays[dayIdx], today)
 
-                return (
-                  <div
-                    key={emp.id}
-                    className="grid gap-2 items-center bg-[#fffefb] rounded-2xl border border-stone-200 [box-shadow:var(--shadow-sm)] px-3 py-2.5"
-                    style={{ gridTemplateColumns: '96px repeat(7, 1fr)' }}
-                  >
-                    {/* Name + hours */}
-                    <div className="min-w-0 pr-1">
-                      <p className="text-sm font-medium text-stone-900 truncate">{firstName}</p>
-                      <p className="text-[10px] text-stone-400 mt-0.5 tabular-nums">
-                        {totalMins > 0 ? fmtMinutes(totalMins) : (
-                          <span className="text-stone-300">No shifts</span>
-                        )}
-                      </p>
-                    </div>
-
-                    {/* Day cells */}
-                    {[0, 1, 2, 3, 4, 5, 6].map(dayIdx => {
-                      const shift = empShifts?.get(dayIdx)
-                      const isToday = isSameDay(weekDays[dayIdx], today)
-
-                      if (!shift) {
-                        return (
-                          <div
-                            key={dayIdx}
-                            className={`h-11 rounded-xl flex items-center justify-center ${
-                              isToday ? 'bg-stone-100/50' : ''
-                            }`}
-                          >
-                            <span className={`text-[10px] ${isToday ? 'text-stone-300' : 'text-stone-200'}`}>
-                              —
-                            </span>
-                          </div>
-                        )
-                      }
-
+                    if (!shift) {
                       return (
-                        <Link
+                        <div
                           key={dayIdx}
-                          href={`/admin/schedule/${shift.id}`}
-                          className={`h-11 rounded-xl flex flex-col items-center justify-center gap-px transition-opacity hover:opacity-75 active:scale-95 ${
-                            isToday ? 'bg-stone-900' : 'bg-stone-800'
+                          className={`h-11 rounded-xl flex items-center justify-center ${
+                            isToday ? 'bg-stone-100/50' : ''
                           }`}
                         >
-                          <span className="text-[9px] font-semibold text-white tabular-nums leading-none">
-                            {compactTime(shift.start_time)}
+                          <span className={`text-[10px] ${isToday ? 'text-stone-300' : 'text-stone-200'}`}>
+                            —
                           </span>
-                          <span className="text-[9px] text-white/50 tabular-nums leading-none">
-                            {compactTime(shift.end_time)}
-                          </span>
-                        </Link>
+                        </div>
                       )
-                    })}
-                  </div>
-                )
-              })}
-            </div>
+                    }
 
-            {/* ── Empty week message ─────────────────────────────── */}
-            {shiftCount === 0 && (
-              <p className="text-sm text-stone-400 pt-6 text-center">
-                No shifts this week — add one with the button above.
-              </p>
-            )}
+                    return (
+                      <Link
+                        key={dayIdx}
+                        href={`/admin/schedule/${shift.id}`}
+                        className={`h-11 rounded-xl flex flex-col items-center justify-center gap-px transition-opacity hover:opacity-75 active:scale-95 ${
+                          isToday ? 'bg-stone-900' : 'bg-stone-800'
+                        }`}
+                      >
+                        <span className="text-[9px] font-semibold text-white tabular-nums leading-none">
+                          {compactTime(shift.start_time)}
+                        </span>
+                        <span className="text-[9px] text-white/50 tabular-nums leading-none">
+                          {compactTime(shift.end_time)}
+                        </span>
+                      </Link>
+                    )
+                  })}
+                </div>
+              )
+            })}
           </div>
-        </div>
+
+          {/* ── Empty week message ─────────────────────────────── */}
+          {shiftCount === 0 && (
+            <p className="text-sm text-stone-400 pt-6 text-center">
+              No shifts this week — add one with the button above.
+            </p>
+          )}
+        </>
       )}
     </div>
   )
