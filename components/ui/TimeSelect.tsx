@@ -38,8 +38,8 @@ export default function TimeSelect({ name, defaultValue, required, label, classN
         required={required}
         className={`
           w-full px-3.5 py-2.5 rounded-xl border border-stone-200
-          text-sm bg-white text-stone-900
-          focus:outline-none focus:ring-2 focus:ring-stone-400
+          text-sm bg-[#f7f6f3] text-stone-900
+          focus:outline-none focus:ring-2 focus:ring-stone-900/20
           min-h-[44px] ${className}
         `}
       >

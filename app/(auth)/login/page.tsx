@@ -11,9 +11,9 @@ export default async function LoginPage() {
     .order('name')
 
   return (
-    <div className="min-h-screen bg-[#faf9f7] flex flex-col px-4 pb-8 pt-page">
+    <div className="min-h-screen bg-[#faf9f7] flex flex-col px-4 pb-8 pt-page animate-page-in">
       <div className="w-full max-w-sm mx-auto">
-        <h1 className="text-xl font-semibold text-stone-900 tracking-tight mb-6">Timekeep</h1>
+        <h1 className="text-2xl font-semibold text-stone-900 tracking-tight mb-8">Timekeep</h1>
         <LoginForm employees={employees ?? []} />
       </div>
     </div>

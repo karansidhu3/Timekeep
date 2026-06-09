@@ -107,8 +107,8 @@ export default function ClockInButton({ openEntry }: Props) {
           <select
             value={fixTime}
             onChange={e => setFixTime(e.target.value)}
-            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-white
-              text-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-400 min-h-[44px]"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-[#f7f6f3]
+              text-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-900/20 min-h-[44px]"
           >
             <option value="">Select time…</option>
             {Array.from({ length: 96 }, (_, i) => {
@@ -145,12 +145,15 @@ export default function ClockInButton({ openEntry }: Props) {
     <div className="space-y-3">
       {openEntry ? (
         <div className="space-y-3">
-          <div className="bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-green-800">Clocked in</p>
-              {elapsed && <p className="text-xs text-green-600 mt-0.5">{elapsed} elapsed</p>}
+          <div className="bg-[#f0faf4] border border-green-500/20 rounded-2xl px-5 py-4">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-green-700">On shift</p>
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
             </div>
-            <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse" />
+            <p className="text-3xl font-semibold tracking-tight text-stone-900 leading-none">
+              {elapsed ?? '—'}
+            </p>
+            <p className="text-sm text-stone-400 mt-1.5">elapsed</p>
           </div>
           <Button
             variant="secondary"

@@ -20,7 +20,7 @@ export default async function TemplatesPage() {
   ])
 
   return (
-    <div className="max-w-2xl mx-auto px-6 pb-10 pt-page">
+    <div className="max-w-2xl mx-auto px-6 pb-10 pt-page animate-page-in">
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-stone-900">Weekly templates</h1>
         <p className="text-sm text-stone-400 mt-1">

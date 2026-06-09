@@ -55,7 +55,7 @@ export default function EditEmployeeForm({ employee }: { employee: Employee }) {
       <Input label="Full name" name="name" type="text" defaultValue={employee.name} required />
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-medium text-stone-700">Role</label>
-        <select name="role" defaultValue={employee.role} className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-stone-400 min-h-[44px]">
+        <select name="role" defaultValue={employee.role} className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-[#f7f6f3] focus:outline-none focus:ring-2 focus:ring-stone-900/20 min-h-[44px]">
           <option value="employee">Employee</option>
           <option value="admin">Admin</option>
         </select>

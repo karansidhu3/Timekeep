@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import ShiftCard from '@/components/employee/ShiftCard'
 import ClockInButton from '@/components/employee/ClockInButton'
 import ClientDate from '@/components/ui/ClientDate'
+import { signOut } from '@/lib/actions/auth'
 
 export default async function DashboardPage() {
   const supabase = await createServerClient()
@@ -37,22 +38,29 @@ export default async function DashboardPage() {
   ])
 
   return (
-    <div className="max-w-lg mx-auto px-4 pt-page pb-6">
+    <div className="max-w-lg mx-auto px-4 pt-page pb-6 animate-page-in">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-semibold text-stone-900">
-            Hi, {employee?.name?.split(' ')[0]}
+          <h1 className="text-2xl font-semibold tracking-tight text-stone-900">
+            {employee?.name?.split(' ')[0]}
           </h1>
-          <p className="text-sm text-stone-400"><ClientDate /></p>
+          <p className="text-sm text-stone-400 mt-0.5"><ClientDate /></p>
         </div>
-        {employee?.role === 'admin' && (
-          <a
-            href="/admin/dashboard"
-            className="text-xs font-medium text-stone-500 hover:text-stone-700 px-3 py-1.5 rounded-lg hover:bg-stone-100"
-          >
-            Admin →
-          </a>
-        )}
+        <div className="flex items-center gap-1">
+          {employee?.role === 'admin' && (
+            <a
+              href="/admin/dashboard"
+              className="text-xs font-medium text-stone-400 hover:text-stone-700 px-3 py-2 rounded-xl hover:bg-stone-100 transition-colors duration-150"
+            >
+              Admin
+            </a>
+          )}
+          <form action={signOut}>
+            <button className="text-xs font-medium text-stone-400 hover:text-stone-700 px-3 py-2 rounded-xl hover:bg-stone-100 transition-colors duration-150">
+              Sign out
+            </button>
+          </form>
+        </div>
       </div>
 
       <div className="space-y-3">

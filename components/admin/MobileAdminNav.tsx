@@ -49,7 +49,7 @@ export default function MobileAdminNav() {
   const [isPending, startTransition] = useTransition()
 
   return (
-    <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-stone-100">
+    <nav className="md:hidden fixed bottom-0 inset-x-0 bg-[#fffefb] border-t border-stone-100">
       <div className="flex" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         {links.map(({ href, label, icon }) => {
           const active = pathname.startsWith(href)

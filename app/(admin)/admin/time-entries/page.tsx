@@ -31,7 +31,7 @@ export default async function TimeEntriesPage() {
   }))
 
   return (
-    <div className="max-w-4xl mx-auto px-6 pb-10 pt-page">
+    <div className="max-w-4xl mx-auto px-6 pb-10 pt-page animate-page-in">
       <h1 className="text-2xl font-semibold text-stone-900 mb-8">Time entries</h1>
       <TimeEntriesManager entries={rows} employees={employees ?? []} />
     </div>

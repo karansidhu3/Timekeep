@@ -88,8 +88,8 @@ function DayModal({ state, onClose }: { state: EditState; onClose: () => void })
   }
 
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-sm p-6 pb-[max(2rem,env(safe-area-inset-bottom))] sm:pb-6">
+    <div className="animate-fade-in fixed inset-0 bg-black/30 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+      <div className="animate-sheet-up sm:animate-float-in bg-[#fffefb] rounded-t-2xl sm:rounded-2xl [box-shadow:var(--shadow-xl)] w-full sm:max-w-sm p-6 pb-[max(2rem,env(safe-area-inset-bottom))] sm:pb-6">
         {/* drag handle — mobile only */}
         <div className="w-10 h-1 bg-stone-200 rounded-full mx-auto mb-5 sm:hidden" />
 
@@ -120,7 +120,7 @@ function DayModal({ state, onClose }: { state: EditState; onClose: () => void })
               name="notes"
               defaultValue={state.notes}
               placeholder="e.g. Opening shift"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-stone-400 min-h-[44px]"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-[#f7f6f3] focus:outline-none focus:ring-2 focus:ring-stone-900/20 min-h-[44px]"
             />
           </div>
 

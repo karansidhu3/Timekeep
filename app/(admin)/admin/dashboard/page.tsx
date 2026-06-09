@@ -34,24 +34,24 @@ export default async function AdminDashboardPage() {
   ])
 
   return (
-    <div className="max-w-3xl mx-auto px-6 pb-10 pt-page">
+    <div className="max-w-3xl mx-auto px-6 pb-10 pt-page animate-page-in">
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-stone-900">Dashboard</h1>
         <p className="text-stone-500 text-sm mt-1"><ClientDate /></p>
       </div>
 
       <div className="grid grid-cols-3 gap-3 mb-8">
-        <Card className="p-4">
-          <p className="text-xs font-medium text-stone-400 uppercase tracking-wide">Staff</p>
-          <p className="text-3xl font-semibold text-stone-900 mt-1">{employees?.length ?? 0}</p>
+        <Card className="p-5">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Staff</p>
+          <p className="text-4xl font-semibold tracking-tight text-stone-900 mt-2 leading-none">{employees?.length ?? 0}</p>
         </Card>
-        <Card className="p-4">
-          <p className="text-xs font-medium text-stone-400 uppercase tracking-wide">Shifts</p>
-          <p className="text-3xl font-semibold text-stone-900 mt-1">{todayShifts?.length ?? 0}</p>
+        <Card className="p-5">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Shifts</p>
+          <p className="text-4xl font-semibold tracking-tight text-stone-900 mt-2 leading-none">{todayShifts?.length ?? 0}</p>
         </Card>
-        <Card className="p-4">
-          <p className="text-xs font-medium text-stone-400 uppercase tracking-wide">Active</p>
-          <p className="text-3xl font-semibold text-stone-900 mt-1">{openEntries?.length ?? 0}</p>
+        <Card className={`p-5 ${(openEntries?.length ?? 0) > 0 ? 'bg-[#f0faf4]' : ''}`}>
+          <p className={`text-[10px] font-semibold uppercase tracking-widest ${(openEntries?.length ?? 0) > 0 ? 'text-green-700' : 'text-stone-400'}`}>Active</p>
+          <p className={`text-4xl font-semibold tracking-tight mt-2 leading-none ${(openEntries?.length ?? 0) > 0 ? 'text-green-900' : 'text-stone-900'}`}>{openEntries?.length ?? 0}</p>
         </Card>
       </div>
 

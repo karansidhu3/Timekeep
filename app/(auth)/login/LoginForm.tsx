@@ -96,11 +96,11 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
       </p>
 
       {/* PIN dots */}
-      <div className="flex gap-4 justify-center mb-7">
+      <div className="flex gap-5 justify-center mb-7">
         {[0, 1, 2, 3].map(i => (
           <div
             key={i}
-            className={`w-3.5 h-3.5 rounded-full transition-all duration-100 ${
+            className={`w-4 h-4 rounded-full transition-all duration-100 ${
               i < pin.length ? 'bg-stone-900 scale-110' : 'bg-stone-200'
             }`}
           />
