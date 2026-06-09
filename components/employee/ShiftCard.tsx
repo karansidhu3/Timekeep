@@ -11,8 +11,8 @@ interface Shift {
   notes: string | null
 }
 
-export default function ShiftCard({ shifts }: { shifts: Shift[] }) {
-  const now = new Date()
+export default function ShiftCard({ shifts, serverNow }: { shifts: Shift[]; serverNow: string }) {
+  const now = new Date(serverNow)
   const todayStr = now.toDateString()
   const shift = shifts.find(s => new Date(s.start_time).toDateString() === todayStr) ?? null
 

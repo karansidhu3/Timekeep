@@ -10,5 +10,5 @@ function getGreeting(): string {
 }
 
 export default function Greeting({ name }: { name: string }) {
-  return <>{getGreeting()}, {name}</>
+  return <span suppressHydrationWarning>{getGreeting()}, {name}</span>
 }

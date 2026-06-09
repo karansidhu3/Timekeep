@@ -65,7 +65,7 @@ export default async function DashboardPage() {
       </div>
 
       <div className="space-y-3">
-        <ShiftCard shifts={shifts ?? []} />
+        <ShiftCard shifts={shifts ?? []} serverNow={now.toISOString()} />
         <ClockInButton openEntry={openEntry} />
       </div>
     </div>
