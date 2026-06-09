@@ -1,5 +1,6 @@
 import { createServerClient } from '@/lib/supabase/server'
 import LoginForm from './LoginForm'
+import Logo from '@/components/ui/Logo'
 
 export default async function LoginPage() {
   const supabase = await createServerClient()
@@ -13,7 +14,9 @@ export default async function LoginPage() {
   return (
     <div className="min-h-screen bg-[#faf9f7] flex flex-col px-4 pb-8 pt-page animate-page-in">
       <div className="w-full max-w-sm mx-auto">
-        <h1 className="text-2xl font-semibold text-stone-900 tracking-tight mb-8">Timekeep</h1>
+        <div className="mb-10">
+          <Logo size="lg" />
+        </div>
         <LoginForm employees={employees ?? []} />
       </div>
     </div>

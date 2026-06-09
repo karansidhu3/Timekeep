@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from '@/lib/actions/auth'
+import Logo from '@/components/ui/Logo'
 
 const links = [
   { href: '/admin/dashboard', label: 'Dashboard' },
@@ -18,8 +19,7 @@ export default function Sidebar() {
   return (
     <aside className="hidden md:flex flex-col fixed top-0 left-0 h-full w-56 bg-[#fffefb] border-r border-stone-100 py-6 px-3">
       <Link href="/" className="px-3 mb-8 block">
-        <span className="text-lg font-semibold text-stone-900 tracking-tight">Timekeep</span>
-        <span className="block text-[11px] font-medium text-stone-400 tracking-wide mt-0.5">Admin</span>
+        <Logo size="sm" />
       </Link>
 
       <nav className="flex-1 space-y-0.5">

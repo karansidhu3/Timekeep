@@ -73,8 +73,8 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
                 onClick={() => handleSelectEmployee(emp.id)}
                 className="bg-[#fffefb] rounded-2xl border border-stone-200 [box-shadow:var(--shadow-sm)]
                            px-4 py-5 flex flex-col items-center text-center
-                           active:scale-[0.97] transition-[transform,background-color] duration-150
-                           hover:bg-stone-50"
+                           active:scale-[0.97] transition-[transform,background-color,box-shadow] duration-150
+                           hover:bg-stone-50 hover:[box-shadow:var(--shadow-md)]"
               >
                 <span className="text-2xl font-semibold text-stone-600 leading-none tracking-tight">
                   {getInitials(emp.name)}

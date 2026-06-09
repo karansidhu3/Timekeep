@@ -25,7 +25,7 @@ export default async function EmployeesPage() {
 
       <div className="space-y-2">
         {(employees ?? []).map(emp => (
-          <Card key={emp.id} className="p-4 flex items-center justify-between">
+          <Card key={emp.id} hoverable className="p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div>
                 <p className="text-sm font-medium text-stone-900">{emp.name}</p>

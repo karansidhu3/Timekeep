@@ -82,7 +82,7 @@ export default async function AdminSchedulePage({
               ) : (
                 <div className="space-y-2 mb-4">
                   {dayShifts.map(shift => (
-                    <Card key={shift.id} className="p-4 flex items-center justify-between">
+                    <Card key={shift.id} hoverable className="p-4 flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-stone-900">
                           {(shift.employees as unknown as { name: string } | null)?.name}

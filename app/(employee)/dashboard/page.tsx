@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import ShiftCard from '@/components/employee/ShiftCard'
 import ClockInButton from '@/components/employee/ClockInButton'
 import ClientDate from '@/components/ui/ClientDate'
+import Greeting from '@/components/ui/Greeting'
 import { signOut } from '@/lib/actions/auth'
 
 export default async function DashboardPage() {
@@ -42,7 +43,7 @@ export default async function DashboardPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-stone-900">
-            {employee?.name?.split(' ')[0]}
+            <Greeting name={employee?.name?.split(' ')[0] ?? ''} />
           </h1>
           <p className="text-sm text-stone-400 mt-0.5"><ClientDate /></p>
         </div>

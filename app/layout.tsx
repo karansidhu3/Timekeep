@@ -11,6 +11,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'Timekeep',
   description: 'Workforce scheduling and time tracking',
+  manifest: '/manifest.json',
+  icons: {
+    icon: '/favicon.svg',
+    apple: '/icon.svg',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
