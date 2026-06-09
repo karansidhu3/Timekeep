@@ -1,4 +1,4 @@
-import { format, startOfWeek, endOfWeek, addWeeks, differenceInMinutes } from 'date-fns'
+import { format, startOfWeek, endOfWeek, addWeeks, differenceInMinutes, isToday, isYesterday, isThisWeek } from 'date-fns'
 
 export function formatShiftTime(start: string, end: string): string {
   const s = new Date(start)
@@ -35,4 +35,14 @@ export function getWeekRange(weekOffset = 0): { start: Date; end: Date } {
 
 export function calcDurationMinutes(clockIn: string, clockOut: string | null): number {
   return differenceInMinutes(clockOut ? new Date(clockOut) : new Date(), new Date(clockIn))
+}
+
+// Contextual date: shows only time for today, "Yesterday · h:mm a" for yesterday,
+// "EEE · h:mm a" within the current week, and "MMM d · h:mm a" for older.
+export function smartDate(iso: string): string {
+  const d = new Date(iso)
+  if (isToday(d)) return format(d, 'h:mm a')
+  if (isYesterday(d)) return `Yesterday · ${format(d, 'h:mm a')}`
+  if (isThisWeek(d, { weekStartsOn: 1 })) return format(d, 'EEE · h:mm a')
+  return format(d, 'MMM d · h:mm a')
 }

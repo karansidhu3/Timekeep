@@ -2,11 +2,10 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { format } from 'date-fns'
+import { format, isToday, isYesterday, isThisWeek } from 'date-fns'
 import { adminCreateTimeEntry, adminUpdateTimeEntry } from '@/lib/actions/time-entries'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import Badge from '@/components/ui/Badge'
 import TimeSelect from '@/components/ui/TimeSelect'
 import Card from '@/components/ui/Card'
 import { formatDuration, calcDurationMinutes } from '@/lib/utils'
@@ -37,7 +36,49 @@ function toLocalTime(iso: string) {
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
 }
 
-// ── shared modal ──────────────────────────────────────────────────────────────
+// Contextual clock time — omits date for today, adds context for older entries
+function smartTime(iso: string): string {
+  const d = new Date(iso)
+  return format(d, 'h:mm a')
+}
+
+// Group label for date headers
+function dateGroupLabel(iso: string): string {
+  const d = new Date(iso)
+  if (isToday(d)) return 'Today'
+  if (isYesterday(d)) return 'Yesterday'
+  if (isThisWeek(d, { weekStartsOn: 1 })) return format(d, 'EEEE')
+  return format(d, 'EEEE, MMM d')
+}
+
+interface DateGroup {
+  label: string
+  dateKey: string
+  entries: TimeEntryRow[]
+  totalMinutes: number
+}
+
+function groupByDate(entries: TimeEntryRow[]): DateGroup[] {
+  const map = new Map<string, TimeEntryRow[]>()
+  for (const e of entries) {
+    const key = toLocalDate(e.clock_in)
+    if (!map.has(key)) map.set(key, [])
+    map.get(key)!.push(e)
+  }
+  const groups: DateGroup[] = []
+  for (const [key, group] of map) {
+    const totalMinutes = group.reduce((sum, e) => sum + calcDurationMinutes(e.clock_in, e.clock_out), 0)
+    groups.push({
+      label: dateGroupLabel(group[0].clock_in),
+      dateKey: key,
+      entries: group,
+      totalMinutes,
+    })
+  }
+  return groups
+}
+
+// ── modal ─────────────────────────────────────────────────────────────────────
 
 interface ModalProps {
   mode: 'add' | 'edit'
@@ -171,99 +212,125 @@ export default function TimeEntriesManager({ entries, employees }: Props) {
   const [addOpen, setAddOpen] = useState(false)
   const [editEntry, setEditEntry] = useState<TimeEntryRow | null>(null)
 
+  const groups = groupByDate(entries)
+
   return (
     <>
-      {/* Header action */}
-      <div className="flex justify-end mb-4">
-        <Button size="sm" variant="secondary" onClick={() => setAddOpen(true)}>+ Add entry</Button>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-5">
+        <p className="text-xs text-stone-400">
+          {entries.length} {entries.length === 1 ? 'entry' : 'entries'}
+        </p>
+        <Button size="sm" variant="secondary" onClick={() => setAddOpen(true)}>
+          + Add entry
+        </Button>
       </div>
 
-      {/* ── Mobile: card list ─────────────────────────────────────── */}
-      <div className="md:hidden">
-        <Card className="overflow-hidden divide-y divide-stone-50">
-          {entries.length === 0 ? (
-            <p className="px-4 py-8 text-stone-400 text-sm text-center">No time entries yet.</p>
-          ) : (
-            entries.map(entry => {
-              const duration = calcDurationMinutes(entry.clock_in, entry.clock_out)
-              const isActive = !entry.clock_out
-              return (
-                <div key={entry.id} className={`px-4 py-3.5 ${isActive ? 'bg-green-50/60' : ''}`}>
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="text-sm font-medium text-stone-900">{entry.employee_name}</p>
-                    <button
-                      onClick={() => setEditEntry(entry)}
-                      className="text-xs text-stone-400 hover:text-stone-700 px-2.5 py-1.5 rounded-lg hover:bg-stone-100 transition-colors shrink-0 -mr-1"
-                    >
-                      Edit
-                    </button>
-                  </div>
-                  <p className="text-xs text-stone-500 mt-1">
-                    {format(new Date(entry.clock_in), 'MMM d · h:mm a')}
-                    {' '}
-                    <span className="text-stone-300">→</span>
-                    {' '}
-                    {entry.clock_out
-                      ? format(new Date(entry.clock_out), 'h:mm a')
-                      : <Badge variant="success">Active</Badge>}
-                  </p>
-                  <p className="text-xs text-stone-400 mt-0.5">{formatDuration(duration)}</p>
-                </div>
-              )
-            })
-          )}
-        </Card>
-      </div>
+      {entries.length === 0 && (
+        <p className="text-sm text-stone-400 py-8 text-center">No time entries yet.</p>
+      )}
 
-      {/* ── Desktop: table ────────────────────────────────────────── */}
-      <div className="hidden md:block">
-        <Card className="overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-stone-100">
-                <th className="text-left text-xs font-medium text-stone-400 uppercase tracking-wide px-4 py-3">Employee</th>
-                <th className="text-left text-xs font-medium text-stone-400 uppercase tracking-wide px-4 py-3">Clock in</th>
-                <th className="text-left text-xs font-medium text-stone-400 uppercase tracking-wide px-4 py-3">Clock out</th>
-                <th className="text-left text-xs font-medium text-stone-400 uppercase tracking-wide px-4 py-3">Duration</th>
-                <th className="px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody>
-              {entries.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-4 py-8 text-stone-400 text-center">No time entries yet.</td>
-                </tr>
-              ) : (
-                entries.map(entry => {
-                  const duration = calcDurationMinutes(entry.clock_in, entry.clock_out)
+      {/* ── Date groups ─────────────────────────────────────────────── */}
+      <div className="space-y-6">
+        {groups.map(group => (
+          <div key={group.dateKey}>
+            {/* Group header */}
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-semibold text-stone-500">{group.label}</p>
+              <p className="text-xs text-stone-400 tabular-nums">{formatDuration(group.totalMinutes)} total</p>
+            </div>
+
+            {/* ── Mobile: card list ────────────────────────── */}
+            <div className="md:hidden">
+              <Card className="overflow-hidden divide-y divide-stone-50">
+                {group.entries.map(entry => {
                   const isActive = !entry.clock_out
                   return (
-                    <tr key={entry.id} className={`border-b border-stone-50 last:border-0 transition-colors duration-100 ${isActive ? 'bg-green-50/50' : 'hover:bg-stone-50/60'}`}>
-                      <td className="px-4 py-3 font-medium text-stone-900">{entry.employee_name}</td>
-                      <td className="px-4 py-3 text-stone-600">
-                        {format(new Date(entry.clock_in), 'MMM d, h:mm a')}
-                      </td>
-                      <td className="px-4 py-3 text-stone-600">
-                        {entry.clock_out
-                          ? format(new Date(entry.clock_out), 'MMM d, h:mm a')
-                          : <Badge variant="success">Active</Badge>}
-                      </td>
-                      <td className="px-4 py-3 text-stone-500">{formatDuration(duration)}</td>
-                      <td className="px-4 py-3 text-right">
+                    <div
+                      key={entry.id}
+                      className={`px-4 py-3.5 ${isActive ? 'border-l-2 border-green-500 bg-[#f4fbf6]' : ''}`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="text-sm font-medium text-stone-700">{entry.employee_name}</p>
                         <button
                           onClick={() => setEditEntry(entry)}
-                          className="text-xs text-stone-400 hover:text-stone-700 px-2 py-1 rounded hover:bg-stone-100 transition-colors"
+                          className="text-xs text-stone-400 hover:text-stone-700 px-2.5 py-1.5 rounded-lg hover:bg-stone-100 transition-colors shrink-0 -mr-1"
                         >
                           Edit
                         </button>
-                      </td>
-                    </tr>
+                      </div>
+                      <p className="text-xs text-stone-500 mt-1 tabular-nums">
+                        {smartTime(entry.clock_in)}
+                        {' – '}
+                        {entry.clock_out ? smartTime(entry.clock_out) : (
+                          <span className="text-green-600 font-medium">now</span>
+                        )}
+                      </p>
+                      <p className="text-sm font-semibold text-stone-900 mt-0.5 tabular-nums">
+                        {formatDuration(calcDurationMinutes(entry.clock_in, entry.clock_out))}
+                        {isActive && <span className="text-green-600 text-xs font-medium ml-1.5">active</span>}
+                      </p>
+                    </div>
                   )
-                })
-              )}
-            </tbody>
-          </table>
-        </Card>
+                })}
+              </Card>
+            </div>
+
+            {/* ── Desktop: table ───────────────────────────── */}
+            <div className="hidden md:block">
+              <Card className="overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-stone-100">
+                      <th className="text-left text-xs font-medium text-stone-400 uppercase tracking-wide px-4 py-3">Employee</th>
+                      <th className="text-left text-xs font-medium text-stone-400 uppercase tracking-wide px-4 py-3">Clock in</th>
+                      <th className="text-left text-xs font-medium text-stone-400 uppercase tracking-wide px-4 py-3">Clock out</th>
+                      <th className="text-left text-xs font-medium text-stone-400 uppercase tracking-wide px-4 py-3">Duration</th>
+                      <th className="px-4 py-3" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {group.entries.map(entry => {
+                      const isActive = !entry.clock_out
+                      return (
+                        <tr
+                          key={entry.id}
+                          className={`border-b border-stone-50 last:border-0 transition-colors duration-100 ${
+                            isActive
+                              ? 'border-l-2 border-green-500 bg-[#f4fbf6] hover:bg-[#edf8f1]'
+                              : 'hover:bg-stone-50/60'
+                          }`}
+                        >
+                          <td className="px-4 py-3 text-stone-700 font-medium">{entry.employee_name}</td>
+                          <td className="px-4 py-3 text-stone-900 tabular-nums">
+                            {smartTime(entry.clock_in)}
+                          </td>
+                          <td className="px-4 py-3 tabular-nums">
+                            {entry.clock_out
+                              ? <span className="text-stone-900">{smartTime(entry.clock_out)}</span>
+                              : <span className="text-green-600 font-medium text-xs">Active</span>
+                            }
+                          </td>
+                          <td className="px-4 py-3 text-stone-900 font-semibold tabular-nums">
+                            {formatDuration(calcDurationMinutes(entry.clock_in, entry.clock_out))}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <button
+                              onClick={() => setEditEntry(entry)}
+                              className="text-xs text-stone-400 hover:text-stone-700 px-2 py-1 rounded-lg hover:bg-stone-100 transition-colors"
+                            >
+                              Edit
+                            </button>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </Card>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Modals */}

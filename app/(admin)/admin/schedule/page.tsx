@@ -40,23 +40,24 @@ export default async function AdminSchedulePage({
   ])
 
   const weekDays = eachDayOfInterval({ start, end })
+  const shiftCount = (shifts ?? []).length
 
   return (
     <div className="max-w-4xl mx-auto px-6 pb-10 pt-page animate-page-in">
       <div className="mb-8">
         <div className="flex items-center justify-between mb-1">
-          <h1 className="text-2xl font-semibold text-stone-900">Schedule</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-stone-900">Schedule</h1>
           <NewShiftButton employees={employees ?? []} weekStart={start.toISOString()} />
         </div>
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <p className="text-sm text-stone-400">
-              {format(start, 'MMM d')} – {format(end, 'MMM d')}
-            </p>
-            <Link href="/admin/templates" className="text-xs text-stone-400 hover:text-stone-600 transition-colors">
-              Templates →
-            </Link>
-          </div>
+          <p className="text-sm text-stone-400">
+            {format(start, 'MMM d')} – {format(end, 'MMM d')}
+            {shiftCount > 0 && (
+              <span className="ml-1.5">
+                · {shiftCount} shift{shiftCount !== 1 ? 's' : ''}
+              </span>
+            )}
+          </p>
           <div className="flex items-center gap-1">
             <ApplyTemplateButton
               templates={templates ?? []}
@@ -67,41 +68,54 @@ export default async function AdminSchedulePage({
         </div>
       </div>
 
-      <div className="space-y-4 stagger">
+      {shiftCount === 0 && (
+        <p className="text-sm text-stone-400 py-4">No shifts scheduled this week.</p>
+      )}
+
+      <div className="space-y-1">
         {weekDays.map(day => {
           const dayShifts = (shifts ?? []).filter(s => isSameDay(new Date(s.start_time), day))
           const isToday = isSameDay(day, new Date())
+          const hasShifts = dayShifts.length > 0
+
+          if (!hasShifts) {
+            // Compact empty day row — visible but not space-consuming
+            return (
+              <div key={day.toISOString()} className="flex items-center gap-3 py-2">
+                <p className={`text-xs font-semibold uppercase tracking-wide w-32 shrink-0 ${isToday ? 'text-stone-600' : 'text-stone-300'}`}>
+                  {format(day, 'EEE, MMM d')}{isToday ? ' · Today' : ''}
+                </p>
+                <p className="text-xs text-stone-300">No shifts</p>
+              </div>
+            )
+          }
 
           return (
-            <div key={day.toISOString()}>
+            <div key={day.toISOString()} className="pt-3 pb-1">
               <p className={`text-xs font-semibold uppercase tracking-wide mb-2 ${isToday ? 'text-stone-900' : 'text-stone-400'}`}>
                 {format(day, 'EEEE, MMM d')}{isToday && ' · Today'}
               </p>
-              {dayShifts.length === 0 ? (
-                <p className="text-sm text-stone-400 pl-1 mb-4">No shifts</p>
-              ) : (
-                <div className="space-y-2 mb-4">
-                  {dayShifts.map(shift => (
-                    <Card key={shift.id} hoverable className="p-4 flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-stone-900">
-                          {(shift.employees as unknown as { name: string } | null)?.name}
-                        </p>
-                        <p className="text-xs text-stone-500 mt-0.5">
-                          <ClientTime iso={shift.start_time} /> – <ClientTime iso={shift.end_time} />
-                        </p>
-                        {shift.notes && <p className="text-xs text-stone-400 mt-1">{shift.notes}</p>}
-                      </div>
-                      <Link
-                        href={`/admin/schedule/${shift.id}`}
-                        className="text-sm text-stone-400 hover:text-stone-700 px-3 py-3 rounded-xl hover:bg-stone-50 transition-colors min-h-[44px] flex items-center"
-                      >
-                        Edit
-                      </Link>
-                    </Card>
-                  ))}
-                </div>
-              )}
+              <div className="space-y-2 mb-2">
+                {dayShifts.map(shift => (
+                  <Card key={shift.id} hoverable className="p-4 flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-stone-900">
+                        {(shift.employees as unknown as { name: string } | null)?.name}
+                      </p>
+                      <p className="text-xs text-stone-500 mt-0.5 tabular-nums">
+                        <ClientTime iso={shift.start_time} /> – <ClientTime iso={shift.end_time} />
+                      </p>
+                      {shift.notes && <p className="text-xs text-stone-400 mt-1">{shift.notes}</p>}
+                    </div>
+                    <Link
+                      href={`/admin/schedule/${shift.id}`}
+                      className="text-sm text-stone-400 hover:text-stone-700 px-3 py-3 rounded-xl hover:bg-stone-50 transition-colors min-h-[44px] flex items-center"
+                    >
+                      Edit
+                    </Link>
+                  </Card>
+                ))}
+              </div>
             </div>
           )
         })}

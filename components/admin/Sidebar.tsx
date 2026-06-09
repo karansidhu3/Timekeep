@@ -5,13 +5,32 @@ import { usePathname } from 'next/navigation'
 import { signOut } from '@/lib/actions/auth'
 import Logo from '@/components/ui/Logo'
 
-const links = [
-  { href: '/admin/dashboard', label: 'Dashboard' },
+const operationalLinks = [
+  { href: '/admin/dashboard', label: 'Today' },
   { href: '/admin/schedule', label: 'Schedule' },
-  { href: '/admin/templates', label: 'Templates' },
-  { href: '/admin/employees', label: 'Employees' },
   { href: '/admin/time-entries', label: 'Time entries' },
 ]
+
+const setupLinks = [
+  { href: '/admin/employees', label: 'Employees' },
+  { href: '/admin/templates', label: 'Templates' },
+]
+
+function NavLink({ href, label, pathname }: { href: string; label: string; pathname: string }) {
+  const active = pathname.startsWith(href)
+  return (
+    <Link
+      href={href}
+      className={`block px-3 py-2 rounded-xl text-sm font-medium transition-colors duration-150 ${
+        active
+          ? 'bg-stone-100/80 text-stone-900'
+          : 'text-stone-500 hover:text-stone-800 hover:bg-stone-50'
+      }`}
+    >
+      {label}
+    </Link>
+  )
+}
 
 export default function Sidebar() {
   const pathname = usePathname()
@@ -23,22 +42,15 @@ export default function Sidebar() {
       </Link>
 
       <nav className="flex-1 space-y-0.5">
-        {links.map(({ href, label }) => {
-          const active = pathname.startsWith(href)
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={`block px-3 py-2 rounded-xl text-sm font-medium transition-colors duration-150 ${
-                active
-                  ? 'bg-stone-100/80 text-stone-900'
-                  : 'text-stone-500 hover:text-stone-800 hover:bg-stone-50'
-              }`}
-            >
-              {label}
-            </Link>
-          )
-        })}
+        {operationalLinks.map(({ href, label }) => (
+          <NavLink key={href} href={href} label={label} pathname={pathname} />
+        ))}
+
+        <div className="my-3 border-t border-stone-100" />
+
+        {setupLinks.map(({ href, label }) => (
+          <NavLink key={href} href={href} label={label} pathname={pathname} />
+        ))}
       </nav>
 
       <div className="pt-4 border-t border-stone-100">
