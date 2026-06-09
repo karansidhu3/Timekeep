@@ -7,6 +7,13 @@ import Card from '@/components/ui/Card'
 interface Employee {
   id: string
   name: string
+  role: string
+}
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/)
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
 }
 
 export default function LoginForm({ employees }: { employees: Employee[] }) {
@@ -52,26 +59,39 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
     submitRef.current = false
   }
 
-  // ── Name selection ────────────────────────────────────────────────────────
+  // ── Name selection — tile grid ────────────────────────────────────────────
   if (!selectedId) {
     return (
-      <Card className="overflow-hidden">
+      <div>
         {employees.length === 0 ? (
-          <p className="text-sm text-stone-400 px-4 py-5">No employees found.</p>
+          <p className="text-sm text-stone-400 py-8 text-center">No employees found.</p>
         ) : (
-          <div className="divide-y divide-stone-100">
+          <div className="grid grid-cols-2 gap-3">
             {employees.map(emp => (
               <button
                 key={emp.id}
                 onClick={() => handleSelectEmployee(emp.id)}
-                className="w-full text-left px-4 py-4 text-[15px] font-medium text-stone-900 active:bg-stone-50 transition-colors"
+                className="bg-[#fffefb] rounded-2xl border border-stone-200 [box-shadow:var(--shadow-sm)]
+                           px-4 py-5 flex flex-col items-center text-center
+                           active:scale-[0.97] transition-[transform,background-color] duration-150
+                           hover:bg-stone-50"
               >
-                {emp.name}
+                <span className="text-2xl font-semibold text-stone-600 leading-none tracking-tight">
+                  {getInitials(emp.name)}
+                </span>
+                <span className="text-sm font-medium text-stone-900 mt-3 leading-tight">
+                  {emp.name}
+                </span>
+                {emp.role === 'admin' && (
+                  <span className="text-[10px] uppercase tracking-widest text-stone-400 mt-1">
+                    Admin
+                  </span>
+                )}
               </button>
             ))}
           </div>
         )}
-      </Card>
+      </div>
     )
   }
 
@@ -90,13 +110,13 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
         Back
       </button>
 
-      <p className="text-xl font-semibold text-stone-900 mb-1">{selected?.name}</p>
-      <p className="text-sm text-stone-400 mb-7">
+      <p className="text-2xl font-semibold tracking-tight text-stone-900 mb-1">{selected?.name}</p>
+      <p className="text-sm text-stone-400 mb-8">
         {isPending ? 'Signing in…' : 'Enter your 4-digit PIN'}
       </p>
 
       {/* PIN dots */}
-      <div className="flex gap-5 justify-center mb-7">
+      <div className="flex gap-5 justify-center mb-8">
         {[0, 1, 2, 3].map(i => (
           <div
             key={i}
@@ -108,7 +128,7 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
       </div>
 
       {error && (
-        <p className="text-sm text-red-500 text-center mb-5 -mt-2">{error}</p>
+        <p className="text-sm text-red-500 text-center mb-5 -mt-3">{error}</p>
       )}
 
       {/* Keypad */}

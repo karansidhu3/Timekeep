@@ -6,7 +6,7 @@ export default async function LoginPage() {
 
   const { data: employees } = await supabase
     .from('employees')
-    .select('id, name')
+    .select('id, name, role')
     .eq('active', true)
     .order('name')
 
