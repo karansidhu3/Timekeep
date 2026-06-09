@@ -23,7 +23,7 @@ export default async function EmployeesPage() {
         <NewEmployeeButton />
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-2 stagger">
         {(employees ?? []).map(emp => (
           <Card key={emp.id} hoverable className="p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">

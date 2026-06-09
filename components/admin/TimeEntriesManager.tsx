@@ -238,7 +238,7 @@ export default function TimeEntriesManager({ entries, employees }: Props) {
                   const duration = calcDurationMinutes(entry.clock_in, entry.clock_out)
                   const isActive = !entry.clock_out
                   return (
-                    <tr key={entry.id} className={`border-b border-stone-50 last:border-0 ${isActive ? 'bg-green-50/50' : ''}`}>
+                    <tr key={entry.id} className={`border-b border-stone-50 last:border-0 transition-colors duration-100 ${isActive ? 'bg-green-50/50' : 'hover:bg-stone-50/60'}`}>
                       <td className="px-4 py-3 font-medium text-stone-900">{entry.employee_name}</td>
                       <td className="px-4 py-3 text-stone-600">
                         {format(new Date(entry.clock_in), 'MMM d, h:mm a')}

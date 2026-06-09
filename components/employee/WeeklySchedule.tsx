@@ -17,7 +17,7 @@ interface Props {
 
 export default function WeeklySchedule({ shifts, weekDays }: Props) {
   return (
-    <div className="divide-y divide-stone-100">
+    <div className="divide-y divide-stone-100 stagger">
       {weekDays.map(day => {
         const dayShifts = shifts.filter(s => isSameDay(new Date(s.start_time), day))
         const today = isSameDay(day, new Date())

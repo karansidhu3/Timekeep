@@ -4,8 +4,7 @@ import { useState, useTransition, useEffect } from 'react'
 import { format } from 'date-fns'
 import { clockIn, clockOut } from '@/lib/actions/time-entries'
 import Button from '@/components/ui/Button'
-import TimeSelect from '@/components/ui/TimeSelect'
-import { calcDurationMinutes, formatDuration } from '@/lib/utils'
+import { formatElapsed, formatDuration } from '@/lib/utils'
 
 interface TimeEntry {
   id: string
@@ -34,16 +33,22 @@ function toLocalDate(iso: string) {
 export default function ClockInButton({ openEntry }: Props) {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
-  const [elapsed, setElapsed] = useState<string | null>(null)
+  const [elapsedSeconds, setElapsedSeconds] = useState<number | null>(null)
   const [fixTime, setFixTime] = useState('')
 
+  // Tick every second for a live elapsed display
   useEffect(() => {
-    if (!openEntry || isMissedClockOut(openEntry.clock_in)) { setElapsed(null); return }
+    if (!openEntry || isMissedClockOut(openEntry.clock_in)) {
+      setElapsedSeconds(null)
+      return
+    }
     function tick() {
-      setElapsed(formatDuration(calcDurationMinutes(openEntry!.clock_in, null)))
+      setElapsedSeconds(
+        Math.floor((Date.now() - new Date(openEntry!.clock_in).getTime()) / 1000)
+      )
     }
     tick()
-    const id = setInterval(tick, 60000)
+    const id = setInterval(tick, 1000)
     return () => clearInterval(id)
   }, [openEntry])
 
@@ -88,14 +93,13 @@ export default function ClockInButton({ openEntry }: Props) {
 
   // ── Missed clock-out from a previous day ──────────────────────────────────
   if (openEntry && isMissedClockOut(openEntry.clock_in)) {
-    const clockInDate = toLocalDate(openEntry.clock_in)
     const clockInFormatted = format(new Date(openEntry.clock_in), "EEE, MMM d 'at' h:mm a")
 
     return (
       <div className="space-y-3">
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5">
           <p className="text-sm font-semibold text-amber-800">Missed clock-out</p>
-          <p className="text-xs text-amber-700 mt-1">
+          <p className="text-xs text-amber-700 mt-1 leading-relaxed">
             You clocked in on {clockInFormatted} and didn&apos;t clock out.
           </p>
         </div>
@@ -122,12 +126,7 @@ export default function ClockInButton({ openEntry }: Props) {
           </select>
         </div>
 
-        <Button
-          size="lg"
-          onClick={handleFixClockOut}
-          disabled={isPending || !fixTime}
-          className="w-full"
-        >
+        <Button size="lg" onClick={handleFixClockOut} disabled={isPending || !fixTime} className="w-full">
           {isPending ? 'Saving…' : 'Fix clock-out'}
         </Button>
 
@@ -145,16 +144,30 @@ export default function ClockInButton({ openEntry }: Props) {
     <div className="space-y-3">
       {openEntry ? (
         <div className="space-y-3">
-          <div className="bg-[#f0faf4] border border-green-500/20 rounded-2xl px-5 py-4">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-green-700">On shift</p>
+
+          {/* Dark cinematic on-shift card */}
+          <div className="bg-stone-900 rounded-2xl px-6 py-6">
+            <div className="flex items-center justify-between mb-5">
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-stone-500">
+                On shift
+              </span>
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
             </div>
-            <p className="text-3xl font-semibold tracking-tight text-stone-900 leading-none">
-              {elapsed ?? '—'}
+
+            <p className="text-6xl font-semibold tracking-tight text-white leading-none">
+              {elapsedSeconds !== null ? formatElapsed(elapsedSeconds) : '—'}
             </p>
-            <p className="text-sm text-stone-400 mt-1.5">elapsed</p>
+
+            <div className="mt-6 pt-5 border-t border-stone-800">
+              <p className="text-sm text-stone-500">
+                Since{' '}
+                <span className="text-stone-300 font-medium">
+                  {format(new Date(openEntry.clock_in), 'h:mm a')}
+                </span>
+              </p>
+            </div>
           </div>
+
           <Button
             variant="secondary"
             size="lg"
@@ -170,7 +183,7 @@ export default function ClockInButton({ openEntry }: Props) {
           size="lg"
           onClick={handleClockIn}
           disabled={isPending}
-          className="w-full"
+          className="w-full py-5 text-base"
         >
           {isPending ? 'Clocking in…' : 'Clock in'}
         </Button>

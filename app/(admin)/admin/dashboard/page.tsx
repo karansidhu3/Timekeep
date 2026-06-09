@@ -25,7 +25,7 @@ export default async function AdminDashboardPage() {
       .order('start_time'),
     supabase
       .from('time_entries')
-      .select('id, clock_in, employees(name)')
+      .select('id, clock_in, employee_id, employees(name)')
       .is('clock_out', null),
     supabase
       .from('employees')
@@ -55,7 +55,7 @@ export default async function AdminDashboardPage() {
         </Card>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 stagger">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-stone-700">Today&apos;s shifts</h2>
           <Link href="/admin/schedule" className="text-xs text-stone-400 hover:text-stone-600">
@@ -67,23 +67,40 @@ export default async function AdminDashboardPage() {
           <p className="text-sm text-stone-400 py-4">No shifts scheduled today.</p>
         ) : (
           todayShifts.map(shift => {
-            const isClockedIn = openEntries?.some(e => {
+            const matchingEntry = openEntries?.find(e => {
               const empEntry = (e.employees as unknown as { name: string } | null)
               const shiftEmp = (shift.employees as unknown as { name: string } | null)
               return empEntry?.name === shiftEmp?.name
             })
+            const isClockedIn = !!matchingEntry
 
             return (
-              <Card key={shift.id} className="p-4 flex items-center justify-between">
+              <Card
+                key={shift.id}
+                className={`p-4 flex items-center justify-between ${isClockedIn ? 'border-green-500/20' : ''}`}
+                style={isClockedIn ? { background: '#f4fbf6' } : undefined}
+              >
                 <div>
-                  <p className="text-sm font-medium text-stone-900">
-                    {(shift.employees as unknown as { name: string } | null)?.name}
-                  </p>
-                  <p className="text-xs text-stone-500 mt-0.5">
-                    <ClientTime iso={shift.start_time} fmt="EEE MMM d · h:mm a" /> – <ClientTime iso={shift.end_time} fmt="h:mm a" />
+                  <div className="flex items-center gap-2">
+                    {isClockedIn && (
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" />
+                    )}
+                    <p className="text-sm font-medium text-stone-900">
+                      {(shift.employees as unknown as { name: string } | null)?.name}
+                    </p>
+                  </div>
+                  <p className="text-xs text-stone-500 mt-0.5 ml-3.5">
+                    <ClientTime iso={shift.start_time} fmt="h:mm a" /> – <ClientTime iso={shift.end_time} fmt="h:mm a" />
+                    {isClockedIn && matchingEntry && (
+                      <span className="text-green-600 ml-2">
+                        · since <ClientTime iso={matchingEntry.clock_in} fmt="h:mm a" />
+                      </span>
+                    )}
                   </p>
                 </div>
-                {isClockedIn && <Badge variant="success">Clocked in</Badge>}
+                {!isClockedIn && (
+                  <span className="text-xs text-stone-300 font-medium">Not in</span>
+                )}
               </Card>
             )
           })

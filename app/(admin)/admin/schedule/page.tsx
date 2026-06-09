@@ -67,7 +67,7 @@ export default async function AdminSchedulePage({
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 stagger">
         {weekDays.map(day => {
           const dayShifts = (shifts ?? []).filter(s => isSameDay(new Date(s.start_time), day))
           const isToday = isSameDay(day, new Date())
