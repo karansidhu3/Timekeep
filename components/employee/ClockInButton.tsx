@@ -1,10 +1,9 @@
 'use client'
 
 import { useState, useTransition, useEffect } from 'react'
-import { format } from 'date-fns'
 import { clockIn, clockOut } from '@/lib/actions/time-entries'
 import Button from '@/components/ui/Button'
-import { formatElapsed, formatDuration } from '@/lib/utils'
+import { formatElapsed, formatDuration, formatTimePST } from '@/lib/utils'
 
 interface TimeEntry {
   id: string
@@ -93,7 +92,9 @@ export default function ClockInButton({ openEntry }: Props) {
 
   // ── Missed clock-out from a previous day ──────────────────────────────────
   if (openEntry && isMissedClockOut(openEntry.clock_in)) {
-    const clockInFormatted = format(new Date(openEntry.clock_in), "EEE, MMM d 'at' h:mm a")
+    const clockInFormatted = `${new Date(openEntry.clock_in).toLocaleDateString('en-US', {
+      timeZone: 'America/Los_Angeles', weekday: 'short', month: 'short', day: 'numeric',
+    })} at ${formatTimePST(openEntry.clock_in)}`
 
     return (
       <div className="space-y-3">
@@ -106,7 +107,7 @@ export default function ClockInButton({ openEntry }: Props) {
 
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-stone-700">
-            What time did you leave on {format(new Date(openEntry.clock_in), 'MMM d')}?
+            What time did you leave on {new Date(openEntry.clock_in).toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles', month: 'short', day: 'numeric' })}?
           </label>
           <select
             value={fixTime}
@@ -162,7 +163,7 @@ export default function ClockInButton({ openEntry }: Props) {
               <p className="text-sm text-stone-500">
                 Since{' '}
                 <span className="text-stone-300 font-medium">
-                  {format(new Date(openEntry.clock_in), 'h:mm a')}
+                  {formatTimePST(openEntry.clock_in)}
                 </span>
               </p>
             </div>

@@ -1,7 +1,7 @@
 'use client'
 
 import { format, isSameDay } from 'date-fns'
-import { formatDuration, calcDurationMinutes } from '@/lib/utils'
+import { formatDuration, calcDurationMinutes, formatTimePST } from '@/lib/utils'
 
 interface Shift {
   id: string
@@ -55,7 +55,7 @@ export default function WeeklySchedule({ shifts, weekDays }: Props) {
                 dayShifts.map(shift => (
                   <div key={shift.id} className="mb-2 last:mb-0">
                     <p className={`text-sm font-semibold ${today ? 'text-stone-900' : 'text-stone-700'}`}>
-                      {format(new Date(shift.start_time), 'h:mm a')} – {format(new Date(shift.end_time), 'h:mm a')}
+                      {formatTimePST(shift.start_time)} – {formatTimePST(shift.end_time)}
                     </p>
                     <p className="text-xs text-stone-400 mt-0.5">
                       {formatDuration(calcDurationMinutes(shift.start_time, shift.end_time))}

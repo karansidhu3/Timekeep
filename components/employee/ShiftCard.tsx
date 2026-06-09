@@ -1,8 +1,7 @@
 'use client'
 
-import { format } from 'date-fns'
 import Card from '@/components/ui/Card'
-import { formatDuration, calcDurationMinutes } from '@/lib/utils'
+import { formatDuration, calcDurationMinutes, formatTimePST } from '@/lib/utils'
 
 interface Shift {
   id: string
@@ -32,8 +31,8 @@ export default function ShiftCard({ shifts, serverNow }: { shifts: Shift[]; serv
   const hasStarted   = now >= shiftStart
   const isOver       = now >= shiftEnd
   const minutesUntil = hasStarted ? 0 : Math.ceil((shiftStart.getTime() - now.getTime()) / 60000)
-  const startTime    = format(shiftStart, 'h:mm a')
-  const endTime      = format(shiftEnd,   'h:mm a')
+  const startTime    = formatTimePST(shift.start_time)
+  const endTime      = formatTimePST(shift.end_time)
   const duration     = calcDurationMinutes(shift.start_time, shift.end_time)
 
   return (

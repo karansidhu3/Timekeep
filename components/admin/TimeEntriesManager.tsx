@@ -8,7 +8,7 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import TimeSelect from '@/components/ui/TimeSelect'
 import Card from '@/components/ui/Card'
-import { formatDuration, calcDurationMinutes } from '@/lib/utils'
+import { formatDuration, calcDurationMinutes, formatTimePST, localDatePST, localTimePST } from '@/lib/utils'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -36,19 +36,8 @@ export interface WeeklySummary {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function toLocalDate(iso: string) {
-  const d = new Date(iso)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
-
-function toLocalTime(iso: string) {
-  const d = new Date(iso)
-  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
-}
-
-function smartTime(iso: string): string {
-  return format(new Date(iso), 'h:mm a')
-}
+const toLocalDate = localDatePST
+const toLocalTime = localTimePST
 
 function dateGroupLabel(iso: string): string {
   const d = new Date(iso)
@@ -359,9 +348,9 @@ export default function TimeEntriesManager({ entries, employees, weeklySummaries
                         </button>
                       </div>
                       <p className="text-xs text-stone-500 mt-1 tabular-nums">
-                        {smartTime(entry.clock_in)}
+                        {formatTimePST(entry.clock_in)}
                         {' – '}
-                        {entry.clock_out ? smartTime(entry.clock_out) : (
+                        {entry.clock_out ? formatTimePST(entry.clock_out) : (
                           <span className={forgotten ? 'text-amber-500 font-medium' : 'text-green-600 font-medium'}>
                             {forgotten ? 'needs review' : 'now'}
                           </span>
@@ -408,10 +397,10 @@ export default function TimeEntriesManager({ entries, employees, weeklySummaries
                           }`}
                         >
                           <td className="px-4 py-3 text-stone-700 font-medium">{entry.employee_name}</td>
-                          <td className="px-4 py-3 text-stone-900 tabular-nums">{smartTime(entry.clock_in)}</td>
+                          <td className="px-4 py-3 text-stone-900 tabular-nums">{formatTimePST(entry.clock_in)}</td>
                           <td className="px-4 py-3 tabular-nums">
                             {entry.clock_out ? (
-                              <span className="text-stone-900">{smartTime(entry.clock_out)}</span>
+                              <span className="text-stone-900">{formatTimePST(entry.clock_out)}</span>
                             ) : forgotten ? (
                               <span className="text-amber-500 font-semibold text-xs">Needs review</span>
                             ) : (

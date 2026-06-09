@@ -1,12 +1,12 @@
 'use client'
 
-import { format } from 'date-fns'
+import { formatTimePST } from '@/lib/utils'
 
 interface Props {
   iso: string
-  fmt?: string
+  fmt?: string  // accepted for backwards compat, formatTimePST is always used
 }
 
-export default function ClientTime({ iso, fmt = 'h:mm a' }: Props) {
-  return <>{format(new Date(iso), fmt)}</>
+export default function ClientTime({ iso }: Props) {
+  return <>{formatTimePST(iso)}</>
 }

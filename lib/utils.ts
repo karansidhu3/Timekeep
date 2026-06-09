@@ -1,5 +1,57 @@
 import { format, startOfWeek, endOfWeek, addWeeks, differenceInMinutes, isToday, isYesterday, isThisWeek } from 'date-fns'
 
+const TZ = 'America/Los_Angeles'
+
+// "7:00 AM" / "12:30 PM" — always PST/PDT, consistent on server and client
+export function formatTimePST(iso: string): string {
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: TZ,
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  }).format(new Date(iso))
+}
+
+// Compact 12h, no AM/PM, no ":00" on the hour — for tight schedule chips
+export function compactTimePST(iso: string): string {
+  const str = new Intl.DateTimeFormat('en-US', {
+    timeZone: TZ,
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).format(new Date(iso))
+  const [hStr, mStr] = str.split(':')
+  const h = parseInt(hStr, 10)
+  const m = parseInt(mStr, 10)
+  const h12 = h % 12 || 12
+  return m === 0 ? String(h12) : `${h12}:${String(m).padStart(2, '0')}`
+}
+
+// 0=Mon … 6=Sun, evaluated in PST
+export function weekdayIndexPST(iso: string): number {
+  const short = new Intl.DateTimeFormat('en-US', {
+    timeZone: TZ,
+    weekday: 'short',
+  }).format(new Date(iso))
+  const map: Record<string, number> = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 }
+  return map[short] ?? 0
+}
+
+// YYYY-MM-DD date string in PST — use en-CA locale which outputs ISO date format
+export function localDatePST(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-CA', { timeZone: TZ })
+}
+
+// HH:MM in PST (24-hour) — for pre-filling <input type="time"> and <TimeSelect>
+export function localTimePST(iso: string): string {
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: TZ,
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).format(new Date(iso))
+}
+
 export function formatShiftTime(start: string, end: string): string {
   const s = new Date(start)
   const e = new Date(end)

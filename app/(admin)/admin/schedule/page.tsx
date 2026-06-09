@@ -1,20 +1,12 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { format, eachDayOfInterval, isSameDay, differenceInMinutes } from 'date-fns'
-import { getWeekRange } from '@/lib/utils'
+import { getWeekRange, compactTimePST, weekdayIndexPST } from '@/lib/utils'
 import Link from 'next/link'
 import AdminWeekNav from '@/components/admin/AdminWeekNav'
 import NewShiftButton from '@/components/admin/NewShiftButton'
 import ApplyTemplateButton from '@/components/admin/ApplyTemplateButton'
 
-// Compact 12h time: "9", "9:30", "12" — no am/pm for display in tight chips
-function compactTime(iso: string): string {
-  const d = new Date(iso)
-  const h = d.getHours()
-  const m = d.getMinutes()
-  const h12 = h % 12 || 12
-  return m === 0 ? String(h12) : `${h12}:${String(m).padStart(2, '0')}`
-}
 
 function fmtMinutes(mins: number): string {
   const h = Math.floor(mins / 60)
@@ -62,8 +54,7 @@ export default async function AdminSchedulePage({
   const hoursMap = new Map<string, number>()
 
   for (const shift of (shifts ?? []) as ShiftRow[]) {
-    // getDay() returns 0=Sun…6=Sat → normalise to 0=Mon…6=Sun
-    const dayIdx = (new Date(shift.start_time).getDay() + 6) % 7
+    const dayIdx = weekdayIndexPST(shift.start_time)
     if (!rotaMap.has(shift.employee_id)) rotaMap.set(shift.employee_id, new Map())
     rotaMap.get(shift.employee_id)!.set(dayIdx, shift)
     const mins = differenceInMinutes(new Date(shift.end_time), new Date(shift.start_time))
@@ -176,10 +167,10 @@ export default async function AdminSchedulePage({
                         }`}
                       >
                         <span className="text-[9px] font-semibold text-white tabular-nums leading-none">
-                          {compactTime(shift.start_time)}
+                          {compactTimePST(shift.start_time)}
                         </span>
                         <span className="text-[9px] text-white/50 tabular-nums leading-none">
-                          {compactTime(shift.end_time)}
+                          {compactTimePST(shift.end_time)}
                         </span>
                       </Link>
                     )
