@@ -38,7 +38,7 @@ export default function NewEmployeeButton() {
 
   return (
     <div className="animate-fade-in fixed inset-0 bg-black/30 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-      <div className="animate-sheet-up sm:animate-float-in bg-[#fffefb] rounded-t-2xl sm:rounded-2xl [box-shadow:var(--shadow-xl)] w-full sm:max-w-sm p-6 pb-[max(2rem,env(safe-area-inset-bottom))] sm:pb-6">
+      <div className="animate-sheet-up sm:animate-float-in bg-[#fffefb] rounded-t-2xl sm:rounded-2xl [box-shadow:var(--shadow-xl)] w-full sm:max-w-sm p-6 pb-[max(2rem,env(safe-area-inset-bottom))] sm:pb-6 overflow-y-auto max-h-[90dvh]">
         <div className="w-10 h-1 bg-stone-200 rounded-full mx-auto mb-5 sm:hidden" />
         <h2 className="text-base font-semibold text-stone-900 mb-5">New employee</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
