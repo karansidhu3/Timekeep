@@ -213,11 +213,11 @@ function TimeEntryModal({ mode, employees, entry, onClose }: ModalProps) {
 interface Props {
   entries: TimeEntryRow[]
   employees: EmployeeOption[]
-  weeklySummaries: WeeklySummary[]
+  weeklySummaries?: WeeklySummary[]
   weekLabel: string
 }
 
-export default function TimeEntriesManager({ entries, employees, weeklySummaries, weekLabel }: Props) {
+export default function TimeEntriesManager({ entries, employees, weeklySummaries = [], weekLabel }: Props) {
   const [addOpen, setAddOpen] = useState(false)
   const [editEntry, setEditEntry] = useState<TimeEntryRow | null>(null)
 

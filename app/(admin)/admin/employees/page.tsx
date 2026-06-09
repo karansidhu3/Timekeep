@@ -32,33 +32,32 @@ export default async function EmployeesPage() {
 
       <div className="space-y-2 stagger">
         {(employees ?? []).map(emp => (
-          <Card key={emp.id} hoverable className="p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center flex-shrink-0">
-                  <span className="text-xs font-semibold text-stone-500">
-                    {emp.name.trim().split(/\s+/).map((n: string) => n[0]).filter(Boolean).slice(0, 2).join('').toUpperCase()}
-                  </span>
+          <Link key={emp.id} href={`/admin/employees/${emp.id}`} className="block">
+            <Card hoverable className="p-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="relative flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center">
+                    <span className="text-xs font-semibold text-stone-500">
+                      {emp.name.trim().split(/\s+/).map((n: string) => n[0]).filter(Boolean).slice(0, 2).join('').toUpperCase()}
+                    </span>
+                  </div>
+                  {clockedInSet.has(emp.id) && (
+                    <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-[#faf9f7]" />
+                  )}
                 </div>
-                {clockedInSet.has(emp.id) && (
-                  <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-[#faf9f7]" />
-                )}
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium text-stone-900">{emp.name}</p>
-                  {!emp.active && <Badge variant="warning">Inactive</Badge>}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium text-stone-900">{emp.name}</p>
+                    {!emp.active && <Badge variant="warning">Inactive</Badge>}
+                  </div>
+                  <p className="text-xs text-stone-400 mt-0.5 capitalize">{emp.role}</p>
                 </div>
-                <p className="text-xs text-stone-400 mt-0.5 capitalize">{emp.role}</p>
               </div>
-            </div>
-            <Link
-              href={`/admin/employees/${emp.id}`}
-              className="text-sm text-stone-400 hover:text-stone-700 px-3 py-3 rounded-xl hover:bg-stone-50 transition-colors min-h-[44px] flex items-center"
-            >
-              Edit
-            </Link>
-          </Card>
+              <svg className="w-4 h-4 text-stone-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </Card>
+          </Link>
         ))}
       </div>
     </div>
