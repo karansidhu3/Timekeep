@@ -7,7 +7,6 @@ import AdminWeekNav from '@/components/admin/AdminWeekNav'
 import NewShiftButton from '@/components/admin/NewShiftButton'
 import ApplyTemplateButton from '@/components/admin/ApplyTemplateButton'
 
-
 function fmtMinutes(mins: number): string {
   const h = Math.floor(mins / 60)
   const m = mins % 60
@@ -47,7 +46,6 @@ export default async function AdminSchedulePage({
   const weekDays = eachDayOfInterval({ start, end })
   const shiftCount = (shifts ?? []).length
 
-  // Build rota: employee_id → dayIndex (0=Mon…6=Sun) → shift
   type ShiftRow = { id: string; start_time: string; end_time: string; notes: string | null; employee_id: string }
 
   const rotaMap = new Map<string, Map<number, ShiftRow>>()
@@ -64,49 +62,47 @@ export default async function AdminSchedulePage({
   const today = new Date()
 
   return (
-    <div className="max-w-5xl mx-auto px-6 pb-10 pt-page animate-page-in">
+    <div className="max-w-5xl mx-auto px-6 pb-12 pt-page animate-page-in">
 
-      {/* ── Header ────────────────────────────────────────────────── */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-1">
-          <h1 className="text-2xl font-semibold tracking-tight text-stone-900">Schedule</h1>
-          <NewShiftButton employees={employees ?? []} weekStart={start.toISOString()} />
-        </div>
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-stone-400">
+      {/* ── Header ─────────────────────────────────────────────────── */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-semibold tracking-tight text-[#0d0c0b]">Schedule</h1>
+          <p className="text-sm text-[#a8a29e] mt-0.5 tracking-[-0.01em] font-mono">
             {format(start, 'MMM d')} – {format(end, 'MMM d')}
             {shiftCount > 0 && (
-              <span className="ml-1.5">· {shiftCount} shift{shiftCount !== 1 ? 's' : ''}</span>
+              <span className="ml-1.5 text-[#c4bfba]">· {shiftCount} {shiftCount !== 1 ? 'shifts' : 'shift'}</span>
             )}
           </p>
-          <div className="flex items-center gap-1">
-            <ApplyTemplateButton templates={templates ?? []} weekStart={start} />
-            <AdminWeekNav weekOffset={weekOffset} />
-          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <ApplyTemplateButton templates={templates ?? []} weekStart={start} />
+          <NewShiftButton employees={employees ?? []} weekStart={start.toISOString()} />
+          <AdminWeekNav weekOffset={weekOffset} />
         </div>
       </div>
 
       {(employees ?? []).length === 0 ? (
-        <p className="text-sm text-stone-400 py-4">No employees yet.</p>
+        <p className="text-sm text-[#a8a29e] py-4">No employees yet.</p>
       ) : (
         <>
-          {/* ── Day header row ──────────────────────────────────── */}
+          {/* ── Day header row ─────────────────────────────────────── */}
           <div
-            className="grid gap-1.5 mb-2"
-            style={{ gridTemplateColumns: '56px repeat(7, 1fr)' }}
+            className="grid gap-px mb-1"
+            style={{ gridTemplateColumns: '72px repeat(7, 1fr)' }}
           >
-            <div /> {/* name column spacer */}
+            <div />
             {weekDays.map(day => {
               const isToday = isSameDay(day, today)
               return (
-                <div key={day.toISOString()} className="text-center">
+                <div key={day.toISOString()} className={`text-center py-2 rounded-lg ${isToday ? 'bg-[#141210]' : ''}`}>
                   <p className={`text-[9px] font-bold uppercase tracking-widest leading-none ${
-                    isToday ? 'text-stone-900' : 'text-stone-300'
+                    isToday ? 'text-white/50' : 'text-[#c4bfba]'
                   }`}>
                     {format(day, 'EEE')[0]}
                   </p>
-                  <p className={`text-xs mt-0.5 tabular-nums ${
-                    isToday ? 'text-stone-900 font-semibold' : 'text-stone-400'
+                  <p className={`text-xs mt-0.5 font-mono tabular-nums ${
+                    isToday ? 'text-white font-semibold' : 'text-[#78716c]'
                   }`}>
                     {format(day, 'd')}
                   </p>
@@ -115,8 +111,8 @@ export default async function AdminSchedulePage({
             })}
           </div>
 
-          {/* ── Employee rows ───────────────────────────────────── */}
-          <div className="space-y-1.5">
+          {/* ── Employee rows ───────────────────────────────────────── */}
+          <div className="space-y-px stagger">
             {(employees ?? []).map(emp => {
               const empShifts = rotaMap.get(emp.id)
               const totalMins = hoursMap.get(emp.id) ?? 0
@@ -125,16 +121,14 @@ export default async function AdminSchedulePage({
               return (
                 <div
                   key={emp.id}
-                  className="grid gap-1.5 items-center bg-[#fffefb] rounded-2xl border border-stone-200 [box-shadow:var(--shadow-sm)] px-2.5 py-2.5"
-                  style={{ gridTemplateColumns: '56px repeat(7, 1fr)' }}
+                  className="grid gap-px items-stretch"
+                  style={{ gridTemplateColumns: '72px repeat(7, 1fr)' }}
                 >
                   {/* Name + hours */}
-                  <div className="min-w-0">
-                    <p className="text-xs font-medium text-stone-900 truncate">{firstName}</p>
-                    <p className="text-[10px] text-stone-400 mt-0.5 tabular-nums">
-                      {totalMins > 0 ? fmtMinutes(totalMins) : (
-                        <span className="text-stone-300">—</span>
-                      )}
+                  <div className="flex flex-col justify-center pr-2 py-1.5 min-w-0">
+                    <p className="text-xs font-medium text-[#1a1917] truncate tracking-[-0.01em]">{firstName}</p>
+                    <p className="text-[10px] text-[#a8a29e] mt-0.5 font-mono tabular-nums">
+                      {totalMins > 0 ? fmtMinutes(totalMins) : <span className="text-[#e4e0da]">—</span>}
                     </p>
                   </div>
 
@@ -147,13 +141,11 @@ export default async function AdminSchedulePage({
                       return (
                         <div
                           key={dayIdx}
-                          className={`h-11 rounded-xl flex items-center justify-center ${
-                            isToday ? 'bg-stone-100/50' : ''
+                          className={`h-12 rounded-xl flex items-center justify-center ${
+                            isToday ? 'bg-[#141210]/5' : 'bg-[#f0ede8]/40'
                           }`}
                         >
-                          <span className={`text-[10px] ${isToday ? 'text-stone-300' : 'text-stone-200'}`}>
-                            —
-                          </span>
+                          <span className="text-[10px] text-[#e4e0da]">·</span>
                         </div>
                       )
                     }
@@ -162,14 +154,17 @@ export default async function AdminSchedulePage({
                       <Link
                         key={dayIdx}
                         href={`/admin/schedule/${shift.id}`}
-                        className={`h-11 rounded-xl flex flex-col items-center justify-center gap-px transition-opacity hover:opacity-75 active:scale-95 ${
-                          isToday ? 'bg-stone-900' : 'bg-stone-800'
+                        className={`h-12 rounded-xl flex flex-col items-center justify-center gap-px
+                          transition-all duration-150 hover:opacity-80 active:scale-[0.96] ${
+                          isToday
+                            ? 'bg-[#141210]'
+                            : 'bg-[#1e1c19]'
                         }`}
                       >
-                        <span className="text-[9px] font-semibold text-white tabular-nums leading-none">
+                        <span className="text-[9px] font-semibold text-white/90 font-mono tabular-nums leading-none">
                           {compactTimePST(shift.start_time)}
                         </span>
-                        <span className="text-[9px] text-white/50 tabular-nums leading-none">
+                        <span className="text-[9px] text-white/35 font-mono tabular-nums leading-none">
                           {compactTimePST(shift.end_time)}
                         </span>
                       </Link>
@@ -180,10 +175,9 @@ export default async function AdminSchedulePage({
             })}
           </div>
 
-          {/* ── Empty week message ─────────────────────────────── */}
           {shiftCount === 0 && (
-            <p className="text-sm text-stone-400 pt-6 text-center">
-              No shifts this week — add one with the button above.
+            <p className="text-sm text-[#a8a29e] pt-8 text-center tracking-[-0.01em]">
+              No shifts this week — add one above.
             </p>
           )}
         </>

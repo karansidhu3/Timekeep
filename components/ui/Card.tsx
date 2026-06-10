@@ -12,8 +12,10 @@ export default function Card({ children, className = '', hoverable = false, styl
     <div
       style={style}
       className={`
-        bg-[#fffefb] rounded-2xl border border-stone-200 [box-shadow:var(--shadow-sm)]
-        ${hoverable ? 'transition-[box-shadow,background-color] duration-150 hover:bg-stone-50/60 hover:[box-shadow:var(--shadow-md)]' : ''}
+        bg-[#fffefb] rounded-2xl border border-[#e4e0da] [box-shadow:var(--shadow-sm)]
+        ${hoverable
+          ? 'transition-all duration-200 hover:border-[#d6d1ca] hover:[box-shadow:var(--shadow-md)] active:scale-[0.99]'
+          : ''}
         ${className}
       `}
     >

@@ -1,6 +1,5 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import Card from '@/components/ui/Card'
 import ClientTime from '@/components/ui/ClientTime'
 import ClientDate from '@/components/ui/ClientDate'
 import { signOut } from '@/lib/actions/auth'
@@ -28,7 +27,6 @@ export default async function AdminDashboardPage() {
       .is('clock_out', null),
   ])
 
-  // Map employee_id → open entry
   const openByEmployee = new Map<string, { id: string; clock_in: string }>()
   for (const e of openEntries ?? []) {
     openByEmployee.set(e.employee_id, { id: e.id, clock_in: e.clock_in })
@@ -37,12 +35,8 @@ export default async function AdminDashboardPage() {
   const LATE_THRESHOLD_MS = 15 * 60 * 1000
 
   type ShiftRow = {
-    id: string
-    start_time: string
-    end_time: string
-    notes: string | null
-    employee_id: string
-    employees: unknown
+    id: string; start_time: string; end_time: string
+    notes: string | null; employee_id: string; employees: unknown
   }
 
   const clockedIn:  { shift: ShiftRow; entry: { id: string; clock_in: string } }[] = []
@@ -62,152 +56,148 @@ export default async function AdminDashboardPage() {
       } else if (now.getTime() - shiftStart.getTime() > LATE_THRESHOLD_MS) {
         late.push(shift)
       } else {
-        upcoming.push(shift) // within grace period
+        upcoming.push(shift)
       }
     }
   }
 
-  // Clocked in without a scheduled shift today
   const unscheduledActive = (openEntries ?? []).filter(e => !matchedEmployeeIds.has(e.employee_id))
-
   const totalScheduled = (todayShifts ?? []).length
   const totalOnShift = clockedIn.length + unscheduledActive.length
   const hasAnyActivity = totalScheduled > 0 || unscheduledActive.length > 0
 
   return (
-    <div className="max-w-2xl mx-auto px-6 pb-10 pt-page animate-page-in">
+    <div className="max-w-2xl mx-auto px-6 pb-12 pt-page animate-page-in">
 
-      {/* ── Header ──────────────────────────────────────────────────── */}
-      <div className="flex items-start justify-between mb-3">
+      {/* ── Header ────────────────────────────────────────────────────── */}
+      <div className="flex items-start justify-between mb-10">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-stone-900">Today</h1>
-          <p className="text-sm text-stone-400 mt-0.5"><ClientDate /></p>
+          <p className="text-xs text-[#a8a29e] tracking-[-0.01em] mb-1"><ClientDate /></p>
+          <h1 className="text-3xl font-semibold tracking-tight text-[#0d0c0b]">Today</h1>
         </div>
-        {/* Mobile sign-out — desktop uses sidebar */}
         <form action={signOut} className="md:hidden">
-          <button className="text-xs font-medium text-stone-400 hover:text-stone-700 px-3 py-2 rounded-xl hover:bg-stone-100 transition-colors duration-150">
+          <button className="text-xs font-medium text-[#a8a29e] hover:text-[#44403c] px-3 py-2 rounded-xl hover:bg-[#f0ede8] transition-colors duration-150 tracking-[-0.01em]">
             Sign out
           </button>
         </form>
       </div>
 
-      {/* ── Status summary ──────────────────────────────────────────── */}
+      {/* ── Status statement ─────────────────────────────────────────── */}
       {hasAnyActivity ? (
-        <p className="text-sm mb-8 flex items-center gap-2 flex-wrap">
-          <span className={totalOnShift > 0 ? 'text-stone-700 font-medium tabular-nums' : 'text-stone-400 tabular-nums'}>
-            {totalOnShift}
-            {totalScheduled > 0 && <span className="font-normal text-stone-400"> of {totalScheduled}</span>}
-            {' '}on shift
-          </span>
-          {late.length > 0 && (
-            <>
-              <span className="text-stone-200">·</span>
-              <span className="text-amber-500 font-semibold tabular-nums">{late.length} late</span>
-            </>
-          )}
-          {upcoming.length > 0 && (
-            <>
-              <span className="text-stone-200">·</span>
-              <span className="text-stone-400 tabular-nums">{upcoming.length} upcoming</span>
-            </>
-          )}
-        </p>
+        <div className="mb-10">
+          <p className="text-[1.375rem] font-semibold tracking-tight text-[#0d0c0b] leading-snug">
+            {totalOnShift > 0 ? (
+              <>
+                <span className="font-mono">{totalOnShift}</span>
+                {totalScheduled > 0 && (
+                  <span className="text-[#a8a29e] font-normal"> of <span className="font-mono">{totalScheduled}</span></span>
+                )}
+                {' '}on shift
+              </>
+            ) : (
+              <span className="text-[#a8a29e] font-normal">No one clocked in</span>
+            )}
+            {late.length > 0 && (
+              <span className="text-amber-500"> · <span className="font-mono">{late.length}</span> late</span>
+            )}
+            {upcoming.length > 0 && (
+              <span className="text-[#a8a29e] font-normal"> · <span className="font-mono">{upcoming.length}</span> upcoming</span>
+            )}
+          </p>
+        </div>
       ) : (
-        <p className="text-sm text-stone-400 mb-8">No shifts today.</p>
+        <p className="text-[#a8a29e] mb-10 tracking-[-0.01em]">No shifts today.</p>
       )}
 
       {/* ── Clocked in ──────────────────────────────────────────────── */}
-      {clockedIn.length > 0 && (
-        <section className="mb-6">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-3">
-            On shift · {clockedIn.length}
+      {(clockedIn.length > 0 || unscheduledActive.length > 0) && (
+        <section className="mb-8">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#a8a29e] mb-3">
+            On shift · {clockedIn.length + unscheduledActive.length}
           </p>
-          <div className="space-y-2 stagger">
+          <div className="rounded-2xl border border-[#e4e0da] overflow-hidden [box-shadow:var(--shadow-sm)] stagger-fast">
             {clockedIn.map(({ shift, entry }) => {
               const emp = (shift.employees as unknown as { name: string } | null)
               const elapsedSeconds = Math.floor((now.getTime() - new Date(entry.clock_in).getTime()) / 1000)
               return (
-                <Card key={shift.id} className="p-4 border-green-400/30" style={{ background: '#f4fbf6' }}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
-                      <p className="text-sm font-semibold text-stone-900">{emp?.name}</p>
+                <div
+                  key={shift.id}
+                  className="flex items-center justify-between px-4 py-3.5 bg-[#fffefb] border-b border-[#e4e0da] last:border-0"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0 animate-pulse-live" />
+                    <div>
+                      <p className="text-sm font-semibold text-[#0d0c0b] tracking-[-0.01em]">{emp?.name}</p>
+                      <p className="text-xs text-[#a8a29e] tracking-[-0.01em] mt-0.5 font-mono">
+                        since <ClientTime iso={entry.clock_in} />
+                        <span className="text-[#d6d3d1] mx-1">·</span>
+                        <ClientTime iso={shift.start_time} /> – <ClientTime iso={shift.end_time} />
+                      </p>
                     </div>
-                    <p className="text-sm font-semibold text-stone-900 tabular-nums">
-                      {formatElapsed(elapsedSeconds)}
-                    </p>
                   </div>
-                  <div className="flex items-center justify-between mt-1.5 pl-[18px]">
-                    <p className="text-xs text-stone-500">
-                      Since <ClientTime iso={entry.clock_in} fmt="h:mm a" />
-                    </p>
-                    <p className="text-xs text-stone-400 tabular-nums">
-                      <ClientTime iso={shift.start_time} fmt="h:mm a" /> – <ClientTime iso={shift.end_time} fmt="h:mm a" />
-                    </p>
-                  </div>
-                </Card>
+                  <p className="text-sm font-semibold text-[#0d0c0b] font-mono tabular-nums">
+                    {formatElapsed(elapsedSeconds)}
+                  </p>
+                </div>
               )
             })}
-          </div>
-        </section>
-      )}
-
-      {/* ── Unscheduled active ──────────────────────────────────────── */}
-      {unscheduledActive.length > 0 && (
-        <section className="mb-6">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-3">
-            Clocked in · no shift
-          </p>
-          <div className="space-y-2 stagger">
             {unscheduledActive.map(entry => {
               const emp = (entry.employees as unknown as { name: string } | null)
               const elapsedSeconds = Math.floor((now.getTime() - new Date(entry.clock_in).getTime()) / 1000)
               return (
-                <Card key={entry.id} className="p-4" style={{ background: '#f4fbf6' }}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
-                      <p className="text-sm font-semibold text-stone-900">{emp?.name}</p>
+                <div
+                  key={entry.id}
+                  className="flex items-center justify-between px-4 py-3.5 bg-[#fffefb] border-b border-[#e4e0da] last:border-0"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0 animate-pulse-live" />
+                    <div>
+                      <p className="text-sm font-semibold text-[#0d0c0b] tracking-[-0.01em]">{emp?.name}</p>
+                      <p className="text-xs text-[#a8a29e] tracking-[-0.01em] mt-0.5 font-mono">
+                        since <ClientTime iso={entry.clock_in} />
+                        <span className="text-[#d6d3d1] mx-1.5">·</span>
+                        no shift
+                      </p>
                     </div>
-                    <p className="text-sm font-semibold text-stone-900 tabular-nums">
-                      {formatElapsed(elapsedSeconds)}
-                    </p>
                   </div>
-                  <p className="text-xs text-stone-500 mt-1.5 pl-[18px]">
-                    Since <ClientTime iso={entry.clock_in} fmt="h:mm a" />
+                  <p className="text-sm font-semibold text-[#0d0c0b] font-mono tabular-nums">
+                    {formatElapsed(elapsedSeconds)}
                   </p>
-                </Card>
+                </div>
               )
             })}
           </div>
         </section>
       )}
 
-      {/* ── Late / no show ──────────────────────────────────────────── */}
+      {/* ── Late ──────────────────────────────────────────────────────── */}
       {late.length > 0 && (
-        <section className="mb-6">
+        <section className="mb-8">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-500 mb-3">
             Not in · {late.length}
           </p>
-          <div className="space-y-2 stagger">
+          <div className="rounded-2xl border border-amber-200/60 overflow-hidden [box-shadow:var(--shadow-sm)] stagger-fast">
             {late.map(shift => {
               const emp = (shift.employees as unknown as { name: string } | null)
               const minsLate = Math.floor((now.getTime() - new Date(shift.start_time).getTime()) / 60000)
               return (
-                <Card key={shift.id} className="p-4 border-amber-300/40" style={{ background: '#fffdf7' }}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
-                      <p className="text-sm font-semibold text-stone-900">{emp?.name}</p>
+                <div
+                  key={shift.id}
+                  className="flex items-center justify-between px-4 py-3.5 bg-[#fffdf7] border-b border-amber-100 last:border-0"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-semibold text-[#0d0c0b] tracking-[-0.01em]">{emp?.name}</p>
+                      <p className="text-xs text-[#a8a29e] tracking-[-0.01em] mt-0.5 font-mono">
+                        shift started <ClientTime iso={shift.start_time} />
+                      </p>
                     </div>
-                    <p className="text-xs font-semibold text-amber-500 tabular-nums">
-                      {minsLate}m late
-                    </p>
                   </div>
-                  <p className="text-xs text-stone-400 mt-1.5 pl-[18px]">
-                    Shift started <ClientTime iso={shift.start_time} fmt="h:mm a" />
+                  <p className="text-xs font-semibold text-amber-500 font-mono tabular-nums">
+                    {minsLate}m late
                   </p>
-                </Card>
+                </div>
               )
             })}
           </div>
@@ -216,11 +206,11 @@ export default async function AdminDashboardPage() {
 
       {/* ── Upcoming ────────────────────────────────────────────────── */}
       {upcoming.length > 0 && (
-        <section className="mb-6">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-3">
-            Upcoming
+        <section className="mb-8">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#a8a29e] mb-3">
+            Upcoming · {upcoming.length}
           </p>
-          <div className="space-y-2 stagger">
+          <div className="rounded-2xl border border-[#e4e0da] overflow-hidden [box-shadow:var(--shadow-sm)] stagger-fast">
             {upcoming.map(shift => {
               const emp = (shift.employees as unknown as { name: string } | null)
               const minsUntil = Math.ceil((new Date(shift.start_time).getTime() - now.getTime()) / 60000)
@@ -228,15 +218,18 @@ export default async function AdminDashboardPage() {
               const m = minsUntil % 60
               const untilStr = h > 0 ? (m > 0 ? `${h}h ${m}m` : `${h}h`) : `${m}m`
               return (
-                <Card key={shift.id} className="p-4" hoverable>
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-stone-700">{emp?.name}</p>
-                    <p className="text-xs text-stone-400 tabular-nums">in {untilStr}</p>
+                <div
+                  key={shift.id}
+                  className="flex items-center justify-between px-4 py-3.5 bg-[#fffefb] border-b border-[#e4e0da] last:border-0"
+                >
+                  <div>
+                    <p className="text-sm font-medium text-[#1a1917] tracking-[-0.01em]">{emp?.name}</p>
+                    <p className="text-xs text-[#a8a29e] mt-0.5 font-mono tracking-[-0.01em]">
+                      <ClientTime iso={shift.start_time} /> – <ClientTime iso={shift.end_time} />
+                    </p>
                   </div>
-                  <p className="text-xs text-stone-400 mt-1 tabular-nums">
-                    <ClientTime iso={shift.start_time} fmt="h:mm a" /> – <ClientTime iso={shift.end_time} fmt="h:mm a" />
-                  </p>
-                </Card>
+                  <p className="text-xs text-[#a8a29e] font-mono tabular-nums">in {untilStr}</p>
+                </div>
               )
             })}
           </div>

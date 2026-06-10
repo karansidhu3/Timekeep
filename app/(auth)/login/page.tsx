@@ -1,6 +1,6 @@
 import { createServerClient } from '@/lib/supabase/server'
 import LoginForm from './LoginForm'
-import Logo from '@/components/ui/Logo'
+import { LogoMark } from '@/components/ui/Logo'
 
 export default async function LoginPage() {
   const supabase = await createServerClient()
@@ -12,12 +12,28 @@ export default async function LoginPage() {
     .order('name')
 
   return (
-    <div className="min-h-screen bg-[#faf9f7] flex flex-col px-4 pb-8 pt-page animate-page-in">
-      <div className="w-full max-w-sm mx-auto">
-        <div className="mb-10">
-          <Logo size="lg" />
+    <div
+      className="min-h-screen bg-[#f7f5f2] flex flex-col"
+      style={{ paddingTop: 'max(2rem, env(safe-area-inset-top, 0px))', paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 0px))' }}
+    >
+      <div className="w-full max-w-sm mx-auto px-6 flex flex-col flex-1">
+
+        {/* Wordmark */}
+        <div className="mb-12 animate-fade-in">
+          <div className="flex items-center gap-2.5">
+            <LogoMark size={18} color="#0d0c0b" />
+            <span className="text-sm font-semibold tracking-tight text-[#0d0c0b]">Timekeep</span>
+          </div>
         </div>
+
+        {/* Tagline above roster */}
+        <div className="mb-8 animate-fade-in" style={{ animationDelay: '60ms' }}>
+          <p className="text-[#a8a29e] text-sm tracking-[-0.01em]">Who&apos;s clocking in?</p>
+        </div>
+
+        {/* Form */}
         <LoginForm employees={employees ?? []} />
+
       </div>
     </div>
   )

@@ -1,111 +1,170 @@
 @import "tailwindcss";
 
 :root {
-  /* Surfaces */
-  --color-bg:       #faf9f7;
+  /* ── Surfaces ─────────────────────────────────────────────────────────── */
+  --color-bg:       #f7f5f2;
   --color-surface:  #fffefb;
   --color-overlay:  #ffffff;
-  --color-sunken:   #f7f6f3;
-  --color-muted:    #f0ede8;
+  --color-sunken:   #f0ede8;
+  --color-muted:    #e8e4de;
 
-  /* Text */
+  /* Dark surfaces — for focal/active states */
+  --color-dark:     #141210;
+  --color-dark-2:   #1e1c19;
+  --color-dark-3:   #2a2825;
+
+  /* ── Text ────────────────────────────────────────────────────────────── */
+  --color-ink:      #0d0c0b;
   --color-text-1:   #1a1917;
   --color-text-2:   #44403c;
   --color-text-3:   #78716c;
   --color-text-4:   #a8a29e;
   --color-text-5:   #d6d3d1;
 
-  /* Borders */
-  --color-border:     #e7e5e4;
-  --color-border-sub: #f5f5f4;
+  /* On dark surfaces */
+  --color-ink-dark: #f5f3ef;
+  --color-sub-dark: rgba(245,243,239,0.5);
 
-  /* Warm shadows */
-  --shadow-sm: 0 1px 2px rgba(28,24,20,0.06);
-  --shadow-md: 0 2px 8px rgba(28,24,20,0.08), 0 1px 2px rgba(28,24,20,0.04);
-  --shadow-lg: 0 8px 24px rgba(28,24,20,0.10), 0 2px 6px rgba(28,24,20,0.06);
-  --shadow-xl: 0 16px 40px rgba(28,24,20,0.14), 0 4px 12px rgba(28,24,20,0.08);
+  /* ── Borders ─────────────────────────────────────────────────────────── */
+  --color-border:     #e4e0da;
+  --color-border-sub: #f0ede8;
+
+  /* ── Shadows — warm, precise ─────────────────────────────────────────── */
+  --shadow-xs: 0 1px 2px rgba(20,18,16,0.05);
+  --shadow-sm: 0 1px 3px rgba(20,18,16,0.07), 0 1px 2px rgba(20,18,16,0.04);
+  --shadow-md: 0 4px 12px rgba(20,18,16,0.08), 0 2px 4px rgba(20,18,16,0.04);
+  --shadow-lg: 0 12px 32px rgba(20,18,16,0.10), 0 4px 8px rgba(20,18,16,0.05);
+  --shadow-xl: 0 24px 56px rgba(20,18,16,0.14), 0 8px 16px rgba(20,18,16,0.06);
+
+  /* ── Easing vocabulary ───────────────────────────────────────────────── */
+  --ease-spring:    cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-expo-out:  cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-quart-out: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out:    cubic-bezier(0.76, 0, 0.24, 1);
 
   /* Legacy compat */
-  --background: #faf9f7;
-  --foreground: #1a1917;
+  --background: #f7f5f2;
+  --foreground: #0d0c0b;
 }
+
+/* ── Base ─────────────────────────────────────────────────────────────────── */
 
 body {
   background: var(--color-bg);
   color: var(--color-text-1);
   font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 }
 
 /* Eliminate 300ms tap delay on all interactive elements */
-button,
-a,
-[role="button"],
-input,
-select,
-textarea {
+button, a, [role="button"], input, select, textarea {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
+html {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Layout utilities ─────────────────────────────────────────────────────── */
+
 /* Safe-area-aware bottom nav padding */
 .pb-nav {
-  padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
 }
 @media (min-width: 768px) {
   .pb-nav { padding-bottom: 0; }
 }
 
-/* Safe-area-aware page top padding — use on every page container */
+/* Safe-area-aware page top padding */
 .pt-page {
   padding-top: max(2.5rem, calc(env(safe-area-inset-top, 0px) + 1.5rem));
 }
 
-/* Smooth momentum scroll on iOS */
-html {
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
+/* ── Typography — monospace instrument display ───────────────────────────── */
+
+.font-mono {
+  font-family: var(--font-mono), 'JetBrains Mono', 'Menlo', monospace;
+  font-variant-numeric: tabular-nums;
 }
 
-/* ── Modal entrance animations ─────────────────────────────────────────────── */
+/* ── Keyframes ────────────────────────────────────────────────────────────── */
 
 @keyframes fade-in {
-  from { opacity: 0 }
-  to   { opacity: 1 }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 @keyframes sheet-up {
-  from { transform: translateY(100%) }
-  to   { transform: translateY(0) }
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
 }
 
 @keyframes float-in {
-  from { opacity: 0; transform: translateY(8px) }
-  to   { opacity: 1; transform: translateY(0) }
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes page-in {
-  from { opacity: 0; transform: translateY(6px) }
-  to   { opacity: 1; transform: translateY(0) }
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes clock-in-reveal {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Animation utilities ──────────────────────────────────────────────────── */
 
 @layer utilities {
-  .animate-fade-in  { animation: fade-in  150ms ease-out both; }
-  .animate-sheet-up { animation: sheet-up 240ms cubic-bezier(0.32, 0.72, 0, 1) both; }
-  .animate-float-in { animation: float-in 160ms ease-out both; }
-  .animate-page-in  { animation: page-in  220ms ease-out both; }
+  .animate-fade-in    { animation: fade-in     160ms ease-out both; }
+  .animate-sheet-up   { animation: sheet-up    320ms cubic-bezier(0.32, 0.72, 0, 1) both; }
+  .animate-float-in   { animation: float-in    280ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .animate-page-in    { animation: page-in     420ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .animate-scale-in   { animation: scale-in    300ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+  .animate-pulse-live { animation: pulse-live    2s  ease-in-out infinite; }
+  .animate-slide-left { animation: slide-in-left 280ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .animate-clock-in   { animation: clock-in-reveal 480ms cubic-bezier(0.16, 1, 0.3, 1) both; }
 }
 
-/* Stagger animation — apply to a list container.
-   Each direct child fades+lifts in with a 40ms delay per item. */
+/* Stagger — spring-paced, 60ms cadence */
 .stagger > * {
-  animation: page-in 240ms ease-out both;
+  animation: page-in 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .stagger > *:nth-child(1) { animation-delay:   0ms; }
-.stagger > *:nth-child(2) { animation-delay:  40ms; }
-.stagger > *:nth-child(3) { animation-delay:  80ms; }
-.stagger > *:nth-child(4) { animation-delay: 120ms; }
-.stagger > *:nth-child(5) { animation-delay: 160ms; }
-.stagger > *:nth-child(6) { animation-delay: 200ms; }
-.stagger > *:nth-child(7) { animation-delay: 240ms; }
+.stagger > *:nth-child(2) { animation-delay:  60ms; }
+.stagger > *:nth-child(3) { animation-delay: 120ms; }
+.stagger > *:nth-child(4) { animation-delay: 180ms; }
+.stagger > *:nth-child(5) { animation-delay: 240ms; }
+.stagger > *:nth-child(6) { animation-delay: 300ms; }
+.stagger > *:nth-child(7) { animation-delay: 360ms; }
+
+/* Stagger-fast — for dense lists */
+.stagger-fast > * {
+  animation: float-in 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.stagger-fast > *:nth-child(1) { animation-delay:   0ms; }
+.stagger-fast > *:nth-child(2) { animation-delay:  40ms; }
+.stagger-fast > *:nth-child(3) { animation-delay:  80ms; }
+.stagger-fast > *:nth-child(4) { animation-delay: 120ms; }
+.stagger-fast > *:nth-child(5) { animation-delay: 160ms; }
+.stagger-fast > *:nth-child(6) { animation-delay: 200ms; }
+.stagger-fast > *:nth-child(7) { animation-delay: 240ms; }

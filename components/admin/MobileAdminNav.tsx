@@ -9,7 +9,7 @@ const links = [
     label: 'Today',
     icon: (active: boolean) => (
       <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z" />
       </svg>
     ),
   },
@@ -46,20 +46,25 @@ export default function MobileAdminNav() {
   const pathname = usePathname()
 
   return (
-    <nav className="md:hidden fixed bottom-0 inset-x-0 bg-[#fffefb] border-t border-stone-100">
-      <div className="flex" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+    <nav
+      className="md:hidden fixed bottom-0 inset-x-0 bg-[#f7f5f2]/90 backdrop-blur-sm border-t border-[#e4e0da]"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+    >
+      <div className="flex h-14">
         {links.map(({ href, label, icon }) => {
           const active = pathname.startsWith(href)
           return (
             <Link
               key={href}
               href={href}
-              className={`flex-1 flex flex-col items-center gap-1 py-3 transition-colors duration-150 ${
-                active ? 'text-stone-900' : 'text-stone-400'
+              className={`flex-1 flex flex-col items-center justify-center gap-1 transition-colors duration-150 ${
+                active ? 'text-[#0d0c0b]' : 'text-[#a8a29e]'
               }`}
             >
               {icon(active)}
-              <span className="text-xs font-medium">{label}</span>
+              <span className={`text-[9px] font-medium tracking-wide ${
+                active ? 'text-[#0d0c0b]' : 'text-[#a8a29e]'
+              }`}>{label}</span>
             </Link>
           )
         })}

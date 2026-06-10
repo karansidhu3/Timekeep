@@ -2,7 +2,6 @@
 
 import { useState, useTransition, useEffect, useRef } from 'react'
 import { signIn } from '@/lib/actions/auth'
-import Card from '@/components/ui/Card'
 
 interface Employee {
   id: string
@@ -10,10 +9,8 @@ interface Employee {
   role: string
 }
 
-function getInitials(name: string): string {
-  const parts = name.trim().split(/\s+/)
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+function getFirstName(name: string): string {
+  return name.trim().split(/\s+/)[0]
 }
 
 export default function LoginForm({ employees }: { employees: Employee[] }) {
@@ -23,7 +20,7 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
   const [isPending, startTransition] = useTransition()
   const submitRef = useRef(false)
 
-  // Auto-submit the moment the 4th digit is pressed
+  // Auto-submit on 4th digit
   useEffect(() => {
     if (pin.length === 4 && selectedId && !isPending && !submitRef.current) {
       submitRef.current = true
@@ -59,34 +56,30 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
     submitRef.current = false
   }
 
-  // ── Name selection — tile grid ────────────────────────────────────────────
+  // ── Name selection ────────────────────────────────────────────────────────
   if (!selectedId) {
     return (
-      <div>
+      <div className="animate-page-in">
         {employees.length === 0 ? (
-          <p className="text-sm text-stone-400 py-8 text-center">No employees found.</p>
+          <p className="text-sm text-[#a8a29e] py-8 text-center">No employees found.</p>
         ) : (
-          <div className="grid grid-cols-2 gap-3">
-            {employees.map(emp => (
+          <div className="space-y-1">
+            {employees.map((emp, i) => (
               <button
                 key={emp.id}
                 onClick={() => handleSelectEmployee(emp.id)}
-                className="bg-[#fffefb] rounded-2xl border border-stone-200 [box-shadow:var(--shadow-sm)]
-                           px-4 py-5 flex flex-col items-center text-center
-                           active:scale-[0.97] transition-[transform,background-color,box-shadow] duration-150
-                           hover:bg-stone-50 hover:[box-shadow:var(--shadow-md)]"
+                className="w-full text-left px-0 py-4 flex items-center justify-between
+                           border-b border-[#e4e0da] last:border-0
+                           active:opacity-60 transition-opacity duration-100 group"
+                style={{ animationDelay: `${i * 50}ms` }}
               >
-                <span className="text-2xl font-semibold text-stone-600 leading-none tracking-tight">
-                  {getInitials(emp.name)}
+                <span className="text-[2rem] font-semibold tracking-tight text-[#0d0c0b] leading-none
+                                 group-hover:translate-x-1 transition-transform duration-200">
+                  {getFirstName(emp.name)}
                 </span>
-                <span className="text-sm font-medium text-stone-900 mt-3 leading-tight">
-                  {emp.name}
+                <span className="text-[#a8a29e] text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  →
                 </span>
-                {emp.role === 'admin' && (
-                  <span className="text-[10px] uppercase tracking-widest text-stone-400 mt-1">
-                    Admin
-                  </span>
-                )}
               </button>
             ))}
           </div>
@@ -99,61 +92,65 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
 
   // ── PIN entry ─────────────────────────────────────────────────────────────
   return (
-    <Card className="p-6">
+    <div className="animate-scale-in">
+      {/* Name + back */}
       <button
         onClick={() => { setSelectedId(null); setPin(''); setError(null) }}
-        className="text-sm text-stone-400 mb-6 flex items-center gap-1.5 hover:text-stone-700 transition-colors duration-150"
+        className="flex items-center gap-2 text-[#a8a29e] hover:text-[#44403c] transition-colors duration-150 mb-8"
       >
-        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
-        Back
+        <span className="text-sm">Back</span>
       </button>
 
-      <p className="text-2xl font-semibold tracking-tight text-stone-900 mb-1">{selected?.name}</p>
-      <p className="text-sm text-stone-400 mb-8">
+      <p className="text-[2rem] font-semibold tracking-tight text-[#0d0c0b] leading-none mb-1">
+        {getFirstName(selected?.name ?? '')}
+      </p>
+      <p className="text-sm text-[#a8a29e] mb-10 tracking-[-0.01em]">
         {isPending ? 'Signing in…' : 'Enter your 4-digit PIN'}
       </p>
 
       {/* PIN dots */}
-      <div className="flex gap-5 justify-center mb-8">
+      <div className="flex gap-4 mb-10">
         {[0, 1, 2, 3].map(i => (
           <div
             key={i}
-            className={`w-4 h-4 rounded-full transition-all duration-100 ${
-              i < pin.length ? 'bg-stone-900 scale-110' : 'bg-stone-200'
+            className={`h-1.5 rounded-full transition-all duration-200 ${
+              i < pin.length
+                ? 'w-8 bg-[#141210]'
+                : 'w-6 bg-[#e4e0da]'
             }`}
           />
         ))}
       </div>
 
       {error && (
-        <p className="text-sm text-red-500 text-center mb-5 -mt-3">{error}</p>
+        <p className="text-sm text-red-500 mb-8 -mt-6 tracking-[-0.01em]">{error}</p>
       )}
 
       {/* Keypad */}
-      <div className="grid grid-cols-3 gap-1">
+      <div className="grid grid-cols-3 gap-1.5">
         {['1','2','3','4','5','6','7','8','9','','0','del'].map((d, i) => (
           <button
             key={i}
             onClick={() => d === 'del' ? handlePinClear() : d !== '' ? handlePinPress(d) : undefined}
             disabled={isPending}
             className={`
-              py-5 rounded-xl text-xl font-medium text-stone-900 select-none
-              active:bg-stone-100 active:scale-[0.93]
-              transition-[colors,transform] duration-100
-              ${d === '' ? 'pointer-events-none' : ''}
+              h-16 rounded-2xl text-xl font-medium text-[#0d0c0b] select-none
+              transition-all duration-100
+              ${d === '' ? 'pointer-events-none' : 'bg-[#fffefb] border border-[#e4e0da] [box-shadow:var(--shadow-xs)] active:scale-[0.92] active:bg-[#f0ede8] active:[box-shadow:none]'}
               disabled:opacity-40 disabled:active:scale-100
             `}
           >
             {d === 'del' ? (
-              <svg className="mx-auto" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+              <svg className="mx-auto" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9.75 14.25 12m0 0 2.25 2.25M14.25 12l2.25-2.25M14.25 12 12 14.25m-2.58 4.92-6.374-6.374a1.125 1.125 0 0 1 0-1.59L9.42 4.83c.21-.211.497-.33.795-.33H19.5a2.25 2.25 0 0 1 2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25h-9.284c-.298 0-.585-.12-.796-.33z" />
               </svg>
             ) : d}
           </button>
         ))}
       </div>
-    </Card>
+    </div>
   )
 }
