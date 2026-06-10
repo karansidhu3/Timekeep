@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useEffect } from 'react'
 import { clockIn, clockOut } from '@/lib/actions/time-entries'
+import { signOut } from '@/lib/actions/auth'
 import { formatTimePST, formatDuration } from '@/lib/utils'
 
 interface Shift {
@@ -116,6 +117,15 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
         className="flex flex-col min-h-screen bg-[#f7f5f2] px-6 animate-page-in"
         style={{ paddingTop: 'max(2rem, env(safe-area-inset-top, 0px))' }}
       >
+        {/* Top: sign out */}
+        <div className="flex justify-end mb-2">
+          <form action={signOut}>
+            <button className="text-xs font-medium text-[#a8a29e] hover:text-[#44403c] px-3 py-2 rounded-xl hover:bg-[#f0ede8] active:bg-[#e8e4de] transition-colors duration-150 tracking-[-0.01em]">
+              Sign out
+            </button>
+          </form>
+        </div>
+
         <div className="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full">
 
           <div className="inline-flex items-center gap-2 mb-8">
@@ -194,7 +204,11 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
               {isOvertime ? 'Overtime' : 'On shift'}
             </span>
           </div>
-          <span className="text-xs text-white/30 tracking-[-0.01em]">{firstName}</span>
+          <form action={signOut}>
+            <button className="text-xs font-medium text-white/30 hover:text-white/60 px-2 py-1.5 rounded-xl transition-colors duration-150 tracking-[-0.01em]">
+              Sign out
+            </button>
+          </form>
         </div>
 
         {/* Elapsed time — the centrepiece */}
@@ -264,9 +278,14 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
     >
       <div className="flex-1 flex flex-col justify-between max-w-sm mx-auto w-full">
 
-        {/* Top: greeting */}
-        <div>
-          <p className="text-sm text-[#a8a29e] tracking-[-0.01em] mb-1">{firstName}</p>
+        {/* Top: greeting + sign out */}
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-[#a8a29e] tracking-[-0.01em]">{firstName}</p>
+          <form action={signOut}>
+            <button className="text-xs font-medium text-[#a8a29e] hover:text-[#44403c] px-3 py-2 rounded-xl hover:bg-[#f0ede8] active:bg-[#e8e4de] transition-colors duration-150 tracking-[-0.01em]">
+              Sign out
+            </button>
+          </form>
         </div>
 
         {/* Middle: state content */}
