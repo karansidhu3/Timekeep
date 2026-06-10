@@ -107,7 +107,7 @@ export default async function EmployeeDetailPage({
       {/* ── Back link ────────────────────────────────────────────────── */}
       <Link
         href="/admin/employees"
-        className="inline-flex items-center gap-1.5 text-sm text-stone-400 hover:text-stone-700 transition-colors mb-6 -mt-1"
+        className="inline-flex items-center gap-1.5 text-sm text-[#a8a29e] hover:text-[#44403c] transition-colors mb-6 -mt-1 py-1"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -119,21 +119,21 @@ export default async function EmployeeDetailPage({
       <div className="flex items-center gap-4 mb-8">
         <div className="relative flex-shrink-0">
           <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-            isActive ? 'bg-green-100' : 'bg-stone-100'
+            isActive ? 'bg-green-100' : 'bg-[#f0ede8]'
           }`}>
-            <span className={`text-sm font-semibold ${isActive ? 'text-green-700' : 'text-stone-500'}`}>
+            <span className={`text-sm font-semibold ${isActive ? 'text-green-700' : 'text-[#78716c]'}`}>
               {initials}
             </span>
           </div>
           {isActive && (
-            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 border-2 border-[#faf9f7]" />
+            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 border-2 border-[#f7f5f2]" />
           )}
         </div>
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-stone-900">{employee.name}</h1>
-          <p className="text-sm text-stone-400 mt-0.5 capitalize">{employee.role}</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-[#0d0c0b]">{employee.name}</h1>
+          <p className="text-sm text-[#a8a29e] mt-0.5 capitalize tracking-[-0.01em]">{employee.role}</p>
           {isActive && (
-            <p className="text-xs text-green-600 font-medium mt-1 tabular-nums">
+            <p className="text-xs text-green-600 font-medium mt-1 tabular-nums tracking-[-0.01em]">
               Clocked in · {formatDuration(elapsedMins)}
             </p>
           )}
@@ -142,22 +142,22 @@ export default async function EmployeeDetailPage({
 
       {/* ── This week summary ──────────────────────────────────────── */}
       {showWeeklySummary && (
-        <div className="mb-8 bg-[#fffefb] rounded-2xl border border-stone-200 [box-shadow:var(--shadow-sm)] p-4">
+        <div className="mb-8 bg-[#fffefb] rounded-2xl border border-[#e4e0da] [box-shadow:var(--shadow-sm)] p-4">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">This week</p>
-            <p className="text-xs text-stone-400 tabular-nums">{weekLabel}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-[#a8a29e]">This week</p>
+            <p className="text-xs text-[#a8a29e] tabular-nums font-mono">{weekLabel}</p>
           </div>
           <div className="flex items-baseline justify-between mb-2">
-            <p className="text-lg font-semibold text-stone-900 tabular-nums">{formatDuration(workedMinutes)}</p>
-            <p className="text-xs text-stone-400 tabular-nums">
+            <p className="text-lg font-semibold text-[#0d0c0b] tabular-nums font-mono">{formatDuration(workedMinutes)}</p>
+            <p className="text-xs text-[#a8a29e] tabular-nums font-mono">
               of {formatDuration(scheduledMinutes)} scheduled
             </p>
           </div>
-          <div className="h-1.5 bg-stone-100 rounded-full overflow-hidden">
+          <div className="h-0.5 bg-[#f0ede8] rounded-full overflow-hidden">
             <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${pct * 100}%` }} />
           </div>
           {isOvertime && (
-            <p className="text-xs text-amber-500 font-medium mt-2 tabular-nums">
+            <p className="text-xs text-amber-500 font-medium mt-2 tabular-nums tracking-[-0.01em]">
               +{formatDuration(workedMinutes - scheduledMinutes)} over scheduled
             </p>
           )}
@@ -172,8 +172,8 @@ export default async function EmployeeDetailPage({
       />
 
       {/* ── Settings ───────────────────────────────────────────────── */}
-      <div className="mt-12 pt-8 border-t border-stone-100">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-6">
+      <div className="mt-12 pt-8 border-t border-[#e4e0da]">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-[#a8a29e] mb-6">
           Settings
         </p>
         <EditEmployeeForm employee={employee} />

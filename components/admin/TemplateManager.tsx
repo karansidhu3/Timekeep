@@ -3,16 +3,16 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { upsertTemplate, deleteTemplate } from '@/lib/actions/templates'
-import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import TimeSelect from '@/components/ui/TimeSelect'
+import Input from '@/components/ui/Input'
 
 export interface TemplateRow {
   id: string
   employee_id: string
   day_of_week: number
-  start_time: string   // "HH:MM:SS"
-  end_time: string     // "HH:MM:SS"
+  start_time: string
+  end_time: string
   notes: string | null
 }
 
@@ -25,7 +25,6 @@ const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 const DAY_FULL  = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 function fmt12(time: string) {
-  // "HH:MM:SS" → "9:00 AM"
   const [h, m] = time.split(':').map(Number)
   const suffix = h >= 12 ? 'PM' : 'AM'
   const h12 = h % 12 || 12
@@ -33,11 +32,8 @@ function fmt12(time: string) {
 }
 
 function toHHMM(time: string) {
-  // "HH:MM:SS" → "HH:MM"
   return time.slice(0, 5)
 }
-
-// ── per-day row modal ─────────────────────────────────────────────────────────
 
 interface EditState {
   employeeId: string
@@ -90,18 +86,20 @@ function DayModal({ state, onClose }: { state: EditState; onClose: () => void })
   return (
     <div className="animate-fade-in fixed inset-0 bg-black/30 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
       <div className="animate-sheet-up sm:animate-float-in bg-[#fffefb] rounded-t-2xl sm:rounded-2xl [box-shadow:var(--shadow-xl)] w-full sm:max-w-sm p-6 pb-[max(2rem,env(safe-area-inset-bottom))] sm:pb-6">
-        {/* drag handle — mobile only */}
-        <div className="w-10 h-1 bg-stone-200 rounded-full mx-auto mb-5 sm:hidden" />
+        <div className="w-10 h-1 bg-[#e4e0da] rounded-full mx-auto mb-5 sm:hidden" />
 
         <div className="flex items-center justify-between mb-5">
           <div>
-            <p className="text-base font-semibold text-stone-900">
+            <p className="text-base font-semibold text-[#0d0c0b] tracking-[-0.01em]">
               {DAY_FULL[state.dayOfWeek - 1]}
             </p>
-            <p className="text-xs text-stone-400 mt-0.5">{state.employeeName}</p>
+            <p className="text-xs text-[#a8a29e] mt-0.5 tracking-[-0.01em]">{state.employeeName}</p>
           </div>
-          <button onClick={onClose} className="p-1 rounded-lg text-stone-400 hover:bg-stone-100 hover:text-stone-600">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-xl text-[#a8a29e] hover:bg-[#f0ede8] hover:text-[#44403c] transition-colors"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
             </svg>
           </button>
@@ -113,18 +111,15 @@ function DayModal({ state, onClose }: { state: EditState; onClose: () => void })
             <TimeSelect label="End"   name="endTime"   defaultValue={state.endTime}   required />
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-stone-700">Notes (optional)</label>
-            <input
-              type="text"
-              name="notes"
-              defaultValue={state.notes}
-              placeholder="e.g. Opening shift"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-[#f7f6f3] focus:outline-none focus:ring-2 focus:ring-stone-900/20 min-h-[44px]"
-            />
-          </div>
+          <Input
+            label="Notes (optional)"
+            name="notes"
+            type="text"
+            defaultValue={state.notes}
+            placeholder="e.g. Opening shift"
+          />
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-red-500 tracking-[-0.01em]">{error}</p>}
 
           <div className="space-y-2 pt-1">
             <div className="flex gap-2">
@@ -153,8 +148,6 @@ function DayModal({ state, onClose }: { state: EditState; onClose: () => void })
   )
 }
 
-// ── main component ────────────────────────────────────────────────────────────
-
 interface Props {
   employees: EmployeeOption[]
   templates: TemplateRow[]
@@ -163,7 +156,6 @@ interface Props {
 export default function TemplateManager({ employees, templates }: Props) {
   const [editState, setEditState] = useState<EditState | null>(null)
 
-  // Index templates by employee_id → day_of_week for fast lookup
   const byEmployee: Record<string, Record<number, TemplateRow>> = {}
   for (const t of templates) {
     if (!byEmployee[t.employee_id]) byEmployee[t.employee_id] = {}
@@ -184,7 +176,7 @@ export default function TemplateManager({ employees, templates }: Props) {
   }
 
   if (employees.length === 0) {
-    return <p className="text-sm text-stone-400 py-8 text-center">No employees yet.</p>
+    return <p className="text-sm text-[#a8a29e] py-8 text-center tracking-[-0.01em]">No employees yet.</p>
   }
 
   return (
@@ -195,48 +187,48 @@ export default function TemplateManager({ employees, templates }: Props) {
           const hasAny = Object.keys(empMap).length > 0
 
           return (
-            <Card key={emp.id} className="overflow-hidden">
+            <div key={emp.id} className="rounded-2xl border border-[#e4e0da] overflow-hidden [box-shadow:var(--shadow-sm)]">
               {/* Employee header */}
-              <div className="px-4 py-3.5 border-b border-stone-100 flex items-center justify-between">
-                <p className="text-sm font-semibold text-stone-900">{emp.name}</p>
+              <div className="px-4 py-3.5 bg-[#faf8f5] border-b border-[#e4e0da] flex items-center justify-between">
+                <p className="text-sm font-semibold text-[#0d0c0b] tracking-[-0.01em]">{emp.name}</p>
                 {!hasAny && (
-                  <span className="text-xs text-stone-400">No pattern set</span>
+                  <span className="text-xs text-[#a8a29e] tracking-[-0.01em]">No pattern set</span>
                 )}
               </div>
 
               {/* Days */}
-              <div className="divide-y divide-stone-50">
+              <div className="divide-y divide-[#f0ede8]">
                 {[1, 2, 3, 4, 5, 6, 7].map(day => {
                   const t = empMap[day]
                   return (
                     <button
                       key={day}
                       onClick={() => openEdit(emp, day)}
-                      className="w-full flex items-center gap-4 px-4 py-3.5 text-left hover:bg-stone-50 active:bg-stone-100 transition-colors"
+                      className="w-full flex items-center gap-4 px-4 py-3.5 text-left bg-[#fffefb] hover:bg-[#f7f5f2] active:bg-[#f0ede8] transition-colors"
                     >
-                      <span className="text-xs font-bold text-stone-400 uppercase w-8 shrink-0">
+                      <span className="text-xs font-bold text-[#c4bfba] uppercase w-8 shrink-0 tracking-widest">
                         {DAY_NAMES[day - 1]}
                       </span>
                       {t ? (
                         <>
-                          <span className="flex-1 text-sm font-medium text-stone-800">
+                          <span className="flex-1 text-sm font-medium text-[#1a1917] font-mono tracking-[-0.01em]">
                             {fmt12(t.start_time)} – {fmt12(t.end_time)}
                           </span>
                           {t.notes && (
-                            <span className="text-xs text-stone-400 truncate max-w-[100px]">{t.notes}</span>
+                            <span className="text-xs text-[#a8a29e] truncate max-w-[100px] tracking-[-0.01em]">{t.notes}</span>
                           )}
-                          <svg className="text-stone-300 shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                          <svg className="text-[#d6d3d1] shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                           </svg>
                         </>
                       ) : (
-                        <span className="flex-1 text-sm text-stone-300">Off — tap to add</span>
+                        <span className="flex-1 text-sm text-[#d6d3d1] tracking-[-0.01em]">Off — tap to add</span>
                       )}
                     </button>
                   )
                 })}
               </div>
-            </Card>
+            </div>
           )
         })}
       </div>

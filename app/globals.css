@@ -72,10 +72,10 @@ html {
 
 /* Safe-area-aware bottom nav padding */
 .pb-nav {
-  padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
 }
 @media (min-width: 768px) {
-  .pb-nav { padding-bottom: 0; }
+  .pb-nav { padding-bottom: 1.5rem; }
 }
 
 /* Safe-area-aware page top padding */

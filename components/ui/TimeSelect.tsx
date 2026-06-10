@@ -23,24 +23,22 @@ for (let h = 0; h < 24; h++) {
 }
 
 export default function TimeSelect({ name, defaultValue, required, label, className = '' }: Props) {
-  // If the stored value (e.g. "09:37:00") isn't on a 15-min boundary, strip
-  // seconds so "09:37" can at least partially match; otherwise default to empty.
   const normalised = defaultValue?.slice(0, 5) ?? ''
 
   return (
     <div className="flex flex-col gap-1.5">
       {label && (
-        <label className="text-sm font-medium text-stone-700">{label}</label>
+        <label className="text-sm font-medium text-[#44403c] tracking-[-0.01em]">{label}</label>
       )}
       <select
         name={name}
         defaultValue={normalised}
         required={required}
         className={`
-          w-full px-3.5 py-2.5 rounded-xl border border-stone-200
-          text-sm bg-[#f7f6f3] text-stone-900
-          focus:outline-none focus:ring-2 focus:ring-stone-900/20
-          min-h-[44px] ${className}
+          w-full px-4 py-3 rounded-2xl border border-[#e4e0da]
+          text-sm bg-[#f0ede8] text-[#0d0c0b]
+          focus:outline-none focus:border-[#78716c] focus:ring-2 focus:ring-[#141210]/10
+          min-h-[44px] tracking-[-0.01em] ${className}
         `}
       >
         <option value="">Select time…</option>

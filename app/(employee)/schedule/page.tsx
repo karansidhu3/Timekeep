@@ -30,7 +30,7 @@ export default async function SchedulePage({
 
   return (
     <div
-      className="max-w-lg mx-auto px-6 pb-24"
+      className="max-w-lg mx-auto px-6 pb-nav"
       style={{ paddingTop: 'max(2.5rem, env(safe-area-inset-top, 0px))' }}
     >
       {/* Header */}

@@ -29,7 +29,7 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 bg-[#f7f5f2]/90 backdrop-blur-sm"
+      className="fixed bottom-0 inset-x-0 bg-white/80 backdrop-blur-md border-t border-[#e4e0da]/60"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       <div className="flex h-16 px-2">
@@ -39,17 +39,19 @@ export default function BottomNav() {
             <Link
               key={href}
               href={href}
-              className={`flex-1 flex flex-col items-center justify-center gap-1.5 transition-all duration-150 ${
-                active ? 'text-[#0d0c0b]' : 'text-[#a8a29e]'
+              className={`relative flex-1 flex flex-col items-center justify-center gap-1.5 transition-colors duration-150 ${
+                active ? 'text-[#0d0c0b]' : 'text-[#b8b4ae]'
               }`}
             >
-              {/* Pill indicator */}
-              <div className={`transition-all duration-200 ${active ? 'opacity-100' : 'opacity-0'}`}>
-                <div className="w-4 h-0.5 rounded-full bg-[#0d0c0b] mb-0.5" />
-              </div>
+              {/* Top-edge active indicator */}
+              <span
+                className={`absolute top-0 inset-x-8 h-[2px] rounded-full transition-all duration-200 ${
+                  active ? 'bg-[#0d0c0b] opacity-100' : 'opacity-0'
+                }`}
+              />
               {icon(active)}
-              <span className={`text-[10px] font-medium tracking-wide transition-colors duration-150 ${
-                active ? 'text-[#0d0c0b]' : 'text-[#a8a29e]'
+              <span className={`text-[11px] font-medium tracking-wide transition-colors duration-150 ${
+                active ? 'text-[#0d0c0b]' : 'text-[#b8b4ae]'
               }`}>
                 {label}
               </span>

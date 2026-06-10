@@ -14,6 +14,13 @@ interface Props {
   weekStart: string
 }
 
+const selectClass = `
+  w-full px-4 py-3 rounded-2xl border border-[#e4e0da]
+  text-sm bg-[#f0ede8] text-[#0d0c0b]
+  focus:outline-none focus:border-[#78716c] focus:ring-2 focus:ring-[#141210]/10
+  min-h-[44px] tracking-[-0.01em]
+`
+
 export default function NewShiftButton({ employees, weekStart }: Props) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
@@ -68,19 +75,18 @@ export default function NewShiftButton({ employees, weekStart }: Props) {
     )
   }
 
-  // Use local date to avoid UTC-offset mismatch
   const _d = new Date(weekStart)
   const defaultDate = `${_d.getFullYear()}-${String(_d.getMonth() + 1).padStart(2, '0')}-${String(_d.getDate()).padStart(2, '0')}`
 
   return (
     <div className="animate-fade-in fixed inset-0 bg-black/30 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
       <div className="animate-sheet-up sm:animate-float-in bg-[#fffefb] rounded-t-2xl sm:rounded-2xl [box-shadow:var(--shadow-xl)] w-full sm:max-w-sm p-6 pb-[max(2rem,env(safe-area-inset-bottom))] sm:pb-6">
-        <div className="w-10 h-1 bg-stone-200 rounded-full mx-auto mb-5 sm:hidden" />
-        <h2 className="text-base font-semibold text-stone-900 mb-5">New shift</h2>
+        <div className="w-10 h-1 bg-[#e4e0da] rounded-full mx-auto mb-5 sm:hidden" />
+        <h2 className="text-base font-semibold text-[#0d0c0b] mb-5 tracking-[-0.01em]">New shift</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-stone-700">Employee</label>
-            <select name="employeeId" className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-[#f7f6f3] focus:outline-none focus:ring-2 focus:ring-stone-900/20 min-h-[44px]" required>
+            <label className="text-sm font-medium text-[#44403c] tracking-[-0.01em]">Employee</label>
+            <select name="employeeId" className={selectClass} required>
               <option value="">Select employee…</option>
               {employees.map(e => (
                 <option key={e.id} value={e.id}>{e.name}</option>
@@ -93,7 +99,7 @@ export default function NewShiftButton({ employees, weekStart }: Props) {
             <TimeSelect label="End time"   name="endTime"   required />
           </div>
           <Input label="Notes (optional)" name="notes" type="text" placeholder="e.g. Opening shift" />
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-red-500 tracking-[-0.01em]">{error}</p>}
           <div className="flex gap-2 pt-1">
             <Button type="button" variant="secondary" className="flex-1" onClick={() => setOpen(false)}>
               Cancel

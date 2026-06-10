@@ -6,6 +6,7 @@ import { updateShift, deleteShift } from '@/lib/actions/shifts'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import TimeSelect from '@/components/ui/TimeSelect'
+import { localDatePST, localTimePST } from '@/lib/utils'
 
 interface Shift {
   id: string
@@ -17,24 +18,22 @@ interface Shift {
 
 interface Employee { id: string; name: string }
 
+const selectClass = `
+  w-full px-4 py-3 rounded-2xl border border-[#e4e0da]
+  text-sm bg-[#f0ede8] text-[#0d0c0b]
+  focus:outline-none focus:border-[#78716c] focus:ring-2 focus:ring-[#141210]/10
+  min-h-[44px] tracking-[-0.01em]
+`
+
 export default function EditShiftForm({ shift, employees }: { shift: Shift; employees: Employee[] }) {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const [isDeleting, startDeleteTransition] = useTransition()
 
-  const startDate = new Date(shift.start_time)
-  const endDate = new Date(shift.end_time)
-  // Use local date/time — toISOString() returns UTC which is wrong in non-UTC zones
-  function toLocalDate(d: Date) {
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-  }
-  function toLocalTime(d: Date) {
-    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
-  }
-  const defaultDate = toLocalDate(startDate)
-  const defaultStart = toLocalTime(startDate)
-  const defaultEnd = toLocalTime(endDate)
+  const defaultDate = localDatePST(shift.start_time)
+  const defaultStart = localTimePST(shift.start_time)
+  const defaultEnd = localTimePST(shift.end_time)
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -77,8 +76,8 @@ export default function EditShiftForm({ shift, employees }: { shift: Shift; empl
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-stone-700">Employee</label>
-        <select name="employeeId" defaultValue={shift.employee_id} className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-[#f7f6f3] focus:outline-none focus:ring-2 focus:ring-stone-900/20 min-h-[44px]" required>
+        <label className="text-sm font-medium text-[#44403c] tracking-[-0.01em]">Employee</label>
+        <select name="employeeId" defaultValue={shift.employee_id} className={selectClass} required>
           {employees.map(e => (
             <option key={e.id} value={e.id}>{e.name}</option>
           ))}
@@ -90,7 +89,7 @@ export default function EditShiftForm({ shift, employees }: { shift: Shift; empl
         <TimeSelect label="End time"   name="endTime"   defaultValue={defaultEnd}   required />
       </div>
       <Input label="Notes (optional)" name="notes" type="text" defaultValue={shift.notes ?? ''} />
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-red-500 tracking-[-0.01em]">{error}</p>}
       <div className="space-y-2 pt-2">
         <div className="flex gap-2">
           <Button type="button" variant="secondary" className="flex-1" onClick={() => router.back()}>

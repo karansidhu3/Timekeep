@@ -47,23 +47,29 @@ export default function MobileAdminNav() {
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 inset-x-0 bg-[#f7f5f2]/90 backdrop-blur-sm border-t border-[#e4e0da]"
+      className="md:hidden fixed bottom-0 inset-x-0 bg-white/80 backdrop-blur-md border-t border-[#e4e0da]/60"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
-      <div className="flex h-14">
+      <div className="flex h-16">
         {links.map(({ href, label, icon }) => {
           const active = pathname.startsWith(href)
           return (
             <Link
               key={href}
               href={href}
-              className={`flex-1 flex flex-col items-center justify-center gap-1 transition-colors duration-150 ${
-                active ? 'text-[#0d0c0b]' : 'text-[#a8a29e]'
+              className={`relative flex-1 flex flex-col items-center justify-center gap-1 transition-colors duration-150 ${
+                active ? 'text-[#0d0c0b]' : 'text-[#b8b4ae]'
               }`}
             >
+              {/* Top-edge active indicator */}
+              <span
+                className={`absolute top-0 inset-x-6 h-[2px] rounded-full transition-all duration-200 ${
+                  active ? 'bg-[#0d0c0b] opacity-100' : 'opacity-0'
+                }`}
+              />
               {icon(active)}
-              <span className={`text-[9px] font-medium tracking-wide ${
-                active ? 'text-[#0d0c0b]' : 'text-[#a8a29e]'
+              <span className={`text-[11px] font-medium tracking-wide ${
+                active ? 'text-[#0d0c0b]' : 'text-[#b8b4ae]'
               }`}>{label}</span>
             </Link>
           )
