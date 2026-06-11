@@ -68,7 +68,7 @@ export default function MobileAdminNav() {
                 }`}
               />
               {icon(active)}
-              <span className={`text-[11px] font-medium tracking-wide ${
+              <span className={`text-[11px] font-medium tracking-[-0.01em] ${
                 active ? 'text-[#0d0c0b]' : 'text-[#b8b4ae]'
               }`}>{label}</span>
             </Link>

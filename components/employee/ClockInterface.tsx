@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, useEffect } from 'react'
+import { useState, useTransition, useEffect, useRef } from 'react'
 import { clockIn, clockOut } from '@/lib/actions/time-entries'
 import { signOut } from '@/lib/actions/auth'
 import { formatTimePST, formatDuration } from '@/lib/utils'
@@ -32,6 +32,16 @@ function formatLive(seconds: number): string {
   return `${h}:${String(m).padStart(2, '0')}`
 }
 
+function formatCountdown(seconds: number): string {
+  if (seconds <= 0) return '0s'
+  const h = Math.floor(seconds / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  const s = seconds % 60
+  if (h > 0) return m > 0 ? `${h}h ${m}m` : `${h}h`
+  if (m > 0) return `${m}m`
+  return `${s}s`
+}
+
 function isMissedClockOut(clockInIso: string): boolean {
   const todayPST = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' })
   const entryDayPST = new Date(clockInIso).toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' })
@@ -43,11 +53,16 @@ function toLocalDate(iso: string) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
+const HOLD_DURATION = 700
+
 export default function ClockInterface({ shifts, openEntry, serverNow, employeeName }: Props) {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0)
   const [fixTime, setFixTime] = useState('')
+  const [holdProgress, setHoldProgress] = useState(0)
+  const [liveSecondsUntil, setLiveSecondsUntil] = useState(0)
+  const holdTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const now = new Date(serverNow)
   const firstName = employeeName.trim().split(/\s+/)[0]
@@ -60,6 +75,12 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
   const isOnShift = !!openEntry
   const isMissed = openEntry ? isMissedClockOut(openEntry.clock_in) : false
 
+  const shiftStart = todayShift ? new Date(todayShift.start_time) : null
+  const shiftEnd   = todayShift ? new Date(todayShift.end_time)   : null
+  const shiftHasStarted = shiftStart ? now >= shiftStart : false
+  const shiftIsOver     = shiftEnd   ? now >= shiftEnd   : false
+
+  // On-shift elapsed timer
   useEffect(() => {
     if (!openEntry || isMissed) { setElapsedSeconds(0); return }
     function tick() {
@@ -69,6 +90,23 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
     const id = setInterval(tick, 1000)
     return () => clearInterval(id)
   }, [openEntry, isMissed])
+
+  // Upcoming live countdown — ticks every second, shows seconds when < 1min
+  useEffect(() => {
+    if (!todayShift || isOnShift || shiftHasStarted) return
+    function tick() {
+      const secs = Math.ceil((new Date(todayShift!.start_time).getTime() - Date.now()) / 1000)
+      setLiveSecondsUntil(Math.max(secs, 0))
+    }
+    tick()
+    const id = setInterval(tick, 1000)
+    return () => clearInterval(id)
+  }, [todayShift?.start_time, isOnShift, shiftHasStarted])
+
+  // Cleanup hold on unmount
+  useEffect(() => {
+    return () => { if (holdTimerRef.current) clearInterval(holdTimerRef.current) }
+  }, [])
 
   function handleClockIn() {
     setError(null)
@@ -85,6 +123,30 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
       const result = await clockOut(openEntry.id)
       if (!result.success) setError(result.error ?? 'Failed to clock out')
     })
+  }
+
+  function startHold() {
+    if (isPending || holdTimerRef.current) return
+    const startTime = Date.now()
+    holdTimerRef.current = setInterval(() => {
+      const elapsed = Date.now() - startTime
+      const progress = Math.min(elapsed / HOLD_DURATION, 1)
+      setHoldProgress(progress)
+      if (progress >= 1) {
+        clearInterval(holdTimerRef.current!)
+        holdTimerRef.current = null
+        setHoldProgress(0)
+        handleClockOut()
+      }
+    }, 16)
+  }
+
+  function cancelHold() {
+    if (holdTimerRef.current) {
+      clearInterval(holdTimerRef.current)
+      holdTimerRef.current = null
+    }
+    setHoldProgress(0)
   }
 
   function handleFixClockOut() {
@@ -117,7 +179,6 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
         className="flex flex-col min-h-screen bg-[#f7f5f2] px-6 animate-page-in"
         style={{ paddingTop: 'max(2rem, env(safe-area-inset-top, 0px))' }}
       >
-        {/* Top: sign out */}
         <div className="flex justify-end mb-2">
           <form action={signOut}>
             <button className="text-xs font-medium text-[#a8a29e] hover:text-[#44403c] px-3 py-2 rounded-xl hover:bg-[#f0ede8] active:bg-[#e8e4de] transition-colors duration-150 tracking-[-0.01em]">
@@ -127,7 +188,6 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
         </div>
 
         <div className="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full">
-
           <div className="inline-flex items-center gap-2 mb-8">
             <div className="w-2 h-2 rounded-full bg-amber-400" />
             <span className="text-xs font-semibold uppercase tracking-widest text-amber-600">Missed clock-out</span>
@@ -185,9 +245,8 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
     )
   }
 
-  // ── ON SHIFT — the hero state ───────────────────────────────────────────
+  // ── ON SHIFT — hero state ───────────────────────────────────────────────
   if (isOnShift) {
-    const shiftEnd = todayShift ? new Date(todayShift.end_time) : null
     const isOvertime = shiftEnd ? new Date() > shiftEnd : false
 
     return (
@@ -241,32 +300,40 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
           )}
         </div>
 
-        {/* Clock out — pb-nav ensures button clears the frosted BottomNav */}
+        {/* Hold-to-clock-out */}
         <div className="px-6 pt-2 pb-nav">
           {error && <p className="text-sm text-red-400 text-center mb-4">{error}</p>}
           <button
-            onClick={handleClockOut}
+            onPointerDown={startHold}
+            onPointerUp={cancelHold}
+            onPointerLeave={cancelHold}
+            onContextMenu={e => e.preventDefault()}
             disabled={isPending}
-            className="w-full h-14 rounded-2xl bg-white/[0.08] border border-white/10 text-white font-medium text-[15px]
-              tracking-[-0.01em] transition-all duration-150
-              hover:bg-white/[0.12] active:scale-[0.98] active:bg-white/[0.06]
-              disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100"
+            className="relative w-full h-14 rounded-2xl overflow-hidden border border-white/10 text-white font-medium text-[15px] tracking-[-0.01em] select-none disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ WebkitUserSelect: 'none' }}
           >
-            {isPending ? 'Clocking out…' : 'Clock out'}
+            <div
+              className="absolute inset-0 bg-white/[0.12] origin-left"
+              style={{
+                transform: `scaleX(${holdProgress})`,
+                transition: holdProgress === 0 ? 'transform 200ms ease-out' : 'none',
+              }}
+            />
+            <span className="relative z-10 pointer-events-none">
+              {isPending ? 'Clocking out…' : holdProgress > 0.05 ? 'Hold…' : 'Clock out'}
+            </span>
           </button>
+          <p className="text-center text-white/20 text-[11px] mt-3 tracking-[-0.01em]">
+            Hold to clock out
+          </p>
         </div>
       </div>
     )
   }
 
   // ── NOT CLOCKED IN ──────────────────────────────────────────────────────
-
-  const shiftStart = todayShift ? new Date(todayShift.start_time) : null
-  const shiftEnd   = todayShift ? new Date(todayShift.end_time)   : null
-  const msUntil    = shiftStart ? shiftStart.getTime() - now.getTime() : 0
-  const minsUntil  = Math.ceil(msUntil / 60000)
-  const shiftHasStarted = shiftStart ? now >= shiftStart : false
-  const shiftIsOver     = shiftEnd   ? now >= shiftEnd   : false
+  const msUntil   = shiftStart ? shiftStart.getTime() - now.getTime() : 0
+  const minsUntil = Math.ceil(msUntil / 60000)
 
   return (
     <div
@@ -324,10 +391,9 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
               <div
                 className="font-mono text-[#0d0c0b] leading-none tracking-tight mb-4"
                 style={{ fontSize: 'clamp(3.5rem, 18vw, 6rem)' }}
+                suppressHydrationWarning
               >
-                {minsUntil >= 60
-                  ? `${Math.floor(minsUntil / 60)}h ${minsUntil % 60 > 0 ? `${minsUntil % 60}m` : ''}`
-                  : `${minsUntil}m`}
+                {formatCountdown(liveSecondsUntil || minsUntil * 60)}
               </div>
               <p className="text-[#a8a29e] text-sm tracking-[-0.01em] font-mono">
                 {formatTimePST(todayShift.start_time)} – {formatTimePST(todayShift.end_time)}
@@ -347,7 +413,7 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
             onClick={handleClockIn}
             disabled={isPending}
             className="w-full h-14 rounded-2xl bg-[#141210] text-[#f5f3ef] font-medium text-[15px]
-              tracking-[-0.01em] transition-all duration-150 active:scale-[0.98]
+              tracking-[-0.01em] transition-all duration-150 active:scale-[0.97]
               disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100"
           >
             {isPending ? 'Clocking in…' : 'Clock in'}

@@ -67,7 +67,7 @@ export default async function AdminSchedulePage({
       {/* ── Header — two-row layout fits any screen width ─────────── */}
       <div className="mb-6 md:mb-8">
         <div className="flex items-center justify-between mb-1.5">
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#0d0c0b]">Schedule</h1>
+          <h1 className="text-3xl font-semibold tracking-tight text-[#0d0c0b]">Schedule</h1>
           <AdminWeekNav weekOffset={weekOffset} />
         </div>
         <div className="flex items-center justify-between">
@@ -133,7 +133,7 @@ export default async function AdminSchedulePage({
                   >
                     {/* Name + hours */}
                     <div className="flex flex-col justify-center pr-2 py-1.5 min-w-0">
-                      <p className="text-xs font-medium text-[#1a1917] truncate tracking-[-0.01em]">{firstName}</p>
+                      <p className="text-xs font-semibold text-[#0d0c0b] truncate tracking-[-0.01em]">{firstName}</p>
                       <p className="text-[10px] text-[#a8a29e] mt-0.5 font-mono tabular-nums">
                         {totalMins > 0 ? fmtMinutes(totalMins) : <span className="text-[#e4e0da]">—</span>}
                       </p>

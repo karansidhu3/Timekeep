@@ -50,7 +50,7 @@ export default function BottomNav() {
                 }`}
               />
               {icon(active)}
-              <span className={`text-[11px] font-medium tracking-wide transition-colors duration-150 ${
+              <span className={`text-[11px] font-medium tracking-[-0.01em] transition-colors duration-150 ${
                 active ? 'text-[#0d0c0b]' : 'text-[#b8b4ae]'
               }`}>
                 {label}

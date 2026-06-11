@@ -22,7 +22,7 @@ export default async function TemplatesPage() {
   return (
     <div className="max-w-2xl mx-auto px-6 pb-10 pt-page animate-page-in">
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight text-[#0d0c0b]">Weekly templates</h1>
+        <h1 className="text-3xl font-semibold tracking-tight text-[#0d0c0b]">Weekly templates</h1>
         <p className="text-sm text-[#a8a29e] mt-1 tracking-[-0.01em]">
           Set each person&apos;s recurring weekly pattern. Apply it to any week from the Schedule page.
         </p>
