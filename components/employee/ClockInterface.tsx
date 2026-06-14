@@ -323,7 +323,7 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
               {isPending ? 'Clocking out…' : holdProgress > 0.05 ? 'Hold…' : 'Clock out'}
             </span>
           </button>
-          <p className="text-center text-white/20 text-[11px] mt-3 tracking-[-0.01em]">
+          <p className="text-center text-white/50 text-[11px] mt-3 tracking-[-0.01em]">
             Hold to clock out
           </p>
         </div>
@@ -376,7 +376,7 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
           ) : shiftHasStarted ? (
             <div>
               <p className="text-[2.75rem] font-semibold tracking-tight text-[#0d0c0b] leading-tight mb-2">
-                Shift started.
+                Your shift started.
               </p>
               <p className="text-[#a8a29e] text-sm tracking-[-0.01em] font-mono">
                 {formatTimePST(todayShift.start_time)} – {formatTimePST(todayShift.end_time)}

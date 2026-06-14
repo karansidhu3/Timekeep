@@ -60,25 +60,22 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
   if (!selectedId) {
     return (
       <div className="animate-page-in">
+        <p className="text-[#a8a29e] text-sm tracking-[-0.01em] mb-8">Who&apos;s clocking in?</p>
         {employees.length === 0 ? (
           <p className="text-sm text-[#a8a29e] py-8 text-center">No employees found.</p>
         ) : (
-          <div className="space-y-1">
+          <div>
             {employees.map((emp, i) => (
               <button
                 key={emp.id}
                 onClick={() => handleSelectEmployee(emp.id)}
-                className="w-full text-left px-0 py-4 flex items-center justify-between
+                className="w-full text-left py-4 flex items-center justify-between
                            border-b border-[#e4e0da] last:border-0
-                           active:opacity-60 transition-opacity duration-100 group"
+                           active:opacity-60 transition-opacity duration-100"
                 style={{ animationDelay: `${i * 50}ms` }}
               >
-                <span className="text-[2rem] font-semibold tracking-tight text-[#0d0c0b] leading-none
-                                 group-hover:translate-x-1 transition-transform duration-200">
+                <span className="text-[2rem] font-semibold tracking-tight text-[#0d0c0b] leading-none">
                   {getFirstName(emp.name)}
-                </span>
-                <span className="text-[#a8a29e] text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  →
                 </span>
               </button>
             ))}
@@ -96,12 +93,12 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
       {/* Name + back */}
       <button
         onClick={() => { setSelectedId(null); setPin(''); setError(null) }}
-        className="flex items-center gap-2 text-[#a8a29e] hover:text-[#44403c] transition-colors duration-150 mb-8"
+        className="flex items-center gap-1.5 text-[#44403c] hover:text-[#0d0c0b] transition-colors duration-150 mb-8 -ml-0.5"
       >
-        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
-        <span className="text-sm">Back</span>
+        <span className="text-sm font-medium tracking-[-0.01em]">Back</span>
       </button>
 
       <p className="text-[2rem] font-semibold tracking-tight text-[#0d0c0b] leading-none mb-1">
@@ -116,10 +113,10 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
         {[0, 1, 2, 3].map(i => (
           <div
             key={i}
-            className={`h-1.5 rounded-full transition-all duration-200 ${
+            className={`w-3 h-3 rounded-full border-2 transition-all duration-150 ${
               i < pin.length
-                ? 'w-8 bg-[#141210]'
-                : 'w-6 bg-[#e4e0da]'
+                ? 'bg-[#141210] border-[#141210]'
+                : 'bg-transparent border-[#c4bfba]'
             }`}
           />
         ))}
@@ -139,7 +136,7 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
             className={`
               h-16 rounded-2xl text-xl font-medium text-[#0d0c0b] select-none
               transition-all duration-100
-              ${d === '' ? 'pointer-events-none' : 'bg-[#fffefb] border border-[#e4e0da] [box-shadow:var(--shadow-xs)] active:scale-[0.92] active:bg-[#f0ede8] active:[box-shadow:none]'}
+              ${d === '' ? 'pointer-events-none' : 'bg-white border border-[#ccc8c2] [box-shadow:0_1px_3px_rgba(0,0,0,0.08)] active:scale-[0.92] active:bg-[#f0ede8] active:[box-shadow:none]'}
               disabled:opacity-40 disabled:active:scale-100
             `}
           >

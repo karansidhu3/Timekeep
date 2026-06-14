@@ -26,11 +26,6 @@ export default async function LoginPage() {
           </div>
         </div>
 
-        {/* Tagline above roster */}
-        <div className="mb-8 animate-fade-in" style={{ animationDelay: '60ms' }}>
-          <p className="text-[#a8a29e] text-sm tracking-[-0.01em]">Who&apos;s clocking in?</p>
-        </div>
-
         {/* Form */}
         <LoginForm employees={employees ?? []} />
 
