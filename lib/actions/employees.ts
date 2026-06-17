@@ -63,14 +63,13 @@ export async function updateEmployee(
   if (error) return { success: false, error: error.message }
 
   if (data.pin) {
-    const { data: users } = await service.auth.admin.listUsers()
-    const user = users?.users.find(u => u.email === `${id}@internal.local`)
-    if (user) {
-      await service.auth.admin.updateUserById(user.id, { password: data.pin })
-    }
+    // The employee's Supabase Auth UUID is their employee ID — no lookup needed
+    const { error: authError } = await service.auth.admin.updateUserById(id, { password: data.pin })
+    if (authError) return { success: false, error: 'PIN update failed: ' + authError.message }
   }
 
   revalidatePath('/admin/employees')
+  revalidatePath(`/admin/employees/${id}`)
   return { success: true }
 }
 
