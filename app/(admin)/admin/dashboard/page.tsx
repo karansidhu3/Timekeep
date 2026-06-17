@@ -84,7 +84,23 @@ export default async function AdminDashboardPage() {
       </div>
 
       {!hasAnyActivity ? (
-        <p className="text-[#a8a29e] tracking-[-0.01em]">No shifts today.</p>
+        <div className="pt-2">
+          <p className="text-[2rem] font-semibold tracking-tight text-[#0d0c0b] leading-tight mb-2">
+            Nothing today.
+          </p>
+          <p className="text-sm text-[#a8a29e] tracking-[-0.01em] mb-8">
+            No shifts scheduled for today.
+          </p>
+          <Link
+            href="/admin/schedule"
+            className="inline-flex items-center gap-2 text-sm font-medium text-[#0d0c0b] bg-[#f0ede8] px-4 py-3 rounded-2xl hover:bg-[#e8e4de] active:bg-[#e0dcd6] transition-colors tracking-[-0.01em]"
+          >
+            View schedule
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </Link>
+        </div>
       ) : (
         <>
           {/* ── Status number ─────────────────────────────────────────── */}
@@ -133,9 +149,12 @@ export default async function AdminDashboardPage() {
                             shift started <ClientTime iso={shift.start_time} />
                           </p>
                         </div>
-                        <p className="text-sm font-bold text-amber-500 font-mono tabular-nums shrink-0 ml-4">
-                          {formatDuration(minsLate)} late
-                        </p>
+                        <div className="flex items-center gap-2 shrink-0 ml-4">
+                          <p className="text-sm font-bold text-amber-500 font-mono tabular-nums">{formatDuration(minsLate)} late</p>
+                          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="text-amber-300 flex-shrink-0">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                          </svg>
+                        </div>
                       </Link>
                     )
                   })}
@@ -176,9 +195,14 @@ export default async function AdminDashboardPage() {
                             <div className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0 animate-pulse-live" />
                             <p className="text-sm font-semibold text-[#0d0c0b] tracking-[-0.01em] truncate">{emp?.name}</p>
                           </div>
-                          <p className={`text-base font-semibold font-mono tabular-nums shrink-0 ${isOvertime ? 'text-amber-500' : 'text-[#0d0c0b]'}`}>
-                            {formatElapsed(elapsedSeconds)}
-                          </p>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <p className={`text-base font-semibold font-mono tabular-nums ${isOvertime ? 'text-amber-500' : 'text-[#0d0c0b]'}`}>
+                              {formatElapsed(elapsedSeconds)}
+                            </p>
+                            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="text-[#c4bfba] flex-shrink-0">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                          </div>
                         </div>
                         <div className="ml-4">
                           <div className="h-[3px] bg-[#ede9e3] rounded-full overflow-hidden mb-1.5">
@@ -217,9 +241,14 @@ export default async function AdminDashboardPage() {
                               <p className="text-xs text-[#a8a29e] mt-0.5 tracking-[-0.01em]">No shift scheduled</p>
                             </div>
                           </div>
-                          <p className="text-base font-semibold text-[#0d0c0b] font-mono tabular-nums shrink-0">
-                            {formatElapsed(elapsedSeconds)}
-                          </p>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <p className="text-base font-semibold text-[#0d0c0b] font-mono tabular-nums">
+                              {formatElapsed(elapsedSeconds)}
+                            </p>
+                            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="text-[#c4bfba] flex-shrink-0">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                          </div>
                         </div>
                       </Link>
                     )
@@ -251,9 +280,14 @@ export default async function AdminDashboardPage() {
                               <ClientTime iso={shift.start_time} /> – <ClientTime iso={shift.end_time} />
                             </p>
                           </div>
-                          <p className="text-sm font-semibold text-[#a8a29e] font-mono tabular-nums shrink-0">
-                            {minsUntil <= 0 ? 'now' : `in ${formatDuration(minsUntil)}`}
-                          </p>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <p className="text-sm font-semibold text-[#a8a29e] font-mono tabular-nums">
+                              {minsUntil <= 0 ? 'now' : `in ${formatDuration(minsUntil)}`}
+                            </p>
+                            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="text-[#c4bfba] flex-shrink-0">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                          </div>
                         </div>
                       </Link>
                     )

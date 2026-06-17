@@ -9,7 +9,7 @@ export default function AdminWeekNav({ weekOffset }: { weekOffset: number }) {
     <div className="flex items-center gap-1">
       <button
         onClick={() => router.push(`/admin/schedule?week=${weekOffset - 1}`)}
-        className="w-9 h-9 flex items-center justify-center rounded-xl text-[#a8a29e]
+        className="w-11 h-11 flex items-center justify-center rounded-xl text-[#a8a29e]
           hover:bg-[#f0ede8] active:bg-[#e8e4de] transition-colors duration-150"
         aria-label="Previous week"
       >
@@ -30,7 +30,7 @@ export default function AdminWeekNav({ weekOffset }: { weekOffset: number }) {
 
       <button
         onClick={() => router.push(`/admin/schedule?week=${weekOffset + 1}`)}
-        className="w-9 h-9 flex items-center justify-center rounded-xl text-[#a8a29e]
+        className="w-11 h-11 flex items-center justify-center rounded-xl text-[#a8a29e]
           hover:bg-[#f0ede8] active:bg-[#e8e4de] transition-colors duration-150"
         aria-label="Next week"
       >

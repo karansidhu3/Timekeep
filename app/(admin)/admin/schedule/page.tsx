@@ -62,11 +62,11 @@ export default async function AdminSchedulePage({
   const today = new Date()
 
   return (
-    <div className="max-w-5xl mx-auto px-6 pb-nav md:pb-12 pt-page animate-page-in">
+    <div className="max-w-5xl mx-auto px-4 md:px-6 pb-nav md:pb-12 pt-page animate-page-in">
 
-      {/* ── Header — two-row layout fits any screen width ─────────── */}
-      <div className="mb-6 md:mb-8">
-        <div className="flex items-center justify-between mb-1.5">
+      {/* ── Header ───────────────────────────────────────────────────── */}
+      <div className="mb-5 md:mb-8">
+        <div className="flex items-center justify-between mb-1">
           <h1 className="text-3xl font-semibold tracking-tight text-[#0d0c0b]">Schedule</h1>
           <AdminWeekNav weekOffset={weekOffset} />
         </div>
@@ -90,8 +90,8 @@ export default async function AdminSchedulePage({
         <p className="text-sm text-[#a8a29e] py-4">No employees yet.</p>
       ) : (
         /* Horizontal-scroll wrapper: edge-to-edge on mobile, normal on md+ */
-        <div className="-mx-6 overflow-x-auto md:overflow-visible md:mx-0 pb-2">
-          <div className="px-6 md:px-0" style={{ minWidth: '480px' }}>
+        <div className="-mx-4 md:-mx-6 overflow-x-auto md:overflow-visible md:mx-0 pb-2">
+          <div className="px-4 md:px-0" style={{ minWidth: '480px' }}>
 
             {/* ── Day header row ─────────────────────────────────────── */}
             <div
