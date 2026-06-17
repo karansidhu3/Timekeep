@@ -8,7 +8,7 @@ export async function signIn(employeeId: string, pin: string) {
 
   const { error } = await supabase.auth.signInWithPassword({
     email: `${employeeId}@internal.local`,
-    password: pin,
+    password: pin + '::tk',
   })
 
   if (error) return { success: false, error: 'Invalid PIN. Please try again.' }

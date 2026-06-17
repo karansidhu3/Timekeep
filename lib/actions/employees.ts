@@ -17,7 +17,7 @@ export async function createEmployee(data: EmployeeInput) {
   const tempEmail = `tmp-${Date.now()}@internal.local`
   const { data: authData, error: authError } = await service.auth.admin.createUser({
     email: tempEmail,
-    password: data.pin,
+    password: data.pin + '::tk',
     email_confirm: true,
   })
 
@@ -64,7 +64,7 @@ export async function updateEmployee(
 
   if (data.pin) {
     // The employee's Supabase Auth UUID is their employee ID — no lookup needed
-    const { error: authError } = await service.auth.admin.updateUserById(id, { password: data.pin })
+    const { error: authError } = await service.auth.admin.updateUserById(id, { password: data.pin + '::tk' })
     if (authError) return { success: false, error: 'PIN update failed: ' + authError.message }
   }
 
