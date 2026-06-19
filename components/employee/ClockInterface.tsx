@@ -179,8 +179,8 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
 
     return (
       <div
-        className="flex flex-col min-h-screen bg-[#f2ece2] px-6 animate-page-in"
-        style={{ paddingTop: 'max(2rem, env(safe-area-inset-top, 0px))' }}
+        className="flex flex-col bg-[#f2ece2] px-6 animate-page-in"
+        style={{ height: '100dvh', paddingTop: 'max(2rem, env(safe-area-inset-top, 0px))' }}
       >
         <div className="flex justify-end mb-2">
           <form action={signOut}>
@@ -261,7 +261,7 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
     const overtimeMins = Math.max(0, totalWorkedMins - scheduledMins)
 
     return (
-      <div className="flex flex-col min-h-screen bg-[#141210] animate-clock-in">
+      <div className="flex flex-col bg-[#141210] animate-clock-in" style={{ height: '100dvh' }}>
         {/* Completion flash */}
         {completionFlash && (
           <div
@@ -362,8 +362,9 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
 
   return (
     <div
-      className="flex flex-col min-h-screen bg-[#f2ece2] px-6 animate-page-in"
+      className="flex flex-col bg-[#f2ece2] px-6 animate-page-in"
       style={{
+        height: '100dvh',
         paddingTop: 'max(2rem, env(safe-area-inset-top, 0px))',
         paddingBottom: 'calc(4.5rem + max(1rem, env(safe-area-inset-bottom, 0px)))',
       }}
