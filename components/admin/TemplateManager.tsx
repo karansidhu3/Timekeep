@@ -85,19 +85,19 @@ function DayModal({ state, onClose }: { state: EditState; onClose: () => void })
 
   return (
     <div className="animate-fade-in fixed inset-0 bg-black/30 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-      <div className="animate-sheet-up sm:animate-float-in bg-[#fffefb] rounded-t-2xl sm:rounded-2xl [box-shadow:var(--shadow-xl)] w-full sm:max-w-sm p-6 pb-[max(2rem,env(safe-area-inset-bottom))] sm:pb-6">
-        <div className="w-10 h-1 bg-[#e4e0da] rounded-full mx-auto mb-5 sm:hidden" />
+      <div className="animate-sheet-up sm:animate-float-in bg-[#f9f4ea] rounded-t-2xl sm:rounded-2xl [box-shadow:var(--shadow-xl)] w-full sm:max-w-sm p-6 pb-[max(2rem,env(safe-area-inset-bottom))] sm:pb-6">
+        <div className="w-10 h-1 bg-[#d3c9b2] rounded-full mx-auto mb-5 sm:hidden" />
 
         <div className="flex items-center justify-between mb-5">
           <div>
-            <p className="text-base font-semibold text-[#0d0c0b] tracking-[-0.01em]">
+            <p className="text-base font-semibold text-label-1 tracking-[-0.01em]">
               {DAY_FULL[state.dayOfWeek - 1]}
             </p>
-            <p className="text-xs text-[#a8a29e] mt-0.5 tracking-[-0.01em]">{state.employeeName}</p>
+            <p className="text-xs text-label-3 mt-0.5 tracking-[-0.01em]">{state.employeeName}</p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-[#a8a29e] hover:bg-[#f0ede8] hover:text-[#44403c] transition-colors"
+            className="p-1.5 rounded-xl text-label-3 hover:bg-[#eae3d3] hover:text-label-2 transition-colors"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -176,7 +176,7 @@ export default function TemplateManager({ employees, templates }: Props) {
   }
 
   if (employees.length === 0) {
-    return <p className="text-sm text-[#a8a29e] py-8 text-center tracking-[-0.01em]">No employees yet.</p>
+    return <p className="text-sm text-label-3 py-8 text-center tracking-[-0.01em]">No employees yet.</p>
   }
 
   return (
@@ -187,42 +187,42 @@ export default function TemplateManager({ employees, templates }: Props) {
           const hasAny = Object.keys(empMap).length > 0
 
           return (
-            <div key={emp.id} className="rounded-2xl border border-[#e4e0da] overflow-hidden [box-shadow:var(--shadow-sm)]">
+            <div key={emp.id} className="rounded-xl border border-[#d3c9b2] overflow-hidden [box-shadow:var(--shadow-sm)]">
               {/* Employee header */}
-              <div className="px-4 py-3.5 bg-[#faf8f5] border-b border-[#e4e0da] flex items-center justify-between">
-                <p className="text-sm font-semibold text-[#0d0c0b] tracking-[-0.01em]">{emp.name}</p>
+              <div className="px-4 py-3.5 bg-[#f4efe6] border-b border-[#d3c9b2] flex items-center justify-between">
+                <p className="text-sm font-semibold text-label-1 tracking-[-0.01em]">{emp.name}</p>
                 {!hasAny && (
-                  <span className="text-xs text-[#a8a29e] tracking-[-0.01em]">No pattern set</span>
+                  <span className="text-xs text-label-3 tracking-[-0.01em]">No pattern set</span>
                 )}
               </div>
 
               {/* Days */}
-              <div className="divide-y divide-[#f0ede8]">
+              <div className="divide-y divide-[#eae3d3]">
                 {[1, 2, 3, 4, 5, 6, 7].map(day => {
                   const t = empMap[day]
                   return (
                     <button
                       key={day}
                       onClick={() => openEdit(emp, day)}
-                      className="w-full flex items-center gap-4 px-4 py-3.5 text-left bg-[#fffefb] hover:bg-[#f7f5f2] active:bg-[#f0ede8] transition-colors"
+                      className="w-full flex items-center gap-4 px-4 py-3.5 text-left bg-[#f9f4ea] hover:bg-[#f2ece2] active:bg-[#eae3d3] transition-colors"
                     >
-                      <span className="text-xs font-bold text-[#c4bfba] uppercase w-8 shrink-0 tracking-widest">
+                      <span className="text-xs font-bold text-label-4 uppercase w-8 shrink-0 tracking-widest">
                         {DAY_NAMES[day - 1]}
                       </span>
                       {t ? (
                         <>
-                          <span className="flex-1 text-sm font-medium text-[#1a1917] font-mono tracking-[-0.01em]">
+                          <span className="flex-1 text-sm font-medium text-label-1 font-mono tracking-[-0.01em]">
                             {fmt12(t.start_time)} – {fmt12(t.end_time)}
                           </span>
                           {t.notes && (
-                            <span className="text-xs text-[#a8a29e] truncate max-w-[100px] tracking-[-0.01em]">{t.notes}</span>
+                            <span className="text-xs text-label-3 truncate max-w-[100px] tracking-[-0.01em]">{t.notes}</span>
                           )}
-                          <svg className="text-[#d6d3d1] shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                          <svg className="text-label-4 shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                           </svg>
                         </>
                       ) : (
-                        <span className="flex-1 text-sm text-[#d6d3d1] tracking-[-0.01em]">Off — tap to add</span>
+                        <span className="flex-1 text-sm text-label-4 tracking-[-0.01em]">Off — tap to add</span>
                       )}
                     </button>
                   )

@@ -30,7 +30,7 @@ export async function upsertTemplate(data: {
     )
 
   if (error) return { success: false, error: error.message }
-  revalidatePath('/admin/templates')
+  revalidatePath('/', 'layout')
   return { success: true }
 }
 
@@ -46,7 +46,7 @@ export async function deleteTemplate(id: string) {
     .eq('id', id)
 
   if (error) return { success: false, error: error.message }
-  revalidatePath('/admin/templates')
+  revalidatePath('/', 'layout')
   return { success: true }
 }
 
@@ -98,6 +98,6 @@ export async function applyTemplatesToWeek(
     created++
   }
 
-  revalidatePath('/admin/schedule')
+  revalidatePath('/', 'layout')
   return { success: true, created, skipped }
 }

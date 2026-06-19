@@ -25,7 +25,7 @@ export async function createShift(data: ShiftInput) {
 
   if (error) return { success: false, error: error.message }
 
-  revalidatePath('/admin/schedule')
+  revalidatePath('/', 'layout')
   return { success: true }
 }
 
@@ -41,7 +41,7 @@ export async function updateShift(shiftId: string, data: Partial<ShiftInput>) {
 
   if (error) return { success: false, error: error.message }
 
-  revalidatePath('/admin/schedule')
+  revalidatePath('/', 'layout')
   return { success: true }
 }
 
@@ -52,6 +52,6 @@ export async function deleteShift(shiftId: string) {
 
   if (error) return { success: false, error: error.message }
 
-  revalidatePath('/admin/schedule')
+  revalidatePath('/', 'layout')
   return { success: true }
 }

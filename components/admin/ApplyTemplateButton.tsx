@@ -66,7 +66,7 @@ export default function ApplyTemplateButton({ templates, weekStart }: Props) {
 
   return (
     <div className="flex items-center gap-2">
-      {status && <span className="text-xs text-[#78716c] tracking-[-0.01em]">{status}</span>}
+      {status && <span className="text-xs text-label-3 tracking-[-0.01em]">{status}</span>}
       <Button variant="ghost" size="sm" onClick={handleApply} disabled={isPending}>
         {isPending ? 'Applying…' : 'Apply template'}
       </Button>

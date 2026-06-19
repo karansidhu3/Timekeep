@@ -29,7 +29,7 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 bg-white/80 backdrop-blur-md border-t border-[#e4e0da]/60"
+      className="fixed bottom-0 inset-x-0 bg-[#f9f4ea]/92 backdrop-blur-xl border-t border-[#d3c9b2]/50"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       <div className="flex h-16 px-2">
@@ -40,7 +40,7 @@ export default function BottomNav() {
               key={href}
               href={href}
               className={`relative flex-1 flex flex-col items-center justify-center gap-1.5 transition-colors duration-150 ${
-                active ? 'text-[#0d0c0b]' : 'text-[#b8b4ae]'
+                active ? 'text-label-1' : 'text-[#b8b4ae]'
               }`}
             >
               {/* Top-edge active indicator */}
@@ -51,7 +51,7 @@ export default function BottomNav() {
               />
               {icon(active)}
               <span className={`text-[11px] font-medium tracking-[-0.01em] transition-colors duration-150 ${
-                active ? 'text-[#0d0c0b]' : 'text-[#b8b4ae]'
+                active ? 'text-label-1' : 'text-[#b8b4ae]'
               }`}>
                 {label}
               </span>

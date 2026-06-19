@@ -33,7 +33,7 @@ export async function clockIn() {
 
   if (error) return { success: false, error: error.message }
 
-  revalidatePath('/dashboard')
+  revalidatePath('/', 'layout')
   return { success: true }
 }
 
@@ -59,7 +59,7 @@ export async function clockOut(entryId: string, customClockOut?: string) {
     return { success: false, error: 'Could not clock out — entry not found or already closed.' }
   }
 
-  revalidatePath('/dashboard')
+  revalidatePath('/', 'layout')
   return { success: true }
 }
 
@@ -84,7 +84,7 @@ export async function adminCreateTimeEntry(data: {
 
   if (error) return { success: false, error: error.message }
 
-  revalidatePath('/admin/time-entries')
+  revalidatePath('/', 'layout')
   return { success: true }
 }
 
@@ -109,6 +109,47 @@ export async function adminUpdateTimeEntry(data: {
 
   if (error) return { success: false, error: error.message }
 
-  revalidatePath('/admin/time-entries')
+  revalidatePath('/', 'layout')
+  return { success: true }
+}
+
+export async function adminClockIn(employeeId: string) {
+  const supabase = await createServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Not authenticated' }
+
+  const { data: existing } = await supabase
+    .from('time_entries')
+    .select('id')
+    .eq('employee_id', employeeId)
+    .is('clock_out', null)
+    .maybeSingle()
+
+  if (existing) return { success: false, error: 'Already clocked in.' }
+
+  const { error } = await supabase.from('time_entries').insert({
+    employee_id: employeeId,
+    clock_in: new Date().toISOString(),
+  })
+
+  if (error) return { success: false, error: error.message }
+
+  revalidatePath('/', 'layout')
+  return { success: true }
+}
+
+export async function adminDeleteTimeEntry(id: string) {
+  const supabase = await createServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Not authenticated' }
+
+  const { error } = await supabase
+    .from('time_entries')
+    .delete()
+    .eq('id', id)
+
+  if (error) return { success: false, error: error.message }
+
+  revalidatePath('/', 'layout')
   return { success: true }
 }

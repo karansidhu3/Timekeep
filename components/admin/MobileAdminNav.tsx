@@ -9,7 +9,7 @@ const links = [
     label: 'Today',
     icon: (active: boolean) => (
       <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
       </svg>
     ),
   },
@@ -24,10 +24,10 @@ const links = [
   },
   {
     href: '/admin/time-entries',
-    label: 'Time',
+    label: 'Log',
     icon: (active: boolean) => (
       <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
       </svg>
     ),
   },
@@ -44,13 +44,26 @@ const links = [
 
 export default function MobileAdminNav() {
   const pathname = usePathname()
+  const activeIdx = links.findIndex(({ href }) => pathname.startsWith(href))
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 inset-x-0 bg-white/80 backdrop-blur-md border-t border-[#e4e0da]/60"
+      className="md:hidden fixed bottom-0 inset-x-0 bg-[#f9f4ea]/92 backdrop-blur-xl border-t border-[#d3c9b2]/50"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
-      <div className="flex h-16">
+      <div className="relative flex h-16">
+        {/* Sliding top-edge indicator */}
+        {activeIdx !== -1 && (
+          <span
+            className="absolute top-0 h-[2px] rounded-full bg-[#141210]"
+            style={{
+              width: `calc(100% / ${links.length} - 3rem)`,
+              left: `calc(${activeIdx} * (100% / ${links.length}) + 1.5rem)`,
+              transition: 'left 280ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+            }}
+          />
+        )}
+
         {links.map(({ href, label, icon }) => {
           const active = pathname.startsWith(href)
           return (
@@ -58,18 +71,12 @@ export default function MobileAdminNav() {
               key={href}
               href={href}
               className={`relative flex-1 flex flex-col items-center justify-center gap-1 transition-colors duration-150 ${
-                active ? 'text-[#0d0c0b]' : 'text-[#b8b4ae]'
+                active ? 'text-label-1' : 'text-[#b8b4ae]'
               }`}
             >
-              {/* Top-edge active indicator */}
-              <span
-                className={`absolute top-0 inset-x-6 h-[2px] rounded-full transition-all duration-200 ${
-                  active ? 'bg-[#0d0c0b] opacity-100' : 'opacity-0'
-                }`}
-              />
               {icon(active)}
               <span className={`text-[11px] font-medium tracking-[-0.01em] ${
-                active ? 'text-[#0d0c0b]' : 'text-[#b8b4ae]'
+                active ? 'text-label-1' : 'text-[#b8b4ae]'
               }`}>{label}</span>
             </Link>
           )

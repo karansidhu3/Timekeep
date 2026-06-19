@@ -6,10 +6,10 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants = {
-  primary:   'bg-[#141210] text-[#f5f3ef] hover:bg-[#1e1c19] active:bg-[#0d0c0b]',
-  secondary: 'bg-[#f0ede8] text-[#1a1917] hover:bg-[#e8e4de] active:bg-[#ddd9d3]',
+  primary:   'bg-[#141210] text-white hover:bg-[#242220] active:bg-[#0d0c0b]',
+  secondary: 'bg-[#eae3d3] text-label-1 hover:bg-[#ddd4be] active:bg-[#ddd9d3]',
   danger:    'bg-red-600 text-white hover:bg-red-500 active:bg-red-700',
-  ghost:     'text-[#44403c] hover:bg-[#f0ede8] active:bg-[#e8e4de]',
+  ghost:     'text-label-2 hover:bg-[#eae3d3] active:bg-[#ddd4be]',
   dark:      'bg-white/10 text-white hover:bg-white/15 active:bg-white/20 border border-white/10',
 }
 
@@ -29,10 +29,11 @@ export default function Button({
 }: Props) {
   return (
     <button
+      data-spring
       className={`
         inline-flex items-center justify-center gap-2 rounded-2xl font-medium
-        transition-all duration-150 cursor-pointer tracking-[-0.01em]
-        active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100
+        transition-colors duration-150 cursor-pointer tracking-[-0.01em]
+        disabled:opacity-40 disabled:cursor-not-allowed
         ${variants[variant]} ${sizes[size]} ${className}
       `}
       disabled={disabled}

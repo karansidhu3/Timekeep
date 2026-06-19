@@ -1,7 +1,7 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { format, eachDayOfInterval, isSameDay, differenceInMinutes } from 'date-fns'
-import { getWeekRange, compactTimePST, weekdayIndexPST } from '@/lib/utils'
+import { getWeekRange, formatShiftRange, weekdayIndexPST } from '@/lib/utils'
 import Link from 'next/link'
 import AdminWeekNav from '@/components/admin/AdminWeekNav'
 import NewShiftButton from '@/components/admin/NewShiftButton'
@@ -16,7 +16,7 @@ function fmtMinutes(mins: number): string {
 export default async function AdminSchedulePage({
   searchParams,
 }: {
-  searchParams: Promise<{ week?: string }>
+  searchParams: Promise<{ week?: string; dir?: string }>
 }) {
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -24,6 +24,7 @@ export default async function AdminSchedulePage({
 
   const params = await searchParams
   const weekOffset = parseInt(params.week ?? '0', 10)
+  const dir = params.dir as 'next' | 'prev' | undefined
   const { start, end } = getWeekRange(weekOffset)
 
   const [{ data: shifts }, { data: employees }, { data: templates }] = await Promise.all([
@@ -48,146 +49,123 @@ export default async function AdminSchedulePage({
 
   type ShiftRow = { id: string; start_time: string; end_time: string; notes: string | null; employee_id: string }
 
-  const rotaMap = new Map<string, Map<number, ShiftRow>>()
-  const hoursMap = new Map<string, number>()
+  // First name lookup
+  const nameMap = new Map((employees ?? []).map(e => [e.id, e.name.trim().split(/\s+/)[0]]))
 
+  // Group shifts by day index (0=Mon … 6=Sun)
+  const dayShiftsMap = new Map<number, ShiftRow[]>()
   for (const shift of (shifts ?? []) as ShiftRow[]) {
     const dayIdx = weekdayIndexPST(shift.start_time)
-    if (!rotaMap.has(shift.employee_id)) rotaMap.set(shift.employee_id, new Map())
-    rotaMap.get(shift.employee_id)!.set(dayIdx, shift)
-    const mins = differenceInMinutes(new Date(shift.end_time), new Date(shift.start_time))
-    hoursMap.set(shift.employee_id, (hoursMap.get(shift.employee_id) ?? 0) + mins)
+    if (!dayShiftsMap.has(dayIdx)) dayShiftsMap.set(dayIdx, [])
+    dayShiftsMap.get(dayIdx)!.push(shift)
   }
 
   const today = new Date()
 
   return (
-    <div className="max-w-5xl mx-auto px-4 md:px-6 pb-nav md:pb-12 pt-page animate-page-in">
+    <div className="max-w-2xl mx-auto px-4 md:px-6 pb-nav md:pb-12 pt-page">
 
       {/* ── Header ───────────────────────────────────────────────────── */}
-      <div className="mb-5 md:mb-8">
-        <div className="flex items-center justify-between mb-1">
-          <h1 className="text-3xl font-semibold tracking-tight text-[#0d0c0b]">Schedule</h1>
-          <AdminWeekNav weekOffset={weekOffset} />
+      <div className="mb-6">
+        {/* Row 1: Title + primary action — separated ends, no collision */}
+        <div className="flex items-center justify-between mb-3">
+          <h1 className="text-3xl font-semibold tracking-tight text-label-1">Schedule</h1>
+          <NewShiftButton employees={employees ?? []} weekStart={start.toISOString()} />
         </div>
+        {/* Row 2: Week nav (left) + secondary actions (right) */}
         <div className="flex items-center justify-between">
-          <p className="text-sm text-[#a8a29e] tracking-[-0.01em] font-mono">
-            {format(start, 'MMM d')} – {format(end, 'MMM d')}
-            {shiftCount > 0 && (
-              <span className="ml-1.5 text-[#c4bfba]">· {shiftCount} {shiftCount !== 1 ? 'shifts' : 'shift'}</span>
-            )}
-          </p>
-          <div className="flex items-center gap-2">
-            <div className="hidden sm:block">
-              <ApplyTemplateButton templates={templates ?? []} weekStart={start} />
-            </div>
-            <NewShiftButton employees={employees ?? []} weekStart={start.toISOString()} />
+          <div className="flex items-center gap-2.5">
+            <AdminWeekNav weekOffset={weekOffset} />
+            <p className="text-sm text-label-3 tracking-[-0.01em]">
+              {format(start, 'MMM d')} – {format(end, 'MMM d')}
+              {shiftCount > 0 && (
+                <span className="ml-1.5">· {shiftCount} {shiftCount !== 1 ? 'shifts' : 'shift'}</span>
+              )}
+            </p>
           </div>
+          <div className="hidden sm:block">
+            <ApplyTemplateButton templates={templates ?? []} weekStart={start} />
+          </div>
+        </div>
+        {/* Apply template — mobile only */}
+        <div className="sm:hidden mt-2.5">
+          <ApplyTemplateButton templates={templates ?? []} weekStart={start} />
         </div>
       </div>
 
       {(employees ?? []).length === 0 ? (
-        <p className="text-sm text-[#a8a29e] py-4">No employees yet.</p>
+        <p className={`text-sm text-label-3 py-4 ${!dir ? 'animate-page-in' : ''}`}>No employees yet.</p>
       ) : (
-        /* Horizontal-scroll wrapper: edge-to-edge on mobile, normal on md+ */
-        <div className="-mx-4 md:-mx-6 overflow-x-auto md:overflow-visible md:mx-0 pb-2">
-          <div className="px-4 md:px-0" style={{ minWidth: '480px' }}>
+        <div className={`space-y-3 ${dir === 'next' ? 'animate-slide-right' : dir === 'prev' ? 'animate-slide-left' : 'animate-page-in'}`}>
+          {weekDays.map((day, i) => {
+            const isToday = isSameDay(day, today)
+            const dayShifts = dayShiftsMap.get(i) ?? []
 
-            {/* ── Day header row ─────────────────────────────────────── */}
-            <div
-              className="grid gap-px mb-1"
-              style={{ gridTemplateColumns: '64px repeat(7, 1fr)' }}
-            >
-              <div />
-              {weekDays.map(day => {
-                const isToday = isSameDay(day, today)
-                return (
-                  <div key={day.toISOString()} className={`text-center py-2 rounded-lg ${isToday ? 'bg-[#141210]' : ''}`}>
-                    <p className={`text-[9px] font-bold uppercase tracking-widest leading-none ${
-                      isToday ? 'text-white/50' : 'text-[#c4bfba]'
-                    }`}>
-                      {format(day, 'EEE')[0]}
-                    </p>
-                    <p className={`text-xs mt-0.5 font-mono tabular-nums ${
-                      isToday ? 'text-white font-semibold' : 'text-[#78716c]'
-                    }`}>
-                      {format(day, 'd')}
-                    </p>
+            return (
+              <div key={day.toISOString()}>
+
+                {/* ── Day header ─────────────────────────────────────── */}
+                <div className="flex items-center gap-3 mb-1.5">
+                  <div className={`w-9 h-9 rounded-xl flex flex-col items-center justify-center flex-shrink-0 ${
+                    isToday ? 'bg-[#141210]' : 'bg-[#eae3d3]'
+                  }`}>
+                    <p className={`text-[8px] font-bold uppercase tracking-widest leading-none ${
+                      isToday ? 'text-white/50' : 'text-label-3'
+                    }`}>{format(day, 'EEE')}</p>
+                    <p className={`text-sm font-semibold leading-none mt-0.5 ${
+                      isToday ? 'text-white' : 'text-label-2'
+                    }`}>{format(day, 'd')}</p>
                   </div>
-                )
-              })}
-            </div>
+                  <p className={`text-sm tracking-[-0.01em] ${
+                    isToday ? 'font-semibold text-label-1' : 'text-label-3'
+                  }`}>
+                    {format(day, 'EEEE, MMM d')}
+                    {isToday && <span className="ml-2 text-[11px] font-semibold text-label-3 uppercase tracking-widest">Today</span>}
+                  </p>
+                </div>
 
-            {/* ── Employee rows ───────────────────────────────────────── */}
-            <div className="space-y-px stagger">
-              {(employees ?? []).map(emp => {
-                const empShifts = rotaMap.get(emp.id)
-                const totalMins = hoursMap.get(emp.id) ?? 0
-                const firstName = emp.name.trim().split(/\s+/)[0]
-
-                return (
-                  <div
-                    key={emp.id}
-                    className="grid gap-px items-stretch"
-                    style={{ gridTemplateColumns: '64px repeat(7, 1fr)' }}
-                  >
-                    {/* Name + hours */}
-                    <div className="flex flex-col justify-center pr-2 py-1.5 min-w-0">
-                      <p className="text-xs font-semibold text-[#0d0c0b] truncate tracking-[-0.01em]">{firstName}</p>
-                      <p className="text-[10px] text-[#a8a29e] mt-0.5 font-mono tabular-nums">
-                        {totalMins > 0 ? fmtMinutes(totalMins) : <span className="text-[#e4e0da]">—</span>}
-                      </p>
-                    </div>
-
-                    {/* Day cells */}
-                    {[0, 1, 2, 3, 4, 5, 6].map(dayIdx => {
-                      const shift = empShifts?.get(dayIdx)
-                      const isToday = isSameDay(weekDays[dayIdx], today)
-
-                      if (!shift) {
-                        return (
-                          <div
-                            key={dayIdx}
-                            className={`h-12 rounded-xl flex items-center justify-center ${
-                              isToday ? 'bg-[#141210]/5' : 'bg-[#f0ede8]/40'
-                            }`}
-                          >
-                            <span className="text-[10px] text-[#e4e0da]">·</span>
-                          </div>
-                        )
-                      }
-
+                {/* ── Shifts ─────────────────────────────────────────── */}
+                {dayShifts.length > 0 ? (
+                  <div className="ml-12 rounded-xl border border-[#d3c9b2] overflow-hidden [box-shadow:var(--shadow-sm)]">
+                    {dayShifts.map(shift => {
+                      const mins = differenceInMinutes(new Date(shift.end_time), new Date(shift.start_time))
+                      const firstName = nameMap.get(shift.employee_id) ?? '?'
                       return (
                         <Link
-                          key={dayIdx}
+                          key={shift.id}
                           href={`/admin/schedule/${shift.id}`}
-                          className={`h-12 rounded-xl flex flex-col items-center justify-center gap-px
-                            transition-all duration-150 hover:opacity-80 active:scale-[0.96] ${
-                            isToday
-                              ? 'bg-[#141210]'
-                              : 'bg-[#1e1c19]'
-                          }`}
+                          className="flex items-center justify-between px-4 py-3 bg-[#f9f4ea] border-b border-[#d3c9b2] last:border-0 hover:bg-[#f2ece2] active:bg-[#eae3d3] transition-colors duration-150 group"
                         >
-                          <span className="text-[10px] font-semibold text-white/90 font-mono tabular-nums leading-none">
-                            {compactTimePST(shift.start_time)}
-                          </span>
-                          <span className="text-[10px] text-white/35 font-mono tabular-nums leading-none">
-                            {compactTimePST(shift.end_time)}
-                          </span>
+                          <p className="text-sm font-semibold text-label-1 tracking-[-0.01em]">
+                            {firstName}
+                          </p>
+                          <div className="flex items-center gap-3">
+                            <p className="text-sm text-label-2 tracking-[-0.01em]">
+                              {formatShiftRange(shift.start_time, shift.end_time)}
+                            </p>
+                            <p className="text-xs text-label-2 font-mono tabular-nums w-7 text-right">
+                              {fmtMinutes(mins)}
+                            </p>
+                            <svg
+                              className="w-3.5 h-3.5 text-label-3 group-hover:text-label-2 transition-colors flex-shrink-0"
+                              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                            </svg>
+                          </div>
                         </Link>
                       )
                     })}
                   </div>
-                )
-              })}
-            </div>
+                ) : (
+                  <p className="ml-12 text-sm text-label-3 tracking-[-0.01em] py-1">
+                    No shifts
+                  </p>
+                )}
 
-            {shiftCount === 0 && (
-              <p className="text-sm text-[#a8a29e] pt-8 text-center tracking-[-0.01em]">
-                No shifts this week — add one above.
-              </p>
-            )}
-          </div>
+              </div>
+            )
+          })}
         </div>
       )}
     </div>

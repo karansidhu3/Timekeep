@@ -98,7 +98,7 @@ export default function ClockInButton({ openEntry }: Props) {
 
     return (
       <div className="space-y-3">
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5">
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
           <p className="text-sm font-semibold text-amber-800">Missed clock-out</p>
           <p className="text-xs text-amber-700 mt-1 leading-relaxed">
             You clocked in on {clockInFormatted} and didn&apos;t clock out.
@@ -106,14 +106,14 @@ export default function ClockInButton({ openEntry }: Props) {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-stone-700">
+          <label className="text-sm font-medium text-label-2">
             What time did you leave on {new Date(openEntry.clock_in).toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles', month: 'short', day: 'numeric' })}?
           </label>
           <select
             value={fixTime}
             onChange={e => setFixTime(e.target.value)}
-            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-[#f7f6f3]
-              text-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-900/20 min-h-[44px]"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-[#d3c9b2] text-sm bg-[#f9f4ea]
+              text-label-1 focus:outline-none focus:ring-2 focus:ring-[#141210]/20 min-h-[44px]"
           >
             <option value="">Select time…</option>
             {Array.from({ length: 96 }, (_, i) => {
@@ -133,7 +133,7 @@ export default function ClockInButton({ openEntry }: Props) {
 
         {error && <p className="text-sm text-red-600">{error}</p>}
 
-        <p className="text-xs text-stone-400 text-center">
+        <p className="text-xs text-label-3 text-center">
           If this looks wrong, ask your manager to correct it.
         </p>
       </div>
@@ -147,22 +147,22 @@ export default function ClockInButton({ openEntry }: Props) {
         <div className="space-y-3">
 
           {/* Dark cinematic on-shift card */}
-          <div className="bg-stone-900 rounded-2xl px-6 py-6">
+          <div className="bg-[#141210] rounded-2xl px-6 py-6">
             <div className="flex items-center justify-between mb-5">
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-stone-500">
+              <span className="text-[11px] font-semibold uppercase tracking-widest text-white/40">
                 On shift
               </span>
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <div className="w-2 h-2 rounded-full bg-[#4a7c59] animate-pulse" />
             </div>
 
             <p className="text-6xl font-semibold tracking-tight text-white leading-none">
               {elapsedSeconds !== null ? formatElapsed(elapsedSeconds) : '—'}
             </p>
 
-            <div className="mt-6 pt-5 border-t border-stone-800">
-              <p className="text-sm text-stone-500">
+            <div className="mt-6 pt-5 border-t border-white/10">
+              <p className="text-sm text-white/40">
                 Since{' '}
-                <span className="text-stone-300 font-medium">
+                <span className="text-white/70 font-medium">
                   {formatTimePST(openEntry.clock_in)}
                 </span>
               </p>

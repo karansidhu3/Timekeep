@@ -23,8 +23,8 @@ function NavLink({ href, label, pathname }: { href: string; label: string; pathn
       href={href}
       className={`block px-3 py-2 rounded-xl text-sm transition-all duration-150 tracking-[-0.01em] ${
         active
-          ? 'bg-[#141210] text-white font-medium'
-          : 'text-[#78716c] hover:text-[#1a1917] hover:bg-[#f0ede8]'
+          ? 'bg-[#eae3d3] text-label-1 font-semibold'
+          : 'text-label-3 hover:text-label-1 hover:bg-[#eae3d3]'
       }`}
     >
       {label}
@@ -36,11 +36,11 @@ export default function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="hidden md:flex flex-col fixed top-0 left-0 h-full w-52 border-r border-[#e4e0da] py-5 px-3 bg-[#f7f5f2]">
+    <aside className="hidden md:flex flex-col fixed top-0 left-0 h-full w-52 border-r border-[#d3c9b2] py-5 px-3 bg-[#f2ece2]">
       <Link href="/" className="px-3 mb-8 block">
         <div className="flex items-center gap-2">
           <LogoMark size={16} color="#0d0c0b" />
-          <span className="text-sm font-semibold tracking-tight text-[#0d0c0b]">Timekeep</span>
+          <span className="text-sm font-semibold tracking-tight text-label-1">Timekeep</span>
         </div>
       </Link>
 
@@ -49,16 +49,16 @@ export default function Sidebar() {
           <NavLink key={href} href={href} label={label} pathname={pathname} />
         ))}
 
-        <div className="my-3 border-t border-[#e4e0da]" />
+        <div className="my-3 border-t border-[#d3c9b2]" />
 
         {setupLinks.map(({ href, label }) => (
           <NavLink key={href} href={href} label={label} pathname={pathname} />
         ))}
       </nav>
 
-      <div className="pt-3 border-t border-[#e4e0da]">
+      <div className="pt-3 border-t border-[#d3c9b2]">
         <form action={signOut}>
-          <button className="w-full text-left px-3 py-2 text-sm text-[#a8a29e] hover:text-[#44403c] rounded-xl hover:bg-[#f0ede8] transition-colors duration-150 tracking-[-0.01em]">
+          <button className="w-full text-left px-3 py-2 text-sm font-medium text-label-1 rounded-xl bg-[#eae3d3] hover:bg-[#ddd4be] active:bg-[#d3c9b2] transition-colors duration-150 tracking-[-0.01em]">
             Sign out
           </button>
         </form>

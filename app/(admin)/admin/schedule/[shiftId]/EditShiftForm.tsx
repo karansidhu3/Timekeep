@@ -19,8 +19,8 @@ interface Shift {
 interface Employee { id: string; name: string }
 
 const selectClass = `
-  w-full px-4 py-3 rounded-2xl border border-[#e4e0da]
-  text-sm bg-[#f0ede8] text-[#0d0c0b]
+  w-full px-4 py-3 rounded-xl border border-[#d3c9b2]
+  text-sm bg-[#eae3d3] text-label-1
   focus:outline-none focus:border-[#78716c] focus:ring-2 focus:ring-[#141210]/10
   min-h-[44px] tracking-[-0.01em]
 `
@@ -76,7 +76,7 @@ export default function EditShiftForm({ shift, employees }: { shift: Shift; empl
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-[#44403c] tracking-[-0.01em]">Employee</label>
+        <label className="text-sm font-medium text-label-2 tracking-[-0.01em]">Employee</label>
         <select name="employeeId" defaultValue={shift.employee_id} className={selectClass} required>
           {employees.map(e => (
             <option key={e.id} value={e.id}>{e.name}</option>
@@ -90,7 +90,7 @@ export default function EditShiftForm({ shift, employees }: { shift: Shift; empl
       </div>
       <Input label="Notes (optional)" name="notes" type="text" defaultValue={shift.notes ?? ''} />
       {error && <p className="text-sm text-red-500 tracking-[-0.01em]">{error}</p>}
-      <div className="space-y-2 pt-2">
+      <div className="pt-2">
         <div className="flex gap-2">
           <Button type="button" variant="secondary" className="flex-1" onClick={() => router.back()}>
             Cancel
@@ -99,9 +99,12 @@ export default function EditShiftForm({ shift, employees }: { shift: Shift; empl
             {isPending ? 'Saving…' : 'Save changes'}
           </Button>
         </div>
-        <Button type="button" variant="danger" onClick={handleDelete} disabled={isDeleting} className="w-full">
-          {isDeleting ? 'Deleting…' : 'Delete shift'}
-        </Button>
+        <div className="mt-8 pt-6 border-t border-[#d3c9b2]">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-label-4 mb-3">Danger zone</p>
+          <Button type="button" variant="danger" onClick={handleDelete} disabled={isDeleting} className="w-full">
+            {isDeleting ? 'Deleting…' : 'Delete shift'}
+          </Button>
+        </div>
       </div>
     </form>
   )

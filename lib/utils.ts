@@ -1,4 +1,4 @@
-import { format, startOfWeek, endOfWeek, addWeeks, differenceInMinutes, isToday, isYesterday, isThisWeek } from 'date-fns'
+import { format, differenceInMinutes, isToday, isYesterday, isThisWeek } from 'date-fns'
 
 const TZ = 'America/Los_Angeles'
 
@@ -12,7 +12,7 @@ export function formatTimePST(iso: string): string {
   }).format(new Date(iso))
 }
 
-// Compact 12h, no AM/PM, no ":00" on the hour — for tight schedule chips
+// Compact 12h + am/pm suffix, no ":00" on the hour — for tight schedule chips
 export function compactTimePST(iso: string): string {
   const str = new Intl.DateTimeFormat('en-US', {
     timeZone: TZ,
@@ -24,7 +24,9 @@ export function compactTimePST(iso: string): string {
   const h = parseInt(hStr, 10)
   const m = parseInt(mStr, 10)
   const h12 = h % 12 || 12
-  return m === 0 ? String(h12) : `${h12}:${String(m).padStart(2, '0')}`
+  const period = h < 12 ? 'a' : 'p'
+  const timeStr = m === 0 ? String(h12) : `${h12}:${String(m).padStart(2, '0')}`
+  return `${timeStr}${period}`
 }
 
 // 0=Mon … 6=Sun, evaluated in PST
@@ -50,6 +52,17 @@ export function localTimePST(iso: string): string {
     minute: '2-digit',
     hourCycle: 'h23',
   }).format(new Date(iso))
+}
+
+// "9 AM – 5 PM" or "9:30 AM – 5:30 PM" — strips :00 for whole hours
+export function formatShiftRange(startIso: string, endIso: string): string {
+  const fmt = (iso: string) => new Intl.DateTimeFormat('en-US', {
+    timeZone: TZ,
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  }).format(new Date(iso)).replace(':00 ', ' ')
+  return `${fmt(startIso)} – ${fmt(endIso)}`
 }
 
 export function formatShiftTime(start: string, end: string): string {
@@ -78,11 +91,32 @@ export function formatElapsed(seconds: number): string {
 }
 
 export function getWeekRange(weekOffset = 0): { start: Date; end: Date } {
-  const base = addWeeks(new Date(), weekOffset)
-  return {
-    start: startOfWeek(base, { weekStartsOn: 1 }),
-    end: endOfWeek(base, { weekStartsOn: 1 }),
+  const tz = 'America/Los_Angeles'
+  const now = new Date()
+
+  // Find Monday of the current PST week, then apply offset
+  const dowMap: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 }
+  const pstDow = dowMap[now.toLocaleDateString('en-US', { timeZone: tz, weekday: 'short' })] ?? 1
+  const daysSinceMonday = pstDow === 0 ? 6 : pstDow - 1
+  const approxMondayMs = now.getTime() - daysSinceMonday * 86400000 + weekOffset * 7 * 86400000
+  const approxSundayMs = approxMondayMs + 6 * 86400000
+
+  const mondayStr = new Date(approxMondayMs).toLocaleDateString('en-CA', { timeZone: tz })
+  const sundayStr = new Date(approxSundayMs).toLocaleDateString('en-CA', { timeZone: tz })
+
+  // Returns the UTC timestamp corresponding to midnight PST/PDT on the given date,
+  // correctly handling DST by trying UTC-7 (PDT) then UTC-8 (PST).
+  function pstMidnight(dateStr: string): Date {
+    for (const h of [7, 8]) {
+      const t = new Date(`${dateStr}T${String(h).padStart(2, '0')}:00:00Z`)
+      if (t.toLocaleDateString('en-CA', { timeZone: tz }) === dateStr) return t
+    }
+    return new Date(`${dateStr}T08:00:00Z`)
   }
+
+  const start = pstMidnight(mondayStr)
+  const end = new Date(pstMidnight(sundayStr).getTime() + 24 * 3600000 - 1)
+  return { start, end }
 }
 
 export function calcDurationMinutes(clockIn: string, clockOut: string | null): number {

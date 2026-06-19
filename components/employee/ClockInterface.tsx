@@ -22,6 +22,7 @@ interface Props {
   openEntry: OpenEntry | null
   serverNow: string
   employeeName: string
+  todayWorkedMins?: number
 }
 
 function formatLive(seconds: number): string {
@@ -55,13 +56,14 @@ function toLocalDate(iso: string) {
 
 const HOLD_DURATION = 700
 
-export default function ClockInterface({ shifts, openEntry, serverNow, employeeName }: Props) {
+export default function ClockInterface({ shifts, openEntry, serverNow, employeeName, todayWorkedMins = 0 }: Props) {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0)
   const [fixTime, setFixTime] = useState('')
   const [holdProgress, setHoldProgress] = useState(0)
   const [liveSecondsUntil, setLiveSecondsUntil] = useState(0)
+  const [completionFlash, setCompletionFlash] = useState(false)
   const holdTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const now = new Date(serverNow)
@@ -136,6 +138,7 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
         clearInterval(holdTimerRef.current!)
         holdTimerRef.current = null
         setHoldProgress(0)
+        setCompletionFlash(true)
         handleClockOut()
       }
     }, 16)
@@ -176,12 +179,12 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
 
     return (
       <div
-        className="flex flex-col min-h-screen bg-[#f7f5f2] px-6 animate-page-in"
+        className="flex flex-col min-h-screen bg-[#f2ece2] px-6 animate-page-in"
         style={{ paddingTop: 'max(2rem, env(safe-area-inset-top, 0px))' }}
       >
         <div className="flex justify-end mb-2">
           <form action={signOut}>
-            <button className="text-xs font-medium text-[#a8a29e] hover:text-[#44403c] px-3 py-2 rounded-xl hover:bg-[#f0ede8] active:bg-[#e8e4de] transition-colors duration-150 tracking-[-0.01em]">
+            <button className="text-xs font-medium text-label-3 hover:text-label-2 px-3 py-2 rounded-xl hover:bg-[#eae3d3] active:bg-[#ddd4be] transition-colors duration-150 tracking-[-0.01em]">
               Sign out
             </button>
           </form>
@@ -190,24 +193,24 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
         <div className="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full">
           <div className="inline-flex items-center gap-2 mb-8">
             <div className="w-2 h-2 rounded-full bg-amber-400" />
-            <span className="text-xs font-semibold uppercase tracking-widest text-amber-600">Missed clock-out</span>
+            <span className="text-xs font-semibold uppercase tracking-widest text-orange-600">Missed clock-out</span>
           </div>
 
-          <p className="text-[1.75rem] font-semibold tracking-tight text-[#0d0c0b] leading-tight mb-2">
+          <p className="text-[1.75rem] font-semibold tracking-tight text-label-1 leading-tight mb-2">
             You forgot to clock out
           </p>
-          <p className="text-[#78716c] text-sm mb-10 tracking-[-0.01em]">
+          <p className="text-label-3 text-sm mb-10 tracking-[-0.01em]">
             You clocked in on {missedDate} and didn&apos;t clock out.
           </p>
 
           <div className="flex flex-col gap-2 mb-6">
-            <label className="text-sm font-medium text-[#44403c] tracking-[-0.01em]">
+            <label className="text-sm font-medium text-label-2 tracking-[-0.01em]">
               What time did you leave on {new Date(openEntry.clock_in).toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles', month: 'short', day: 'numeric' })}?
             </label>
             <select
               value={fixTime}
               onChange={e => setFixTime(e.target.value)}
-              className="w-full px-4 py-3 rounded-2xl border border-[#e4e0da] bg-[#f0ede8] text-sm text-[#0d0c0b]
+              className="w-full px-4 py-3 rounded-xl border border-[#d3c9b2] bg-[#eae3d3] text-sm text-label-1
                 focus:outline-none focus:border-[#78716c] focus:ring-2 focus:ring-[#141210]/10
                 transition-all duration-150 min-h-[44px]"
             >
@@ -226,16 +229,17 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
           {error && <p className="text-sm text-red-500 mb-4 tracking-[-0.01em]">{error}</p>}
 
           <button
+            data-spring
             onClick={handleFixClockOut}
             disabled={isPending || !fixTime}
             className="w-full h-14 rounded-2xl bg-[#141210] text-[#f5f3ef] font-medium text-[15px]
-              tracking-[-0.01em] transition-all duration-150 active:scale-[0.98]
-              disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100"
+              tracking-[-0.01em] transition-colors duration-150
+              disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {isPending ? 'Saving…' : 'Fix clock-out'}
           </button>
 
-          <p className="text-xs text-[#a8a29e] text-center mt-4">
+          <p className="text-xs text-label-3 text-center mt-4">
             If this looks wrong, ask your manager to correct it.
           </p>
         </div>
@@ -247,10 +251,25 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
 
   // ── ON SHIFT — hero state ───────────────────────────────────────────────
   if (isOnShift) {
-    const isOvertime = shiftEnd ? new Date() > shiftEnd : false
+    const scheduledMins = (shiftStart && shiftEnd)
+      ? Math.floor((shiftEnd.getTime() - shiftStart.getTime()) / 60000)
+      : 0
+    const totalWorkedMins = Math.floor(elapsedSeconds / 60) + todayWorkedMins
+    const isOvertime = scheduledMins > 0
+      ? totalWorkedMins > scheduledMins
+      : (shiftEnd ? new Date() > shiftEnd : false)
+    const overtimeMins = Math.max(0, totalWorkedMins - scheduledMins)
 
     return (
       <div className="flex flex-col min-h-screen bg-[#141210] animate-clock-in">
+        {/* Completion flash */}
+        {completionFlash && (
+          <div
+            className="fixed inset-0 bg-white pointer-events-none z-50"
+            style={{ animation: 'fade-in 80ms ease-in reverse both' }}
+            onAnimationEnd={() => setCompletionFlash(false)}
+          />
+        )}
 
         {/* Top bar */}
         <div
@@ -258,13 +277,13 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
           style={{ paddingTop: 'max(1.75rem, env(safe-area-inset-top, 0px))' }}
         >
           <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse-live" />
+            <div className="w-1.5 h-1.5 rounded-full bg-[#7ab898] animate-pulse-live" />
             <span className="text-xs font-semibold uppercase tracking-widest text-white/40">
               {isOvertime ? 'Overtime' : 'On shift'}
             </span>
           </div>
           <form action={signOut}>
-            <button className="text-xs font-medium text-white/30 hover:text-white/60 px-2 py-1.5 rounded-xl transition-colors duration-150 tracking-[-0.01em]">
+            <button className="text-xs font-medium text-white/50 hover:text-white/70 px-2 py-1.5 rounded-xl transition-colors duration-150 tracking-[-0.01em]">
               Sign out
             </button>
           </form>
@@ -273,19 +292,25 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
         {/* Elapsed time — the centrepiece */}
         <div className="flex-1 flex flex-col items-center justify-center px-6">
           <div
-            className="font-mono text-white leading-none tracking-tight text-center"
+            className="font-mono font-medium text-white leading-none tracking-tight text-center"
             style={{ fontSize: 'clamp(4.5rem, 22vw, 8rem)' }}
             suppressHydrationWarning
           >
             {formatLive(elapsedSeconds)}
           </div>
 
-          <p className="text-white/40 text-sm mt-6 tracking-[-0.01em] font-mono">
+          <p className="text-white/60 text-sm mt-6 tracking-[-0.01em] font-mono">
             since {formatTimePST(openEntry!.clock_in)}
           </p>
 
+          {todayWorkedMins > 0 && (
+            <p className="text-white/45 text-xs mt-1.5 tracking-[-0.01em] font-mono">
+              +{formatDuration(todayWorkedMins)} prior session
+            </p>
+          )}
+
           {todayShift && (
-            <p className="text-white/25 text-xs mt-2 tracking-[-0.01em] font-mono">
+            <p className="text-white/60 text-xs mt-2 tracking-[-0.01em] font-mono">
               {formatTimePST(todayShift.start_time)} – {formatTimePST(todayShift.end_time)}
             </p>
           )}
@@ -294,7 +319,7 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
             <div className="mt-6 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-400/15">
               <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
               <span className="text-xs font-semibold text-amber-400 tracking-[-0.01em]">
-                +{formatDuration(Math.floor((Date.now() - new Date(todayShift!.end_time).getTime()) / 60000))} over
+                +{formatDuration(overtimeMins)} over
               </span>
             </div>
           )}
@@ -337,7 +362,7 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
 
   return (
     <div
-      className="flex flex-col min-h-screen bg-[#f7f5f2] px-6 animate-page-in"
+      className="flex flex-col min-h-screen bg-[#f2ece2] px-6 animate-page-in"
       style={{
         paddingTop: 'max(2rem, env(safe-area-inset-top, 0px))',
         paddingBottom: 'calc(4.5rem + max(1rem, env(safe-area-inset-bottom, 0px)))',
@@ -347,9 +372,9 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
 
         {/* Top: greeting + sign out */}
         <div className="flex items-center justify-between">
-          <p className="text-sm text-[#a8a29e] tracking-[-0.01em]">{firstName}</p>
+          <p className="text-sm font-medium text-label-2 tracking-[-0.01em]">{firstName}</p>
           <form action={signOut}>
-            <button className="text-xs font-medium text-[#a8a29e] hover:text-[#44403c] px-3 py-2 rounded-xl hover:bg-[#f0ede8] active:bg-[#e8e4de] transition-colors duration-150 tracking-[-0.01em]">
+            <button className="text-xs font-medium text-label-3 hover:text-label-2 px-3 py-2 rounded-xl hover:bg-[#eae3d3] active:bg-[#ddd4be] transition-colors duration-150 tracking-[-0.01em]">
               Sign out
             </button>
           </form>
@@ -359,47 +384,47 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
         <div className="flex flex-col">
           {!todayShift ? (
             <div>
-              <p className="text-[2.75rem] font-semibold tracking-tight text-[#0d0c0b] leading-tight mb-2">
+              <p className="text-[2.75rem] font-semibold tracking-tight text-label-1 leading-tight mb-2">
                 Off today.
               </p>
-              <p className="text-[#a8a29e] text-sm tracking-[-0.01em]">No shift scheduled.</p>
+              <p className="text-label-3 text-sm tracking-[-0.01em]">No shift scheduled.</p>
             </div>
           ) : shiftIsOver ? (
             <div>
-              <p className="text-[2.75rem] font-semibold tracking-tight text-[#0d0c0b] leading-tight mb-2">
+              <p className="text-[2.75rem] font-semibold tracking-tight text-label-1 leading-tight mb-2">
                 Shift over.
               </p>
-              <p className="text-[#a8a29e] text-sm tracking-[-0.01em] font-mono">
+              <p className="text-label-3 text-sm tracking-[-0.01em] font-mono">
                 {formatTimePST(todayShift.start_time)} – {formatTimePST(todayShift.end_time)}
               </p>
             </div>
           ) : shiftHasStarted ? (
             <div>
-              <p className="text-[2.75rem] font-semibold tracking-tight text-[#0d0c0b] leading-tight mb-2">
+              <p className="text-[2.75rem] font-semibold tracking-tight text-label-1 leading-tight mb-2">
                 Your shift started.
               </p>
-              <p className="text-[#a8a29e] text-sm tracking-[-0.01em] font-mono">
+              <p className="text-label-3 text-sm tracking-[-0.01em] font-mono">
                 {formatTimePST(todayShift.start_time)} – {formatTimePST(todayShift.end_time)}
               </p>
               {todayShift.notes && (
-                <p className="text-[#78716c] text-sm mt-3 tracking-[-0.01em]">{todayShift.notes}</p>
+                <p className="text-label-3 text-sm mt-3 tracking-[-0.01em]">{todayShift.notes}</p>
               )}
             </div>
           ) : (
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-[#a8a29e] mb-4">Starts in</p>
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-label-3 mb-4">Starts in</p>
               <div
-                className="font-mono text-[#0d0c0b] leading-none tracking-tight mb-4"
+                className="font-mono text-label-1 leading-none tracking-tight mb-4"
                 style={{ fontSize: 'clamp(3.5rem, 18vw, 6rem)' }}
                 suppressHydrationWarning
               >
                 {formatCountdown(liveSecondsUntil || minsUntil * 60)}
               </div>
-              <p className="text-[#a8a29e] text-sm tracking-[-0.01em] font-mono">
+              <p className="text-label-3 text-sm tracking-[-0.01em] font-mono">
                 {formatTimePST(todayShift.start_time)} – {formatTimePST(todayShift.end_time)}
               </p>
               {todayShift.notes && (
-                <p className="text-[#78716c] text-sm mt-3 tracking-[-0.01em]">{todayShift.notes}</p>
+                <p className="text-label-3 text-sm mt-3 tracking-[-0.01em]">{todayShift.notes}</p>
               )}
             </div>
           )}
@@ -410,14 +435,21 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
           {error && <p className="text-sm text-red-500 mb-4 tracking-[-0.01em]">{error}</p>}
 
           <button
+            data-spring
             onClick={handleClockIn}
             disabled={isPending}
-            className="w-full h-14 rounded-2xl bg-[#141210] text-[#f5f3ef] font-medium text-[15px]
-              tracking-[-0.01em] transition-all duration-150 active:scale-[0.97]
-              disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100"
+            className="w-full h-14 rounded-2xl bg-[#4a7c59] text-white font-medium text-[15px]
+              tracking-[-0.01em] transition-colors duration-150
+              hover:bg-[#3d6b55] active:bg-[#2f5443]
+              disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {isPending ? 'Clocking in…' : 'Clock in'}
           </button>
+          {todayWorkedMins > 0 && (
+            <p className="text-center text-xs text-label-3 mt-3 font-mono tracking-[-0.01em] tabular-nums">
+              {formatDuration(todayWorkedMins)} worked today
+            </p>
+          )}
         </div>
 
       </div>

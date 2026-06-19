@@ -49,7 +49,7 @@ export function LogoIcon({ size = 32, className = '' }: LogoIconProps) {
 
   return (
     <div
-      className={`inline-flex items-center justify-center bg-stone-900 flex-shrink-0 ${className}`}
+      className={`inline-flex items-center justify-center bg-[#141210] flex-shrink-0 ${className}`}
       style={{
         width: size,
         height: size,
@@ -68,7 +68,7 @@ interface LogoProps {
 }
 
 const sizeMap = {
-  sm: { icon: 24, text: 'text-sm',   gap: 'gap-2',   sub: 'text-[10px]' },
+  sm: { icon: 24, text: 'text-sm',   gap: 'gap-2',   sub: 'text-[11px]' },
   md: { icon: 30, text: 'text-base', gap: 'gap-2.5', sub: 'text-[11px]' },
   lg: { icon: 38, text: 'text-xl',   gap: 'gap-3',   sub: 'text-xs'     },
 }
@@ -78,7 +78,7 @@ export default function Logo({ size = 'md', className = '' }: LogoProps) {
   return (
     <div className={`flex items-center ${s.gap} ${className}`}>
       <LogoIcon size={s.icon} />
-      <span className={`font-semibold tracking-tight text-stone-900 ${s.text}`}>
+      <span className={`font-semibold tracking-tight text-label-1 ${s.text}`}>
         Timekeep
       </span>
     </div>

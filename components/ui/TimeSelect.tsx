@@ -28,15 +28,15 @@ export default function TimeSelect({ name, defaultValue, required, label, classN
   return (
     <div className="flex flex-col gap-1.5">
       {label && (
-        <label className="text-sm font-medium text-[#44403c] tracking-[-0.01em]">{label}</label>
+        <label className="text-sm font-medium text-label-2 tracking-[-0.01em]">{label}</label>
       )}
       <select
         name={name}
         defaultValue={normalised}
         required={required}
         className={`
-          w-full px-4 py-3 rounded-2xl border border-[#e4e0da]
-          text-sm bg-[#f0ede8] text-[#0d0c0b]
+          w-full px-4 py-3 rounded-xl border border-[#d3c9b2]
+          text-sm bg-[#eae3d3] text-label-1
           focus:outline-none focus:border-[#78716c] focus:ring-2 focus:ring-[#141210]/10
           min-h-[44px] tracking-[-0.01em] ${className}
         `}

@@ -44,7 +44,7 @@ export async function createEmployee(data: EmployeeInput) {
     return { success: false, error: insertError.message }
   }
 
-  revalidatePath('/admin/employees')
+  revalidatePath('/', 'layout')
   return { success: true }
 }
 
@@ -68,8 +68,7 @@ export async function updateEmployee(
     if (authError) return { success: false, error: 'PIN update failed: ' + authError.message }
   }
 
-  revalidatePath('/admin/employees')
-  revalidatePath(`/admin/employees/${id}`)
+  revalidatePath('/', 'layout')
   return { success: true }
 }
 
@@ -83,6 +82,6 @@ export async function deactivateEmployee(id: string) {
 
   if (error) return { success: false, error: error.message }
 
-  revalidatePath('/admin/employees')
+  revalidatePath('/', 'layout')
   return { success: true }
 }

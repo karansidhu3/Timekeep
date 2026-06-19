@@ -4,8 +4,8 @@ interface Props {
 }
 
 const variants = {
-  default: 'bg-stone-100 text-stone-700',
-  success: 'bg-green-100 text-green-800',
+  default: 'bg-[#eae3d3] text-label-2',
+  success: 'bg-[#eef4f1] text-[#2d5a44]',
   warning: 'bg-amber-100 text-amber-800',
   danger: 'bg-red-100 text-red-700',
 }

@@ -71,8 +71,8 @@ export default async function TimeEntriesPage() {
   const weekLabel = `${format(weekStart, 'MMM d')} – ${format(weekEnd, 'MMM d')}`
 
   return (
-    <div className="max-w-4xl mx-auto px-6 pb-10 pt-page animate-page-in">
-      <h1 className="text-3xl font-semibold tracking-tight text-[#0d0c0b] mb-8">Time entries</h1>
+    <div className="max-w-4xl mx-auto px-6 pb-10 pt-page">
+      <h1 className="text-3xl font-semibold tracking-tight text-label-1 mb-8">Time entries</h1>
       <TimeEntriesManager
         entries={rows}
         employees={employees ?? []}

@@ -18,10 +18,10 @@ export default function ShiftCard({ shifts, serverNow }: { shifts: Shift[]; serv
   if (!shift) {
     return (
       <Card className="p-5">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-1">
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-label-3 mb-1">
           Today&apos;s shift
         </p>
-        <p className="text-stone-400 text-sm mt-2">No shift scheduled.</p>
+        <p className="text-label-3 text-sm mt-2">No shift scheduled.</p>
       </Card>
     )
   }
@@ -37,43 +37,43 @@ export default function ShiftCard({ shifts, serverNow }: { shifts: Shift[]; serv
 
   return (
     <Card className="p-5">
-      <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-3">
+      <p className="text-[11px] font-semibold uppercase tracking-widest text-label-3 mb-3">
         Today&apos;s shift
       </p>
 
-      <p className="text-stone-900 font-semibold text-4xl leading-none tracking-tight">
+      <p className="text-label-1 font-medium text-4xl leading-none tracking-tight font-mono">
         {startTime}
       </p>
-      <p className="text-stone-400 font-medium text-xl leading-none tracking-tight mt-2">
+      <p className="text-label-3 font-medium text-xl leading-none tracking-tight mt-2">
         until {endTime}
       </p>
 
       <div className="flex items-center gap-3 mt-3">
-        <p className="text-sm text-stone-400">{formatDuration(duration)}</p>
+        <p className="text-sm text-label-3">{formatDuration(duration)}</p>
         {!hasStarted && (
           <>
-            <span className="text-stone-200">·</span>
-            <p className="text-sm text-stone-400">
-              Starts in <span className="text-stone-600 font-medium">{formatDuration(minutesUntil)}</span>
+            <span className="text-label-4">·</span>
+            <p className="text-sm text-label-3">
+              Starts in <span className="text-label-2 font-medium">{formatDuration(minutesUntil)}</span>
             </p>
           </>
         )}
         {hasStarted && !isOver && (
           <>
-            <span className="text-stone-200">·</span>
-            <p className="text-sm text-green-600 font-medium">In progress</p>
+            <span className="text-label-4">·</span>
+            <p className="text-sm text-[#3d6b55] font-medium">In progress</p>
           </>
         )}
         {isOver && (
           <>
-            <span className="text-stone-200">·</span>
-            <p className="text-sm text-stone-400">Completed</p>
+            <span className="text-label-4">·</span>
+            <p className="text-sm text-label-3">Completed</p>
           </>
         )}
       </div>
 
       {shift.notes && (
-        <p className="text-sm text-stone-500 mt-3 pt-3 border-t border-stone-100 leading-relaxed">
+        <p className="text-sm text-label-3 mt-3 pt-3 border-t border-[#d3c9b2] leading-relaxed">
           {shift.notes}
         </p>
       )}

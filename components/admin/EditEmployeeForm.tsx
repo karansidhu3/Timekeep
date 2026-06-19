@@ -14,8 +14,8 @@ interface Employee {
 }
 
 const selectClass = `
-  w-full px-4 py-3 rounded-2xl border border-[#e4e0da]
-  text-sm bg-[#f0ede8] text-[#0d0c0b]
+  w-full px-4 py-3 rounded-xl border border-[#d3c9b2]
+  text-sm bg-[#eae3d3] text-label-1
   focus:outline-none focus:border-[#78716c] focus:ring-2 focus:ring-[#141210]/10
   min-h-[44px] tracking-[-0.01em]
 `
@@ -61,7 +61,7 @@ export default function EditEmployeeForm({ employee }: { employee: Employee }) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <Input label="Full name" name="name" type="text" defaultValue={employee.name} required />
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-[#44403c] tracking-[-0.01em]">Role</label>
+        <label className="text-sm font-medium text-label-2 tracking-[-0.01em]">Role</label>
         <select name="role" defaultValue={employee.role} className={selectClass}>
           <option value="employee">Employee</option>
           <option value="admin">Admin</option>

@@ -18,6 +18,9 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
   const [pin, setPin] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const [shake, setShake] = useState(false)
+  const [dotAnimIdx, setDotAnimIdx] = useState(-1)
+  const [dotAnimKey, setDotAnimKey] = useState(0)
   const submitRef = useRef(false)
 
   // Auto-submit on 4th digit
@@ -30,6 +33,8 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
         if (result && !result.success) {
           setError(result.error ?? 'Incorrect PIN')
           setPin('')
+          setShake(true)
+          setDotAnimIdx(-1)
         }
       })
     }
@@ -39,6 +44,9 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
     if (isPending) return
     if (pin.length < 4) {
       setError(null)
+      const newIdx = pin.length
+      setDotAnimIdx(newIdx)
+      setDotAnimKey(k => k + 1)
       setPin(p => p + digit)
     }
   }
@@ -46,6 +54,7 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
   function handlePinClear() {
     if (isPending) return
     setPin(p => p.slice(0, -1))
+    setDotAnimIdx(-1)
     setError(null)
   }
 
@@ -53,32 +62,39 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
     setSelectedId(id)
     setPin('')
     setError(null)
+    setShake(false)
+    setDotAnimIdx(-1)
     submitRef.current = false
   }
 
   // ── Name selection ────────────────────────────────────────────────────────
   if (!selectedId) {
     return (
-      <div className="flex-1 flex flex-col justify-center animate-page-in">
-        <p className="text-[#a8a29e] text-sm tracking-[-0.01em] mb-6">Who&apos;s clocking in?</p>
+      <div className="flex-1 flex flex-col justify-center gap-5">
+        <p className="text-[22px] font-semibold tracking-tight text-label-1 leading-tight animate-float-in">
+          Who&apos;s clocking in?
+        </p>
         <div>
           {employees.length === 0 ? (
-            <p className="text-sm text-[#a8a29e] py-8 text-center">No employees found.</p>
+            <p className="text-sm text-label-3 py-8 text-center animate-float-in">No employees found.</p>
           ) : (
-            <div>
+            <div className="flex flex-col gap-2.5">
               {employees.map((emp, i) => (
                 <button
                   key={emp.id}
+                  data-spring
                   onClick={() => handleSelectEmployee(emp.id)}
-                  className="w-full text-left py-5 flex items-center justify-between
-                             border-b border-[#e4e0da] last:border-0
-                             active:opacity-50 transition-opacity duration-100"
-                  style={{ animationDelay: `${i * 50}ms` }}
+                  className="w-full text-left px-5 py-4 flex items-center justify-between
+                             bg-[#f9f4ea] border border-[#d3c9b2] rounded-xl
+                             [box-shadow:0_1px_2px_rgba(20,16,10,0.06)]
+                             active:bg-[#eae3d3] active:[box-shadow:none]
+                             transition-colors duration-100 animate-float-in"
+                  style={{ animationDelay: `${60 + i * 60}ms` }}
                 >
-                  <span className="text-[2rem] font-semibold tracking-tight text-[#0d0c0b] leading-none">
+                  <span className="text-[1.75rem] font-semibold tracking-tight text-label-1 leading-none">
                     {getFirstName(emp.name)}
                   </span>
-                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} className="text-[#c4bfba] flex-shrink-0">
+                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="text-label-3 flex-shrink-0">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                   </svg>
                 </button>
@@ -96,11 +112,11 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
   return (
     <div className="flex-1 flex flex-col animate-scale-in">
 
-      {/* Top: back + name + circles */}
+      {/* Top: back + name + subtitle */}
       <div>
         <button
           onClick={() => { setSelectedId(null); setPin(''); setError(null) }}
-          className="flex items-center gap-1.5 text-[#44403c] hover:text-[#0d0c0b] transition-colors duration-150 mb-8 -ml-0.5"
+          className="flex items-center gap-1.5 text-label-2 hover:text-label-1 transition-colors duration-150 mb-8 -ml-0.5 py-2"
         >
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -108,44 +124,48 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
           <span className="text-sm font-medium tracking-[-0.01em]">Back</span>
         </button>
 
-        <p className="text-[2rem] font-semibold tracking-tight text-[#0d0c0b] leading-none mb-1">
+        <p className="text-[2rem] font-semibold tracking-tight text-label-1 leading-none mb-1">
           {getFirstName(selected?.name ?? '')}
         </p>
-        <p className="text-sm text-[#a8a29e] mb-8 tracking-[-0.01em]">
+        <p className="text-sm text-label-3 tracking-[-0.01em]">
           {isPending ? 'Signing in…' : 'Enter your 4-digit PIN'}
         </p>
+      </div>
 
-        <div className="flex gap-4 mb-3">
+      {/* Dots + keypad — grouped at bottom */}
+      <div className="mt-auto pb-2">
+        <div
+          className={`flex gap-5 justify-center mb-8 ${shake ? 'animate-shake' : ''}`}
+          onAnimationEnd={() => setShake(false)}
+        >
           {[0, 1, 2, 3].map(i => (
             <div
-              key={i}
-              className={`w-3 h-3 rounded-full border-2 transition-all duration-150 ${
+              key={i === dotAnimIdx ? `dot-${i}-${dotAnimKey}` : i}
+              className={`w-5 h-5 rounded-full border-2 ${
                 i < pin.length
-                  ? 'bg-[#141210] border-[#141210]'
-                  : 'bg-transparent border-[#c4bfba]'
+                  ? `bg-[#141210] border-[#141210] ${i === dotAnimIdx ? 'animate-dot-pop' : ''}`
+                  : 'bg-transparent border-[#d3c9b2] transition-all duration-150'
               }`}
             />
           ))}
         </div>
 
         {error && (
-          <p className="text-sm text-red-500 mt-3 tracking-[-0.01em]">{error}</p>
+          <p key={error} className="text-sm text-red-500 text-center mb-5 tracking-[-0.01em] animate-error-in">{error}</p>
         )}
-      </div>
 
-      {/* Keypad — pinned to bottom */}
-      <div className="mt-auto pb-2">
         <div className="grid grid-cols-3 gap-1.5">
           {['1','2','3','4','5','6','7','8','9','','0','del'].map((d, i) => (
             <button
               key={i}
+              data-spring={d !== '' ? true : undefined}
               onClick={() => d === 'del' ? handlePinClear() : d !== '' ? handlePinPress(d) : undefined}
               disabled={isPending}
               className={`
-                h-16 rounded-2xl text-xl font-medium text-[#0d0c0b] select-none
-                transition-all duration-100
-                ${d === '' ? 'pointer-events-none' : 'bg-white border border-[#ccc8c2] [box-shadow:0_1px_3px_rgba(0,0,0,0.08)] active:scale-[0.92] active:bg-[#f0ede8] active:[box-shadow:none]'}
-                disabled:opacity-40 disabled:active:scale-100
+                h-16 rounded-2xl text-xl font-medium text-label-1 select-none
+                transition-colors duration-100
+                ${d === '' ? 'pointer-events-none' : 'bg-[#f9f4ea] border border-[#d3c9b2] [box-shadow:0_1px_2px_rgba(20,16,10,0.07)] active:bg-[#eae3d3] active:[box-shadow:none]'}
+                disabled:opacity-40
               `}
             >
               {d === 'del' ? (
@@ -161,3 +181,4 @@ export default function LoginForm({ employees }: { employees: Employee[] }) {
     </div>
   )
 }
+

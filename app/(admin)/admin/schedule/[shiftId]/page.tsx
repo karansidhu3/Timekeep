@@ -21,14 +21,14 @@ export default async function EditShiftPage({ params }: { params: Promise<{ shif
     <div className="max-w-lg mx-auto px-6 pb-10 pt-page animate-page-in">
       <Link
         href="/admin/schedule"
-        className="inline-flex items-center gap-1.5 text-sm text-[#a8a29e] hover:text-[#44403c] transition-colors mb-6 -mt-1 py-1"
+        className="inline-flex items-center gap-1 px-3 py-2 -ml-1 mb-5 rounded-xl bg-[#eae3d3] hover:bg-[#ddd4be] active:bg-[#d3c9b2] text-sm font-medium text-label-1 transition-colors tracking-[-0.01em]"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
         Schedule
       </Link>
-      <h1 className="text-2xl font-semibold tracking-tight text-[#0d0c0b] mb-8">Edit shift</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-label-1 mb-8">Edit shift</h1>
       <EditShiftForm shift={shift} employees={employees ?? []} />
     </div>
   )

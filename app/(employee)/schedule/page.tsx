@@ -8,7 +8,7 @@ import WeekNav from '@/components/employee/WeekNav'
 export default async function SchedulePage({
   searchParams,
 }: {
-  searchParams: Promise<{ week?: string }>
+  searchParams: Promise<{ week?: string; dir?: string }>
 }) {
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -16,6 +16,7 @@ export default async function SchedulePage({
 
   const params = await searchParams
   const weekOffset = parseInt(params.week ?? '0', 10)
+  const dir = params.dir as 'next' | 'prev' | undefined
   const { start, end } = getWeekRange(weekOffset)
 
   const { data: shifts } = await supabase
@@ -36,15 +37,15 @@ export default async function SchedulePage({
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-[#0d0c0b]">Schedule</h1>
-          <p className="text-sm text-[#a8a29e] mt-0.5 tracking-[-0.01em] font-mono">
+          <h1 className="text-2xl font-semibold tracking-tight text-label-1">Schedule</h1>
+          <p className="text-sm text-label-3 mt-0.5 tracking-[-0.01em]">
             {format(start, 'MMM d')} – {format(end, 'MMM d')}
           </p>
         </div>
         <WeekNav weekOffset={weekOffset} />
       </div>
 
-      <WeeklySchedule shifts={shifts ?? []} weekDays={weekDays} />
+      <WeeklySchedule shifts={shifts ?? []} weekDays={weekDays} dir={dir} />
     </div>
   )
 }
