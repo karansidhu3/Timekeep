@@ -117,45 +117,48 @@ export default async function EmployeeDetailPage({
       </Link>
 
       {/* ── Employee header ─────────────────────────────────────────── */}
-      <div className="flex items-center gap-4 mb-8">
-        <div className="relative flex-shrink-0">
-          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-            isActive ? 'bg-[#eef4f1]' : 'bg-[#eae3d3]'
-          }`}>
-            <span className={`text-sm font-semibold ${isActive ? 'text-[#3d6b55]' : 'text-label-3'}`}>
-              {initials}
-            </span>
+      <div className="mb-8">
+        <div className="flex items-center gap-4">
+          <div className="relative flex-shrink-0">
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+              isActive ? 'bg-[#eef4f1]' : 'bg-[#eae3d3]'
+            }`}>
+              <span className={`text-sm font-semibold ${isActive ? 'text-[#3d6b55]' : 'text-label-3'}`}>
+                {initials}
+              </span>
+            </div>
+            {isActive && (
+              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#4a7c59] border-2 border-[#f2ece2]" />
+            )}
           </div>
-          {isActive && (
-            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#4a7c59] border-2 border-[#f2ece2]" />
-          )}
+          <div className="min-w-0">
+            <h1 className="text-2xl font-semibold tracking-tight text-label-1">{employee.name}</h1>
+            <p className="text-sm text-label-3 mt-0.5 capitalize tracking-[-0.01em]">{employee.role}</p>
+            {isActive && (
+              <p className="text-xs text-[#3d6b55] font-medium mt-1 tabular-nums tracking-[-0.01em]">
+                Clocked in · {formatDuration(elapsedMins)}
+              </p>
+            )}
+          </div>
         </div>
-        <div className="flex-1 min-w-0">
-          <h1 className="text-2xl font-semibold tracking-tight text-label-1">{employee.name}</h1>
-          <p className="text-sm text-label-3 mt-0.5 capitalize tracking-[-0.01em]">{employee.role}</p>
-          {isActive ? (
-            <p className="text-xs text-[#3d6b55] font-medium mt-1 tabular-nums tracking-[-0.01em]">
-              Clocked in · {formatDuration(elapsedMins)}
-            </p>
-          ) : (
-            <AdminClockInButton
-              employeeId={employee.id}
-              firstName={employee.name.trim().split(/\s+/)[0]}
-            />
-          )}
-        </div>
+        {!isActive && (
+          <AdminClockInButton
+            employeeId={employee.id}
+            firstName={employee.name.trim().split(/\s+/)[0]}
+          />
+        )}
       </div>
 
       {/* ── This week summary ──────────────────────────────────────── */}
       {showWeeklySummary && (
-        <div className="mb-8 bg-[#f9f4ea] rounded-xl border border-[#d3c9b2] [box-shadow:var(--shadow-sm)] p-4">
+        <div className="mb-10 bg-[#f9f4ea] rounded-xl border border-[#d3c9b2] [box-shadow:var(--shadow-sm)] p-4">
           <div className="flex items-center justify-between mb-3">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-label-3">This week</p>
-            <p className="text-xs text-label-3 tabular-nums font-mono">{weekLabel}</p>
+            <p className="text-xs text-label-3 tabular-nums">{weekLabel}</p>
           </div>
           <div className="flex items-baseline justify-between mb-2">
-            <p className="text-lg font-medium text-label-1 tabular-nums font-mono">{formatDuration(workedMinutes)}</p>
-            <p className="text-xs text-label-3 tabular-nums font-mono">
+            <p className="text-lg font-medium text-label-1 tabular-nums">{formatDuration(workedMinutes)}</p>
+            <p className="text-xs text-label-3 tabular-nums">
               of {formatDuration(scheduledMinutes)} scheduled
             </p>
           </div>
@@ -172,9 +175,6 @@ export default async function EmployeeDetailPage({
 
       {/* ── Settings ───────────────────────────────────────────────── */}
       <div className="mb-10">
-        <p className="text-[11px] font-semibold uppercase tracking-widest text-label-3 mb-3">
-          Settings
-        </p>
         <EditEmployeeForm employee={employee} />
       </div>
 

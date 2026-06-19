@@ -38,7 +38,7 @@ export default async function SchedulePage({
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-label-1">Schedule</h1>
-          <p className="text-sm text-label-3 mt-0.5 tracking-[-0.01em]">
+          <p className="text-sm text-label-2 mt-0.5 tracking-[-0.01em]">
             {format(start, 'MMM d')} – {format(end, 'MMM d')}
           </p>
         </div>

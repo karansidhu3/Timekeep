@@ -41,20 +41,20 @@ export default function ShiftCard({ shifts, serverNow }: { shifts: Shift[]; serv
         Today&apos;s shift
       </p>
 
-      <p className="text-label-1 font-medium text-4xl leading-none tracking-tight font-mono">
+      <p className="text-label-1 font-medium text-4xl leading-none tracking-tight">
         {startTime}
       </p>
-      <p className="text-label-3 font-medium text-xl leading-none tracking-tight mt-2">
+      <p className="text-label-2 font-medium text-xl leading-none tracking-tight mt-2">
         until {endTime}
       </p>
 
       <div className="flex items-center gap-3 mt-3">
-        <p className="text-sm text-label-3">{formatDuration(duration)}</p>
+        <p className="text-sm text-label-2">{formatDuration(duration)}</p>
         {!hasStarted && (
           <>
             <span className="text-label-4">·</span>
-            <p className="text-sm text-label-3">
-              Starts in <span className="text-label-2 font-medium">{formatDuration(minutesUntil)}</span>
+            <p className="text-sm text-label-2">
+              Starts in <span className="text-label-1 font-medium">{formatDuration(minutesUntil)}</span>
             </p>
           </>
         )}
@@ -73,7 +73,7 @@ export default function ShiftCard({ shifts, serverNow }: { shifts: Shift[]; serv
       </div>
 
       {shift.notes && (
-        <p className="text-sm text-label-3 mt-3 pt-3 border-t border-[#d3c9b2] leading-relaxed">
+        <p className="text-sm text-label-2 mt-3 pt-3 border-t border-[#d3c9b2] leading-relaxed">
           {shift.notes}
         </p>
       )}

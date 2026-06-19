@@ -1,6 +1,8 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
+import { format } from 'date-fns'
+import { formatShiftRange } from '@/lib/utils'
 import EditShiftForm from './EditShiftForm'
 
 export default async function EditShiftPage({ params }: { params: Promise<{ shiftId: string }> }) {
@@ -17,6 +19,11 @@ export default async function EditShiftPage({ params }: { params: Promise<{ shif
 
   if (!shift) notFound()
 
+  const employeeName = (employees ?? []).find(e => e.id === shift.employee_id)?.name ?? ''
+  const firstName = employeeName.trim().split(/\s+/)[0] || 'Shift'
+  const shiftDate = format(new Date(shift.start_time), 'EEE, MMM d')
+  const timeRange = formatShiftRange(shift.start_time, shift.end_time)
+
   return (
     <div className="max-w-lg mx-auto px-6 pb-10 pt-page animate-page-in">
       <Link
@@ -28,7 +35,10 @@ export default async function EditShiftPage({ params }: { params: Promise<{ shif
         </svg>
         Schedule
       </Link>
-      <h1 className="text-2xl font-semibold tracking-tight text-label-1 mb-8">Edit shift</h1>
+      <div className="mb-8">
+        <h1 className="text-3xl font-semibold tracking-tight text-label-1">{firstName}</h1>
+        <p className="text-sm text-label-3 mt-0.5 tracking-[-0.01em]">{shiftDate} · {timeRange}</p>
+      </div>
       <EditShiftForm shift={shift} employees={employees ?? []} />
     </div>
   )

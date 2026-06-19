@@ -34,12 +34,12 @@ export default function WeeklySchedule({ shifts, weekDays, dir }: Props) {
             {/* Day label column */}
             <div className="w-16 flex-shrink-0">
               <p className={`text-xs font-semibold uppercase tracking-widest leading-none ${
-                today ? 'text-label-1' : 'text-label-3'
+                today ? 'text-label-1' : 'text-label-2'
               }`}>
                 {format(day, 'EEE')}
               </p>
               <p className={`text-sm mt-1 ${
-                today ? 'text-label-1 font-semibold' : 'text-label-3'
+                today ? 'text-label-1 font-semibold' : 'text-label-2'
               }`}>
                 {format(day, 'MMM d')}
               </p>
@@ -55,16 +55,16 @@ export default function WeeklySchedule({ shifts, weekDays, dir }: Props) {
               ) : (
                 dayShifts.map(shift => (
                   <div key={shift.id} className="mb-3 last:mb-0">
-                    <p className={`tracking-[-0.01em] font-mono ${
+                    <p className={`tracking-[-0.01em] ${
                       today ? 'text-sm font-semibold text-label-1' : 'text-sm font-medium text-label-2'
                     }`}>
                       {formatTimePST(shift.start_time)} – {formatTimePST(shift.end_time)}
                     </p>
-                    <p className="text-xs text-label-3 mt-0.5 tracking-[-0.01em]">
+                    <p className="text-xs text-label-2 mt-0.5 tracking-[-0.01em]">
                       {formatDuration(calcDurationMinutes(shift.start_time, shift.end_time))}
                     </p>
                     {shift.notes && (
-                      <p className="text-xs text-label-3 mt-1 tracking-[-0.01em] leading-relaxed">{shift.notes}</p>
+                      <p className="text-xs text-label-2 mt-1 tracking-[-0.01em] leading-relaxed">{shift.notes}</p>
                     )}
                   </div>
                 ))

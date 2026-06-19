@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { createShift } from '@/lib/actions/shifts'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
@@ -113,11 +112,6 @@ export default function NewShiftButton({ employees, weekStart }: Props) {
             >
               {saved ? 'Saved' : isPending ? 'Saving…' : 'Create shift'}
             </Button>
-          </div>
-          <div className="pt-1 text-center">
-            <Link href="/admin/templates" className="text-sm text-label-2 underline underline-offset-2 hover:text-label-1 transition-colors tracking-[-0.01em]">
-              Manage templates
-            </Link>
           </div>
         </form>
       </div>

@@ -199,7 +199,7 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
           <p className="text-[1.75rem] font-semibold tracking-tight text-label-1 leading-tight mb-2">
             You forgot to clock out
           </p>
-          <p className="text-label-3 text-sm mb-10 tracking-[-0.01em]">
+          <p className="text-label-2 text-sm mb-10 tracking-[-0.01em]">
             You clocked in on {missedDate} and didn&apos;t clock out.
           </p>
 
@@ -292,25 +292,25 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
         {/* Elapsed time — the centrepiece */}
         <div className="flex-1 flex flex-col items-center justify-center px-6">
           <div
-            className="font-mono font-medium text-white leading-none tracking-tight text-center"
+            className="font-medium text-white leading-none tracking-tight text-center"
             style={{ fontSize: 'clamp(4.5rem, 22vw, 8rem)' }}
             suppressHydrationWarning
           >
             {formatLive(elapsedSeconds)}
           </div>
 
-          <p className="text-white/60 text-sm mt-6 tracking-[-0.01em] font-mono">
+          <p className="text-white/60 text-sm mt-6 tracking-[-0.01em]">
             since {formatTimePST(openEntry!.clock_in)}
           </p>
 
           {todayWorkedMins > 0 && (
-            <p className="text-white/45 text-xs mt-1.5 tracking-[-0.01em] font-mono">
+            <p className="text-white/45 text-xs mt-1.5 tracking-[-0.01em]">
               +{formatDuration(todayWorkedMins)} prior session
             </p>
           )}
 
           {todayShift && (
-            <p className="text-white/60 text-xs mt-2 tracking-[-0.01em] font-mono">
+            <p className="text-white/60 text-xs mt-2 tracking-[-0.01em]">
               {formatTimePST(todayShift.start_time)} – {formatTimePST(todayShift.end_time)}
             </p>
           )}
@@ -394,7 +394,7 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
               <p className="text-[2.75rem] font-semibold tracking-tight text-label-1 leading-tight mb-2">
                 Shift over.
               </p>
-              <p className="text-label-3 text-sm tracking-[-0.01em] font-mono">
+              <p className="text-label-2 text-sm tracking-[-0.01em]">
                 {formatTimePST(todayShift.start_time)} – {formatTimePST(todayShift.end_time)}
               </p>
             </div>
@@ -403,28 +403,28 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
               <p className="text-[2.75rem] font-semibold tracking-tight text-label-1 leading-tight mb-2">
                 Your shift started.
               </p>
-              <p className="text-label-3 text-sm tracking-[-0.01em] font-mono">
+              <p className="text-label-2 text-sm tracking-[-0.01em]">
                 {formatTimePST(todayShift.start_time)} – {formatTimePST(todayShift.end_time)}
               </p>
               {todayShift.notes && (
-                <p className="text-label-3 text-sm mt-3 tracking-[-0.01em]">{todayShift.notes}</p>
+                <p className="text-label-2 text-sm mt-3 tracking-[-0.01em]">{todayShift.notes}</p>
               )}
             </div>
           ) : (
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-widest text-label-3 mb-4">Starts in</p>
               <div
-                className="font-mono text-label-1 leading-none tracking-tight mb-4"
+                className="text-label-1 leading-none tracking-tight mb-4"
                 style={{ fontSize: 'clamp(3.5rem, 18vw, 6rem)' }}
                 suppressHydrationWarning
               >
                 {formatCountdown(liveSecondsUntil || minsUntil * 60)}
               </div>
-              <p className="text-label-3 text-sm tracking-[-0.01em] font-mono">
+              <p className="text-label-2 text-sm tracking-[-0.01em]">
                 {formatTimePST(todayShift.start_time)} – {formatTimePST(todayShift.end_time)}
               </p>
               {todayShift.notes && (
-                <p className="text-label-3 text-sm mt-3 tracking-[-0.01em]">{todayShift.notes}</p>
+                <p className="text-label-2 text-sm mt-3 tracking-[-0.01em]">{todayShift.notes}</p>
               )}
             </div>
           )}
@@ -446,7 +446,7 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
             {isPending ? 'Clocking in…' : 'Clock in'}
           </button>
           {todayWorkedMins > 0 && (
-            <p className="text-center text-xs text-label-3 mt-3 font-mono tracking-[-0.01em] tabular-nums">
+            <p className="text-center text-xs text-label-2 mt-3 tracking-[-0.01em] tabular-nums">
               {formatDuration(todayWorkedMins)} worked today
             </p>
           )}

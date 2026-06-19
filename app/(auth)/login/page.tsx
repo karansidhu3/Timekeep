@@ -19,10 +19,10 @@ export default async function LoginPage() {
       <div className="w-full max-w-sm mx-auto px-6 flex flex-col flex-1">
 
         {/* Wordmark */}
-        <div className="mb-12 animate-fade-in">
-          <div className="flex items-center gap-2.5">
-            <LogoMark size={18} color="#0d0c0b" />
-            <span className="text-sm font-semibold tracking-tight text-label-1">Timekeep</span>
+        <div className="pt-2 animate-fade-in">
+          <div className="flex items-center gap-3">
+            <LogoMark size={22} color="#0d0c0b" />
+            <span className="text-base font-semibold tracking-tight text-label-1">Timekeep</span>
           </div>
         </div>
 

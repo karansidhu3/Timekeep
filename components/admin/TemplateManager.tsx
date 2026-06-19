@@ -211,7 +211,7 @@ export default function TemplateManager({ employees, templates }: Props) {
                       </span>
                       {t ? (
                         <>
-                          <span className="flex-1 text-sm font-medium text-label-1 font-mono tracking-[-0.01em]">
+                          <span className="flex-1 text-sm font-medium text-label-1 tracking-[-0.01em]">
                             {fmt12(t.start_time)} – {fmt12(t.end_time)}
                           </span>
                           {t.notes && (

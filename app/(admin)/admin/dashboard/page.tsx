@@ -90,7 +90,7 @@ export default async function AdminDashboardPage() {
   }
 
   const unscheduledActive = (openEntries ?? []).filter(e => !matchedEmployeeIds.has(e.employee_id))
-  const totalScheduled = (todayShifts ?? []).length
+  const totalScheduled = clockedIn.length + upcoming.length + late.length + done.length
   const totalOnShift = clockedIn.length + unscheduledActive.length
   const hasAnyActivity = totalScheduled > 0 || unscheduledActive.length > 0
 
@@ -176,12 +176,12 @@ export default async function AdminDashboardPage() {
                       >
                         <div className="min-w-0">
                           <p className="text-sm font-semibold text-label-1 tracking-[-0.01em] truncate">{emp?.name}</p>
-                          <p className="text-xs text-label-2 mt-0.5 font-mono tracking-[-0.01em]">
+                          <p className="text-xs text-label-2 mt-0.5 tracking-[-0.01em]">
                             Due at <ClientTime iso={shift.start_time} />
                           </p>
                         </div>
                         <div className="flex items-center gap-2 shrink-0 ml-4">
-                          <p className="text-sm font-medium text-rose-600 font-mono tabular-nums">{formatDuration(minsLate)} late</p>
+                          <p className="text-sm font-medium text-rose-600 tabular-nums">{formatDuration(minsLate)} late</p>
                           <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="text-red-400 flex-shrink-0">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                           </svg>
@@ -231,7 +231,7 @@ export default async function AdminDashboardPage() {
                             <p className="text-sm font-semibold text-label-1 tracking-[-0.01em] truncate">{emp?.name}</p>
                           </div>
                           <div className="flex items-center gap-1.5 shrink-0">
-                            <p className={`text-base font-medium font-mono tabular-nums ${isOvertime ? 'text-orange-600' : 'text-label-1'}`}>
+                            <p className={`text-base font-medium tabular-nums ${isOvertime ? 'text-orange-600' : 'text-label-1'}`}>
                               {formatElapsed(totalTodaySeconds)}
                               {priorMins > 0 && (
                                 <span className="text-[11px] font-normal text-label-3 ml-1">today</span>
@@ -249,7 +249,7 @@ export default async function AdminDashboardPage() {
                               style={{ width: `${Math.round(progress * 100)}%` }}
                             />
                           </div>
-                          <p className="text-xs text-label-2 font-mono tracking-[-0.01em]">
+                          <p className="text-xs text-label-2 tracking-[-0.01em]">
                             {isOvertime ? (
                               <span className="text-orange-600">+{formatDuration(overtimeMins)} over</span>
                             ) : minsLeft <= 60 ? (
@@ -276,11 +276,11 @@ export default async function AdminDashboardPage() {
                             <div className="w-1.5 h-1.5 rounded-full bg-[#4a7c59] flex-shrink-0 animate-pulse-live" />
                             <div className="min-w-0">
                               <p className="text-sm font-semibold text-label-1 tracking-[-0.01em] truncate">{emp?.name}</p>
-                              <p className="text-xs text-label-3 mt-0.5 tracking-[-0.01em]">No shift scheduled</p>
+                              <p className="text-xs text-label-2 mt-0.5 tracking-[-0.01em]">No shift scheduled</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-1.5 shrink-0">
-                            <p className="text-base font-medium text-label-1 font-mono tabular-nums">
+                            <p className="text-base font-medium text-label-1 tabular-nums">
                               {formatElapsed(elapsedSeconds)}
                             </p>
                             <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="text-label-3 flex-shrink-0">
@@ -314,12 +314,12 @@ export default async function AdminDashboardPage() {
                         <div className="flex items-center justify-between gap-4">
                           <div className="min-w-0">
                             <p className="text-sm font-medium text-label-1 tracking-[-0.01em] truncate">{emp?.name}</p>
-                            <p className="text-xs text-label-2 mt-0.5 font-mono tracking-[-0.01em]">
+                            <p className="text-xs text-label-2 mt-0.5 tracking-[-0.01em]">
                               <ClientTime iso={shift.start_time} /> – <ClientTime iso={shift.end_time} />
                             </p>
                           </div>
                           <div className="flex items-center gap-1.5 shrink-0">
-                            <p className="text-sm font-medium text-label-1 font-mono tabular-nums">
+                            <p className="text-sm font-medium text-label-1 tabular-nums">
                               {minsUntil <= 0 ? 'now' : `in ${formatDuration(minsUntil)}`}
                             </p>
                             <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="text-label-3 flex-shrink-0">
@@ -359,17 +359,17 @@ export default async function AdminDashboardPage() {
                         <div className="flex items-center justify-between gap-4">
                           <div className="min-w-0">
                             <p className="text-sm font-semibold text-label-1 tracking-[-0.01em] truncate">{emp?.name}</p>
-                            <p className="text-xs text-label-3 mt-0.5 font-mono tracking-[-0.01em]">
+                            <p className="text-xs text-label-2 mt-0.5 tracking-[-0.01em]">
                               <ClientTime iso={shift.start_time} /> – <ClientTime iso={shift.end_time} />
                             </p>
                           </div>
                           <div className="flex flex-col items-end gap-0.5 shrink-0 ml-4">
-                            <p className="text-sm font-medium text-label-1 font-mono tabular-nums">{formatDuration(workedMins)}</p>
+                            <p className="text-sm font-medium text-label-1 tabular-nums">{formatDuration(workedMins)}</p>
                             {isOver && (
-                              <p className="text-xs text-orange-600 font-mono tabular-nums">+{formatDuration(diffMins)} over</p>
+                              <p className="text-xs text-orange-600 tabular-nums">+{formatDuration(diffMins)} over</p>
                             )}
                             {isShort && (
-                              <p className="text-xs text-rose-600 font-mono tabular-nums">-{formatDuration(Math.abs(diffMins))} short</p>
+                              <p className="text-xs text-rose-600 tabular-nums">-{formatDuration(Math.abs(diffMins))} short</p>
                             )}
                           </div>
                         </div>

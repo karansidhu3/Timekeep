@@ -16,7 +16,7 @@ export default function AdminClockInButton({ employeeId, firstName }: { employee
   }
 
   return (
-    <div className="mt-3">
+    <div className="mt-4">
       <button
         data-spring
         onClick={handleClick}

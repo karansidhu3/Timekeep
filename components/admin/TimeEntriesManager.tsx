@@ -51,6 +51,14 @@ function getInitials(name: string): string {
   return name.trim().split(/\s+/).map(n => n[0]).filter(Boolean).slice(0, 2).join('').toUpperCase()
 }
 
+function getBarColor(pct: number, isOvertime: boolean): string {
+  if (isOvertime) return '#f97316'
+  if (pct >= 0.85) return '#3d6b55'
+  if (pct >= 0.50) return '#5a9970'
+  if (pct >= 0.25) return '#e8b84a'
+  return '#e05555'
+}
+
 interface DateGroup {
   label: string
   dateKey: string
@@ -286,10 +294,10 @@ export default function TimeEntriesManager({ entries, employees, weeklySummaries
     <>
       {/* ── This week summary ──────────────────────────────────────── */}
       {weeklySummaries.length > 0 && (
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-3">
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-label-3">This week</p>
-            <p className="text-xs text-label-3 font-mono tracking-[-0.01em]">{weekLabel}</p>
+            <p className="text-xs text-label-3 tracking-[-0.01em]">{weekLabel}</p>
           </div>
 
           <div className="rounded-xl border border-[#d3c9b2] overflow-hidden [box-shadow:var(--shadow-sm)]">
@@ -301,11 +309,9 @@ export default function TimeEntriesManager({ entries, employees, weeklySummaries
               const overMins = summary.worked_minutes - summary.scheduled_minutes
               const isComplete = !summary.has_active_entry &&
                 summary.worked_minutes >= summary.scheduled_minutes && summary.scheduled_minutes > 0
-              const barColor = isOvertime ? 'bg-amber-400' : summary.has_active_entry ? 'bg-[#4a7c59]' : 'bg-[#141210]'
-
               return (
-                <div key={summary.employee_id} className="px-4 py-3.5 bg-[#f9f4ea] border-b border-[#d3c9b2] last:border-0">
-                  <div className="flex items-center gap-3">
+                <div key={summary.employee_id} className="px-4 py-5 bg-[#f9f4ea] border-b border-[#d3c9b2] last:border-0">
+                  <div className="flex items-center gap-3 mb-3">
                     <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
                       summary.has_active_entry ? 'bg-[#eef4f1]' : 'bg-[#eae3d3]'
                     }`}>
@@ -313,25 +319,26 @@ export default function TimeEntriesManager({ entries, employees, weeklySummaries
                         {getInitials(summary.employee_name)}
                       </span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <p className="text-sm font-medium text-label-1 tracking-[-0.01em]">
-                          {summary.employee_name.split(' ')[0]}
-                        </p>
-                        <div className="flex items-center gap-2">
-                          {isOvertime && <span className="text-[11px] font-medium text-orange-600 font-mono tabular-nums">+{formatDuration(overMins)}</span>}
-                          {isComplete && !isOvertime && <span className="text-[11px] text-label-3">Done</span>}
-                          {summary.has_active_entry && !isOvertime && <span className="text-[11px] font-semibold text-[#3d6b55]">Active</span>}
-                          <span className="text-xs font-mono tabular-nums">
-                            <span className="text-label-2">{formatDuration(summary.worked_minutes)}</span>
-                            <span className="text-label-4"> / {formatDuration(summary.scheduled_minutes)}</span>
-                          </span>
-                        </div>
-                      </div>
-                      <div className="h-0.5 bg-[#eae3d3] rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full ${barColor} transition-all duration-500`} style={{ width: `${pct * 100}%` }} />
+                    <div className="flex-1 min-w-0 flex items-center justify-between">
+                      <p className="text-sm font-semibold text-label-1 tracking-[-0.01em]">
+                        {summary.employee_name.split(' ')[0]}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        {isOvertime && <span className="text-xs font-semibold text-orange-600 tabular-nums">+{formatDuration(overMins)}</span>}
+                        {isComplete && !isOvertime && <span className="text-xs text-label-2">Done</span>}
+                        {summary.has_active_entry && !isOvertime && <span className="text-xs font-semibold text-[#3d6b55]">Active</span>}
+                        <span className="tabular-nums">
+                          <span className="text-sm text-label-1 font-semibold">{formatDuration(summary.worked_minutes)}</span>
+                          <span className="text-xs text-label-2"> / {formatDuration(summary.scheduled_minutes)}</span>
+                        </span>
                       </div>
                     </div>
+                  </div>
+                  <div className="h-2 bg-[#eae3d3] rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{ width: `${pct * 100}%`, backgroundColor: getBarColor(pct, isOvertime) }}
+                    />
                   </div>
                 </div>
               )
@@ -340,9 +347,8 @@ export default function TimeEntriesManager({ entries, employees, weeklySummaries
         </div>
       )}
 
-      {/* ── Header row ─────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between mb-5">
-        <p className="text-[11px] font-semibold uppercase tracking-widest text-label-3">All entries</p>
+      {/* ── Log header ─────────────────────────────────────────────── */}
+      <div className="flex items-center justify-end pt-5 mb-6 border-t border-[#d3c9b2]">
         <Button size="sm" variant="secondary" onClick={() => setAddOpen(true)}>+ Add entry</Button>
       </div>
 
@@ -351,12 +357,12 @@ export default function TimeEntriesManager({ entries, employees, weeklySummaries
       )}
 
       {/* ── Date groups ─────────────────────────────────────────────── */}
-      <div className="space-y-6">
+      <div className="space-y-8">
         {firstGroups.map(group => (
           <div key={group.dateKey}>
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-semibold text-label-1 tracking-[-0.01em]">{group.label}</p>
-              <p className="text-xs text-label-3 font-mono tabular-nums">{formatDuration(group.totalMinutes)}</p>
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-base font-semibold text-label-1 tracking-[-0.02em]">{group.label}</p>
+              <p className="text-sm text-label-2 tabular-nums">{formatDuration(group.totalMinutes)}</p>
             </div>
 
             {/* Mobile list */}
@@ -368,28 +374,35 @@ export default function TimeEntriesManager({ entries, employees, weeklySummaries
                   <button
                     key={entry.id}
                     onClick={() => setEditEntry(entry)}
-                    className={`w-full text-left px-4 py-4 border-b border-[#d3c9b2] last:border-0 active:brightness-95 transition-all ${
+                    className={`w-full text-left px-4 py-3.5 border-b border-[#d3c9b2] last:border-0 active:brightness-95 transition-all ${
                       forgotten ? 'border-l-2 border-amber-400 bg-[#fffdf7]'
                         : isActive ? 'border-l-2 border-[#4a7c59] bg-[#eef4f1]' : 'bg-[#f9f4ea]'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <p className="text-sm font-medium text-label-1 tracking-[-0.01em]">{entry.employee_name}</p>
-                      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="text-label-3 shrink-0">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                      </svg>
+                      <p className="text-sm font-semibold text-label-1 tracking-[-0.01em]">{entry.employee_name}</p>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {forgotten ? (
+                          <span className="text-xs font-semibold text-orange-600">Needs review</span>
+                        ) : isActive ? (
+                          <span className="text-xs font-semibold text-[#3d6b55]">Active</span>
+                        ) : (
+                          <span className="text-sm font-semibold text-label-1 tabular-nums">
+                            {formatDuration(calcDurationMinutes(entry.clock_in, entry.clock_out))}
+                          </span>
+                        )}
+                        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="text-label-4 shrink-0">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                        </svg>
+                      </div>
                     </div>
-                    <p className="text-xs text-label-3 mt-1 font-mono tabular-nums tracking-[-0.01em]">
+                    <p className="text-xs text-label-3 mt-0.5 tracking-[-0.01em]">
                       {formatTimePST(entry.clock_in)}{' – '}
                       {entry.clock_out ? formatTimePST(entry.clock_out) : (
-                        <span className={forgotten ? 'text-orange-600 font-medium' : 'text-[#3d6b55] font-medium'}>
-                          {forgotten ? 'needs review' : 'now'}
+                        <span className={forgotten ? 'text-orange-600' : 'text-[#3d6b55]'}>
+                          {forgotten ? '?' : 'now'}
                         </span>
                       )}
-                    </p>
-                    <p className="text-sm font-medium text-label-1 mt-0.5 font-mono tabular-nums">
-                      {formatDuration(calcDurationMinutes(entry.clock_in, entry.clock_out))}
-                      {forgotten && <span className="text-orange-600 text-[11px] font-semibold ml-1.5 font-sans">Needs review</span>}
                     </p>
                   </button>
                 )
@@ -422,8 +435,8 @@ export default function TimeEntriesManager({ entries, employees, weeklySummaries
                         }`}
                       >
                         <td className="px-4 py-3 text-label-1 font-semibold tracking-[-0.01em]">{entry.employee_name}</td>
-                        <td className="px-4 py-3 text-label-2 font-mono tabular-nums">{formatTimePST(entry.clock_in)}</td>
-                        <td className="px-4 py-3 font-mono tabular-nums">
+                        <td className="px-4 py-3 text-label-2 tabular-nums">{formatTimePST(entry.clock_in)}</td>
+                        <td className="px-4 py-3 tabular-nums">
                           {entry.clock_out ? (
                             <span className="text-label-2">{formatTimePST(entry.clock_out)}</span>
                           ) : forgotten ? (
@@ -432,7 +445,7 @@ export default function TimeEntriesManager({ entries, employees, weeklySummaries
                             <span className="text-[#3d6b55] font-semibold text-xs font-sans">Active</span>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-label-1 font-medium font-mono tabular-nums">
+                        <td className="px-4 py-3 text-label-1 font-medium tabular-nums">
                           {formatDuration(calcDurationMinutes(entry.clock_in, entry.clock_out))}
                         </td>
                         <td className="px-4 py-3 text-right">
@@ -461,12 +474,12 @@ export default function TimeEntriesManager({ entries, employees, weeklySummaries
           }}
         >
           <div style={{ overflow: 'hidden' }}>
-            <div className="space-y-6 pt-6">
+            <div className="space-y-8 pt-8">
               {extraGroups.map(group => (
                 <div key={group.dateKey}>
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-sm font-semibold text-label-1 tracking-[-0.01em]">{group.label}</p>
-                    <p className="text-xs text-label-3 font-mono tabular-nums">{formatDuration(group.totalMinutes)}</p>
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-base font-semibold text-label-1 tracking-[-0.02em]">{group.label}</p>
+                    <p className="text-sm text-label-2 tabular-nums">{formatDuration(group.totalMinutes)}</p>
                   </div>
                   <div className="md:hidden rounded-xl border border-[#d3c9b2] overflow-hidden [box-shadow:var(--shadow-sm)]">
                     {group.entries.map(entry => {
@@ -476,27 +489,35 @@ export default function TimeEntriesManager({ entries, employees, weeklySummaries
                         <button
                           key={entry.id}
                           onClick={() => setEditEntry(entry)}
-                          className={`w-full text-left px-4 py-4 border-b border-[#d3c9b2] last:border-0 active:brightness-95 transition-all ${
+                          className={`w-full text-left px-4 py-3.5 border-b border-[#d3c9b2] last:border-0 active:brightness-95 transition-all ${
                             forgotten ? 'border-l-2 border-amber-400 bg-[#fffdf7]'
                               : isActive ? 'border-l-2 border-[#4a7c59] bg-[#eef4f1]' : 'bg-[#f9f4ea]'
                           }`}
                         >
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-sm font-medium text-label-1 tracking-[-0.01em]">{entry.employee_name}</p>
-                            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="text-label-3 shrink-0">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                            </svg>
+                            <p className="text-sm font-semibold text-label-1 tracking-[-0.01em]">{entry.employee_name}</p>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              {forgotten ? (
+                                <span className="text-xs font-semibold text-orange-600">Needs review</span>
+                              ) : isActive ? (
+                                <span className="text-xs font-semibold text-[#3d6b55]">Active</span>
+                              ) : (
+                                <span className="text-sm font-semibold text-label-1 tabular-nums">
+                                  {formatDuration(calcDurationMinutes(entry.clock_in, entry.clock_out))}
+                                </span>
+                              )}
+                              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="text-label-4 shrink-0">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                              </svg>
+                            </div>
                           </div>
-                          <p className="text-xs text-label-3 mt-1 font-mono tabular-nums tracking-[-0.01em]">
+                          <p className="text-xs text-label-3 mt-0.5 tracking-[-0.01em]">
                             {formatTimePST(entry.clock_in)}{' – '}
                             {entry.clock_out ? formatTimePST(entry.clock_out) : (
-                              <span className={forgotten ? 'text-orange-600 font-medium' : 'text-[#3d6b55] font-medium'}>
-                                {forgotten ? 'needs review' : 'now'}
+                              <span className={forgotten ? 'text-orange-600' : 'text-[#3d6b55]'}>
+                                {forgotten ? '?' : 'now'}
                               </span>
                             )}
-                          </p>
-                          <p className="text-sm font-medium text-label-1 mt-0.5 font-mono tabular-nums">
-                            {formatDuration(calcDurationMinutes(entry.clock_in, entry.clock_out))}
                           </p>
                         </button>
                       )
@@ -518,8 +539,8 @@ export default function TimeEntriesManager({ entries, employees, weeklySummaries
                               }`}
                             >
                               <td className="px-4 py-3 text-label-2 font-medium tracking-[-0.01em]">{entry.employee_name}</td>
-                              <td className="px-4 py-3 text-label-1 font-mono tabular-nums">{formatTimePST(entry.clock_in)}</td>
-                              <td className="px-4 py-3 font-mono tabular-nums">
+                              <td className="px-4 py-3 text-label-1 tabular-nums">{formatTimePST(entry.clock_in)}</td>
+                              <td className="px-4 py-3 tabular-nums">
                                 {entry.clock_out ? (
                                   <span className="text-label-1">{formatTimePST(entry.clock_out)}</span>
                                 ) : forgotten ? (
@@ -528,7 +549,7 @@ export default function TimeEntriesManager({ entries, employees, weeklySummaries
                                   <span className="text-[#3d6b55] font-semibold text-xs font-sans">Active</span>
                                 )}
                               </td>
-                              <td className="px-4 py-3 text-label-1 font-medium font-mono tabular-nums">
+                              <td className="px-4 py-3 text-label-1 font-medium tabular-nums">
                                 {formatDuration(calcDurationMinutes(entry.clock_in, entry.clock_out))}
                               </td>
                               <td className="px-4 py-3 text-right">

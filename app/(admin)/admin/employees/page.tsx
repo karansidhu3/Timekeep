@@ -38,7 +38,7 @@ export default async function EmployeesPage() {
             <Link
               key={emp.id}
               href={`/admin/employees/${emp.id}`}
-              className="flex items-center justify-between px-4 py-3.5 bg-[#f9f4ea] border-b border-[#d3c9b2]
+              className="flex items-center justify-between px-4 py-4 bg-[#f9f4ea] border-b border-[#d3c9b2]
                 last:border-0 hover:bg-[#f2ece2] active:bg-[#eae3d3] transition-colors duration-150 group"
             >
               <div className="flex items-center gap-3 min-w-0">

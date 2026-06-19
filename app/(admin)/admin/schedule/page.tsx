@@ -5,7 +5,7 @@ import { getWeekRange, formatShiftRange, weekdayIndexPST } from '@/lib/utils'
 import Link from 'next/link'
 import AdminWeekNav from '@/components/admin/AdminWeekNav'
 import NewShiftButton from '@/components/admin/NewShiftButton'
-import ApplyTemplateButton from '@/components/admin/ApplyTemplateButton'
+import ScheduleOptionsMenu from '@/components/admin/ScheduleOptionsMenu'
 
 function fmtMinutes(mins: number): string {
   const h = Math.floor(mins / 60)
@@ -67,36 +67,30 @@ export default async function AdminSchedulePage({
 
       {/* ── Header ───────────────────────────────────────────────────── */}
       <div className="mb-6">
-        {/* Row 1: Title + primary action — separated ends, no collision */}
+        {/* Row 1: Title + options menu + primary action */}
         <div className="flex items-center justify-between mb-3">
           <h1 className="text-3xl font-semibold tracking-tight text-label-1">Schedule</h1>
-          <NewShiftButton employees={employees ?? []} weekStart={start.toISOString()} />
-        </div>
-        {/* Row 2: Week nav (left) + secondary actions (right) */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <AdminWeekNav weekOffset={weekOffset} />
-            <p className="text-sm text-label-3 tracking-[-0.01em]">
-              {format(start, 'MMM d')} – {format(end, 'MMM d')}
-              {shiftCount > 0 && (
-                <span className="ml-1.5">· {shiftCount} {shiftCount !== 1 ? 'shifts' : 'shift'}</span>
-              )}
-            </p>
-          </div>
-          <div className="hidden sm:block">
-            <ApplyTemplateButton templates={templates ?? []} weekStart={start} />
+          <div className="flex items-center gap-2">
+            <ScheduleOptionsMenu templates={templates ?? []} weekStart={start} />
+            <NewShiftButton employees={employees ?? []} weekStart={start.toISOString()} />
           </div>
         </div>
-        {/* Apply template — mobile only */}
-        <div className="sm:hidden mt-2.5">
-          <ApplyTemplateButton templates={templates ?? []} weekStart={start} />
+        {/* Row 2: Week nav + date range */}
+        <div className="flex items-center gap-2.5">
+          <AdminWeekNav weekOffset={weekOffset} />
+          <p className="text-sm text-label-2 tracking-[-0.01em]">
+            {format(start, 'MMM d')} – {format(end, 'MMM d')}
+            {shiftCount > 0 && (
+              <span className="ml-1.5">· {shiftCount} {shiftCount !== 1 ? 'shifts' : 'shift'}</span>
+            )}
+          </p>
         </div>
       </div>
 
       {(employees ?? []).length === 0 ? (
         <p className={`text-sm text-label-3 py-4 ${!dir ? 'animate-page-in' : ''}`}>No employees yet.</p>
       ) : (
-        <div className={`space-y-3 ${dir === 'next' ? 'animate-slide-right' : dir === 'prev' ? 'animate-slide-left' : 'animate-page-in'}`}>
+        <div className={`space-y-5 ${dir === 'next' ? 'animate-slide-right' : dir === 'prev' ? 'animate-slide-left' : 'animate-page-in'}`}>
           {weekDays.map((day, i) => {
             const isToday = isSameDay(day, today)
             const dayShifts = dayShiftsMap.get(i) ?? []
@@ -143,7 +137,7 @@ export default async function AdminSchedulePage({
                             <p className="text-sm text-label-2 tracking-[-0.01em]">
                               {formatShiftRange(shift.start_time, shift.end_time)}
                             </p>
-                            <p className="text-xs text-label-2 font-mono tabular-nums w-7 text-right">
+                            <p className="text-xs text-label-2 tabular-nums w-7 text-right">
                               {fmtMinutes(mins)}
                             </p>
                             <svg
