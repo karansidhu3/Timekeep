@@ -13,8 +13,8 @@ export default async function LoginPage() {
 
   return (
     <div
-      className="min-h-screen bg-[#f2ece2] flex flex-col"
-      style={{ paddingTop: 'max(2rem, env(safe-area-inset-top, 0px))', paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 0px))' }}
+      className="bg-[#f2ece2] flex flex-col overflow-hidden"
+      style={{ height: '100dvh', paddingTop: 'max(2rem, env(safe-area-inset-top, 0px))', paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 0px))' }}
     >
       <div className="w-full max-w-sm mx-auto px-6 flex flex-col flex-1">
 
