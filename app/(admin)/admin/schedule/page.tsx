@@ -52,7 +52,7 @@ export default async function AdminSchedulePage({
   // First name lookup
   const nameMap = new Map((employees ?? []).map(e => [e.id, e.name.trim().split(/\s+/)[0]]))
 
-  // Group shifts by day index (0=Mon … 6=Sun)
+  // Group shifts by day index (0=Sun … 6=Sat)
   const dayShiftsMap = new Map<number, ShiftRow[]>()
   for (const shift of (shifts ?? []) as ShiftRow[]) {
     const dayIdx = weekdayIndexPST(shift.start_time)

@@ -29,13 +29,13 @@ export function compactTimePST(iso: string): string {
   return `${timeStr}${period}`
 }
 
-// 0=Mon … 6=Sun, evaluated in PST
+// 0=Sun … 6=Sat, evaluated in PST
 export function weekdayIndexPST(iso: string): number {
   const short = new Intl.DateTimeFormat('en-US', {
     timeZone: TZ,
     weekday: 'short',
   }).format(new Date(iso))
-  const map: Record<string, number> = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 }
+  const map: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 }
   return map[short] ?? 0
 }
 
@@ -94,15 +94,15 @@ export function getWeekRange(weekOffset = 0): { start: Date; end: Date } {
   const tz = 'America/Los_Angeles'
   const now = new Date()
 
-  // Find Monday of the current PST week, then apply offset
+  // Find Sunday of the current PST week, then apply offset
   const dowMap: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 }
-  const pstDow = dowMap[now.toLocaleDateString('en-US', { timeZone: tz, weekday: 'short' })] ?? 1
-  const daysSinceMonday = pstDow === 0 ? 6 : pstDow - 1
-  const approxMondayMs = now.getTime() - daysSinceMonday * 86400000 + weekOffset * 7 * 86400000
-  const approxSundayMs = approxMondayMs + 6 * 86400000
+  const pstDow = dowMap[now.toLocaleDateString('en-US', { timeZone: tz, weekday: 'short' })] ?? 0
+  const daysSinceSunday = pstDow
+  const approxSundayMs = now.getTime() - daysSinceSunday * 86400000 + weekOffset * 7 * 86400000
+  const approxSaturdayMs = approxSundayMs + 6 * 86400000
 
-  const mondayStr = new Date(approxMondayMs).toLocaleDateString('en-CA', { timeZone: tz })
-  const sundayStr = new Date(approxSundayMs).toLocaleDateString('en-CA', { timeZone: tz })
+  const sundayStr  = new Date(approxSundayMs).toLocaleDateString('en-CA', { timeZone: tz })
+  const saturdayStr = new Date(approxSaturdayMs).toLocaleDateString('en-CA', { timeZone: tz })
 
   // Returns the UTC timestamp corresponding to midnight PST/PDT on the given date,
   // correctly handling DST by trying UTC-7 (PDT) then UTC-8 (PST).
@@ -114,8 +114,8 @@ export function getWeekRange(weekOffset = 0): { start: Date; end: Date } {
     return new Date(`${dateStr}T08:00:00Z`)
   }
 
-  const start = pstMidnight(mondayStr)
-  const end = new Date(pstMidnight(sundayStr).getTime() + 24 * 3600000 - 1)
+  const start = pstMidnight(sundayStr)
+  const end = new Date(pstMidnight(saturdayStr).getTime() + 24 * 3600000 - 1)
   return { start, end }
 }
 
@@ -129,6 +129,6 @@ export function smartDate(iso: string): string {
   const d = new Date(iso)
   if (isToday(d)) return format(d, 'h:mm a')
   if (isYesterday(d)) return `Yesterday · ${format(d, 'h:mm a')}`
-  if (isThisWeek(d, { weekStartsOn: 1 })) return format(d, 'EEE · h:mm a')
+  if (isThisWeek(d, { weekStartsOn: 0 })) return format(d, 'EEE · h:mm a')
   return format(d, 'MMM d · h:mm a')
 }

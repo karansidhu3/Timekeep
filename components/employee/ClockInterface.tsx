@@ -56,9 +56,14 @@ function toLocalDate(iso: string) {
 
 const HOLD_DURATION = 700
 
+// Set to true (alongside ENFORCE_LOCATION in lib/actions/time-entries.ts) to require
+// GPS proximity to clock in. Configure WORK_LAT / WORK_LNG / WORK_RADIUS_METERS in Vercel.
+const ENFORCE_LOCATION = false
+
 export default function ClockInterface({ shifts, openEntry, serverNow, employeeName, todayWorkedMins = 0 }: Props) {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const [isLocating, setIsLocating] = useState(false)
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0)
   const [fixTime, setFixTime] = useState('')
   const [holdProgress, setHoldProgress] = useState(0)
@@ -112,6 +117,30 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
 
   function handleClockIn() {
     setError(null)
+    if (ENFORCE_LOCATION) {
+      if (!navigator.geolocation) {
+        setError('Location access is required to clock in. Please use Chrome or Safari.')
+        return
+      }
+      setIsLocating(true)
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setIsLocating(false)
+          startTransition(async () => {
+            const result = await clockIn({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+            if (!result.success) setError(result.error ?? 'Failed to clock in')
+          })
+        },
+        (err) => {
+          setIsLocating(false)
+          setError(err.code === 1
+            ? 'Location access denied. Enable location in your browser settings to clock in.'
+            : 'Could not get your location. Please try again.')
+        },
+        { timeout: 10000, maximumAge: 60000 }
+      )
+      return
+    }
     startTransition(async () => {
       const result = await clockIn()
       if (!result.success) setError(result.error ?? 'Failed to clock in')
@@ -184,7 +213,7 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
       >
         <div className="flex justify-end mb-2">
           <form action={signOut}>
-            <button className="text-xs font-medium text-label-3 hover:text-label-2 px-3 py-2 rounded-xl hover:bg-[#eae3d3] active:bg-[#ddd4be] transition-colors duration-150 tracking-[-0.01em]">
+            <button className="px-3 py-2 text-sm font-medium text-label-1 rounded-xl bg-[#eae3d3] hover:bg-[#ddd4be] active:bg-[#d3c9b2] transition-colors duration-150 tracking-[-0.01em]">
               Sign out
             </button>
           </form>
@@ -283,7 +312,7 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
             </span>
           </div>
           <form action={signOut}>
-            <button className="text-xs font-medium text-white/50 hover:text-white/70 px-2 py-1.5 rounded-xl transition-colors duration-150 tracking-[-0.01em]">
+            <button className="px-3 py-2 text-sm font-medium text-white/60 rounded-xl bg-white/[0.08] hover:bg-white/[0.13] active:bg-white/[0.18] transition-colors duration-150 tracking-[-0.01em]">
               Sign out
             </button>
           </form>
@@ -369,88 +398,89 @@ export default function ClockInterface({ shifts, openEntry, serverNow, employeeN
         paddingBottom: 'calc(4.5rem + max(1rem, env(safe-area-inset-bottom, 0px)))',
       }}
     >
-      <div className="flex-1 flex flex-col justify-between max-w-sm mx-auto w-full">
+      <div className="flex-1 flex flex-col max-w-sm mx-auto w-full">
 
         {/* Top: greeting + sign out */}
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium text-label-2 tracking-[-0.01em]">{firstName}</p>
           <form action={signOut}>
-            <button className="text-xs font-medium text-label-3 hover:text-label-2 px-3 py-2 rounded-xl hover:bg-[#eae3d3] active:bg-[#ddd4be] transition-colors duration-150 tracking-[-0.01em]">
+            <button className="px-3 py-2 text-sm font-medium text-label-1 rounded-xl bg-[#eae3d3] hover:bg-[#ddd4be] active:bg-[#d3c9b2] transition-colors duration-150 tracking-[-0.01em]">
               Sign out
             </button>
           </form>
         </div>
 
-        {/* Middle: state content */}
-        <div className="flex flex-col">
-          {!todayShift ? (
-            <div>
-              <p className="text-[2.75rem] font-semibold tracking-tight text-label-1 leading-tight mb-2">
-                Off today.
-              </p>
-              <p className="text-label-3 text-sm tracking-[-0.01em]">No shift scheduled.</p>
-            </div>
-          ) : shiftIsOver ? (
-            <div>
-              <p className="text-[2.75rem] font-semibold tracking-tight text-label-1 leading-tight mb-2">
-                Shift over.
-              </p>
-              <p className="text-label-2 text-sm tracking-[-0.01em]">
-                {formatTimePST(todayShift.start_time)} – {formatTimePST(todayShift.end_time)}
-              </p>
-            </div>
-          ) : shiftHasStarted ? (
-            <div>
-              <p className="text-[2.75rem] font-semibold tracking-tight text-label-1 leading-tight mb-2">
-                Your shift started.
-              </p>
-              <p className="text-label-2 text-sm tracking-[-0.01em]">
-                {formatTimePST(todayShift.start_time)} – {formatTimePST(todayShift.end_time)}
-              </p>
-              {todayShift.notes && (
-                <p className="text-label-2 text-sm mt-3 tracking-[-0.01em]">{todayShift.notes}</p>
-              )}
-            </div>
-          ) : (
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-label-3 mb-4">Starts in</p>
-              <div
-                className="text-label-1 leading-none tracking-tight mb-4"
-                style={{ fontSize: 'clamp(3.5rem, 18vw, 6rem)' }}
-                suppressHydrationWarning
-              >
-                {formatCountdown(liveSecondsUntil || minsUntil * 60)}
+        {/* Center: state content + action grouped and vertically centered */}
+        <div className="flex-1 flex flex-col justify-center">
+          <div className="flex flex-col">
+            {!todayShift ? (
+              <div>
+                <p className="text-[2.75rem] font-semibold tracking-tight text-label-1 leading-tight mb-2">
+                  Off today.
+                </p>
+                <p className="text-label-3 text-sm tracking-[-0.01em]">No shift scheduled.</p>
               </div>
-              <p className="text-label-2 text-sm tracking-[-0.01em]">
-                {formatTimePST(todayShift.start_time)} – {formatTimePST(todayShift.end_time)}
+            ) : shiftIsOver ? (
+              <div>
+                <p className="text-[2.75rem] font-semibold tracking-tight text-label-1 leading-tight mb-2">
+                  Shift over.
+                </p>
+                <p className="text-label-2 text-sm tracking-[-0.01em]">
+                  {formatTimePST(todayShift.start_time)} – {formatTimePST(todayShift.end_time)}
+                </p>
+              </div>
+            ) : shiftHasStarted ? (
+              <div>
+                <p className="text-[2.75rem] font-semibold tracking-tight text-label-1 leading-tight mb-2">
+                  Your shift started.
+                </p>
+                <p className="text-label-2 text-sm tracking-[-0.01em]">
+                  {formatTimePST(todayShift.start_time)} – {formatTimePST(todayShift.end_time)}
+                </p>
+                {todayShift.notes && (
+                  <p className="text-label-2 text-sm mt-3 tracking-[-0.01em]">{todayShift.notes}</p>
+                )}
+              </div>
+            ) : (
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-label-3 mb-4">Starts in</p>
+                <div
+                  className="text-label-1 leading-none tracking-tight mb-4"
+                  style={{ fontSize: 'clamp(3.5rem, 18vw, 6rem)' }}
+                  suppressHydrationWarning
+                >
+                  {formatCountdown(liveSecondsUntil || minsUntil * 60)}
+                </div>
+                <p className="text-label-2 text-sm tracking-[-0.01em]">
+                  {formatTimePST(todayShift.start_time)} – {formatTimePST(todayShift.end_time)}
+                </p>
+                {todayShift.notes && (
+                  <p className="text-label-2 text-sm mt-3 tracking-[-0.01em]">{todayShift.notes}</p>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Action */}
+          <div className="mt-10">
+            {error && <p className="text-sm text-red-500 mb-4 tracking-[-0.01em]">{error}</p>}
+            <button
+              data-spring
+              onClick={handleClockIn}
+              disabled={isPending || isLocating}
+              className="w-full h-14 rounded-2xl bg-[#4a7c59] text-white font-medium text-[15px]
+                tracking-[-0.01em] transition-colors duration-150
+                hover:bg-[#3d6b55] active:bg-[#2f5443]
+                disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {isPending ? 'Clocking in…' : isLocating ? 'Getting location…' : 'Clock in'}
+            </button>
+            {todayWorkedMins > 0 && (
+              <p className="text-center text-xs text-label-2 mt-3 tracking-[-0.01em] tabular-nums">
+                {formatDuration(todayWorkedMins)} worked today
               </p>
-              {todayShift.notes && (
-                <p className="text-label-2 text-sm mt-3 tracking-[-0.01em]">{todayShift.notes}</p>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Bottom: action */}
-        <div>
-          {error && <p className="text-sm text-red-500 mb-4 tracking-[-0.01em]">{error}</p>}
-
-          <button
-            data-spring
-            onClick={handleClockIn}
-            disabled={isPending}
-            className="w-full h-14 rounded-2xl bg-[#4a7c59] text-white font-medium text-[15px]
-              tracking-[-0.01em] transition-colors duration-150
-              hover:bg-[#3d6b55] active:bg-[#2f5443]
-              disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            {isPending ? 'Clocking in…' : 'Clock in'}
-          </button>
-          {todayWorkedMins > 0 && (
-            <p className="text-center text-xs text-label-2 mt-3 tracking-[-0.01em] tabular-nums">
-              {formatDuration(todayWorkedMins)} worked today
-            </p>
-          )}
+            )}
+          </div>
         </div>
 
       </div>

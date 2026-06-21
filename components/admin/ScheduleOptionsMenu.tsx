@@ -42,7 +42,7 @@ export default function ScheduleOptionsMenu({ templates, weekStart }: Props) {
     setStatus(null)
     startTransition(async () => {
       const shifts = templates.map(t => {
-        const shiftDay = addDays(weekStart, t.day_of_week - 1)
+        const shiftDay = addDays(weekStart, t.day_of_week % 7)
         const [startH, startM] = t.start_time.split(':').map(Number)
         const [endH, endM]     = t.end_time.split(':').map(Number)
         const start = new Date(shiftDay)
