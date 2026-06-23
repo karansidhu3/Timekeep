@@ -45,7 +45,7 @@ export default async function DashboardPage() {
       new Date(e.clock_in).toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' }) === todayStrLA
     )
     .reduce((sum, e) =>
-      sum + Math.floor((new Date(e.clock_out!).getTime() - new Date(e.clock_in).getTime()) / 60000)
+      sum + Math.ceil((new Date(e.clock_out!).getTime() - new Date(e.clock_in).getTime()) / 60000)
     , 0)
 
   return (
