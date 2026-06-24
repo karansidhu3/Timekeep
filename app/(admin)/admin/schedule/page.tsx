@@ -1,6 +1,6 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { format, eachDayOfInterval, isSameDay, differenceInMinutes } from 'date-fns'
+import { format, addDays, isSameDay, differenceInMinutes } from 'date-fns'
 import { getWeekRange, formatShiftRange, weekdayIndexPST } from '@/lib/utils'
 import Link from 'next/link'
 import AdminWeekNav from '@/components/admin/AdminWeekNav'
@@ -44,7 +44,7 @@ export default async function AdminSchedulePage({
       .select('employee_id, day_of_week, start_time, end_time, notes'),
   ])
 
-  const weekDays = eachDayOfInterval({ start, end })
+  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(start, i))
   const shiftCount = (shifts ?? []).length
 
   type ShiftRow = { id: string; start_time: string; end_time: string; notes: string | null; employee_id: string }
