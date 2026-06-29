@@ -6,6 +6,7 @@ import ClientDate from '@/components/ui/ClientDate'
 import CountUp from '@/components/ui/CountUp'
 import { signOut } from '@/lib/actions/auth'
 import { formatElapsed, formatDuration } from '@/lib/utils'
+import { classifyShifts, type ShiftRow, type OpenEntry } from '@/lib/classify-shifts'
 
 export default async function AdminDashboardPage() {
   const supabase = await createServerClient()
@@ -48,48 +49,12 @@ export default async function AdminDashboardPage() {
   // Employees who have at least one completed session today (clocked in AND out today)
   const doneEmployeeIds = new Set<string>(priorMinsByEmployee.keys())
 
-  const openByEmployee = new Map<string, { id: string; clock_in: string }>()
-  for (const e of openEntries ?? []) {
-    openByEmployee.set(e.employee_id, { id: e.id, clock_in: e.clock_in })
-  }
-
-  const LATE_THRESHOLD_MS = 15 * 60 * 1000
-
-  type ShiftRow = {
-    id: string; start_time: string; end_time: string
-    notes: string | null; employee_id: string; employees: unknown
-  }
-
-  const clockedIn:  { shift: ShiftRow; entry: { id: string; clock_in: string } }[] = []
-  const upcoming:   ShiftRow[] = []
-  const late:       ShiftRow[] = []
-  const done:       ShiftRow[] = []
-  const matchedEmployeeIds = new Set<string>()
-
-  for (const shift of (todayShifts ?? []) as ShiftRow[]) {
-    const shiftDateLA = new Date(shift.start_time).toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' })
-    if (shiftDateLA !== todayLA) continue
-
-    const entry = openByEmployee.get(shift.employee_id)
-    if (entry) {
-      clockedIn.push({ shift, entry })
-      matchedEmployeeIds.add(shift.employee_id)
-    } else {
-      const shiftStart = new Date(shift.start_time)
-      if (doneEmployeeIds.has(shift.employee_id) && shiftStart <= now) {
-        // Already worked today and shift has started — treat as completed
-        done.push(shift)
-      } else if (shiftStart > now) {
-        upcoming.push(shift)
-      } else if (now.getTime() - shiftStart.getTime() > LATE_THRESHOLD_MS) {
-        late.push(shift)
-      } else {
-        upcoming.push(shift)
-      }
-    }
-  }
-
-  const unscheduledActive = (openEntries ?? []).filter(e => !matchedEmployeeIds.has(e.employee_id))
+  const { clockedIn, upcoming, late, done, unscheduledActive } = classifyShifts(
+    (todayShifts ?? []) as ShiftRow[],
+    (openEntries ?? []) as OpenEntry[],
+    doneEmployeeIds,
+    now,
+  )
   const totalScheduled = clockedIn.length + upcoming.length + late.length + done.length
   const totalOnShift = clockedIn.length + unscheduledActive.length
   const hasAnyActivity = totalScheduled > 0 || unscheduledActive.length > 0
